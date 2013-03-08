@@ -1,0 +1,40 @@
+LaTeX class: menukey v1.1
+-------------------------------------------------
+Tobias Weh (www.tobias-weh.de)
+2012/02/27
+
+This package is design to format menu sequences,
+paths and keyboard shortcuts automatically.
+There are servals predefined styles and one
+can define his own styles
+
+License:
+This material is subject to the LaTeX Project
+Public License. See http://www.ctan.org/tex-
+archive/help/Catalogue/licenses.lppl.html for
+the details of that license.
+
+Files:
+* README            - this file
+* menukeys.dtx      - source file
+* menukeys.ins      - install file
+* menukeys.pdf      - documentation
+
+Istall:
+Use your TeX update manager oder do it manually:
+Navigate to the folder that contains menukeys.ins
+and call
+
+   latex menukeys.ins
+
+That gives you the file menukeys.sty which should
+be moved somewhere TeX can find it (e.g.
+$TEXMFHOME/tex/latex/musuos/musuos.cls)
+
+To typeset the manual call
+
+    pdflatex menukeys.dtx
+    makeindex -s gglo.ist -o menukeys.gls menukeys.glo
+    makeindex -s gind.ist -o menukeys.ind menukeys.idx
+    pdflatex menukeys.dtx
+    pdflatex menukeys.dtx
