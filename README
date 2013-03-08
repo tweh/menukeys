@@ -1,12 +1,19 @@
-LaTeX class: menukey v1.1
--------------------------------------------------
-Tobias Weh (www.tobias-weh.de)
-2012/02/27
 
-This package is design to format menu sequences,
-paths and keyboard shortcuts automatically.
-There are servals predefined styles and one
-can define his own styles
+
+                 M E N U K E Y S
+
+
+                   Tobias Weh
+                www.tobias-weh.de
+            github.com/tweh/menukeys
+
+
+
+This package is designed to format menu sequences,
+paths and keyboard shortcuts automatically. There
+are serval predefined styles and one can define
+his own styles in a flexible way.
+
 
 License:
 This material is subject to the LaTeX Project
@@ -14,24 +21,28 @@ Public License. See http://www.ctan.org/tex-
 archive/help/Catalogue/licenses.lppl.html for
 the details of that license.
 
+
 Files:
 * README            - this file
 * menukeys.dtx      - source file
 * menukeys.ins      - install file
 * menukeys.pdf      - documentation
 
-Istall:
-Use your TeX update manager oder do it manually:
-Navigate to the folder that contains menukeys.ins
-and call
+
+Installation:
+It’s recommended to use your package manager to
+installe the current version from CTAN. To install
+this package manually download alls files and then
+navigate to the folder that contains menukeys.ins.
+Run
 
    latex menukeys.ins
 
-That gives you the file menukeys.sty which should
-be moved somewhere TeX can find it (e.g.
-$TEXMFHOME/tex/latex/musuos/musuos.cls)
+to get the file menukeys.sty which should be moved
+somewhere TeX can find it (e.g. $TEXMFHOME/tex/
+latex/menukeys/menukeys.sty)
 
-To typeset the manual call
+To typeset the manual run
 
     pdflatex menukeys.dtx
     makeindex -s gglo.ist -o menukeys.gls menukeys.glo
