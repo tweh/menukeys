@@ -18,7 +18,7 @@
 % \iffalse
 %<package>\NeedsTeXFormat{LaTeX2e}[2009/01/01]
 %<package>\ProvidesPackage{menukeys}
-%<package>  [2012/02/27 v1.1 a package to format menus paths and shortcuts]
+%<package>  [2013/05/28 v1.1a a package to format menus paths and shortcuts]
 %
 %<*driver>
 \documentclass{ltxdoc}
@@ -1377,6 +1377,7 @@
 %    \end{macrocode}
 % \end{macro}
 % \begin{macro}{\tw@define@menu@macro}
+% \changes{v1.1a}{2013/05/28}{Fixed minor bug, that causes a warning about robustifying (issu \#23), by deleting the line to make the command robust.}
 % Then we set up the internal command to create new menu macros.
 % The list parsing code was essentially provided by Ahmed Musa at
 % \url{http://tex.stackexchange.com/a/44989/4918}. Thank you very much!
@@ -1432,7 +1433,9 @@
 %    \end{macrocode}
 % \end{macro}
 % \subsubsection{User-level commands}
-% \begin{macro}{\newmenumacro}\begin{macro}{\renewmenumacro}
+% \begin{macro}{\newmenumacro}
+% \changes{v1.1a}{2013/05/28}{Added a line to make a new macro robust.}
+% \begin{macro}{\renewmenumacro}
 % \begin{macro}{\providemenumacro}
 % Now it's time to build the user-level commands
 %    \begin{macrocode}
