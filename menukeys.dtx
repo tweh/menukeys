@@ -1426,7 +1426,6 @@
          \cptexpanded{\indrisloop*[\tw@mk@tempa]}\tw@menu@list\tw@mk@tempb}%
          \@nameuse{tw@style@#3@post}}%
       }%
-      \expandafter\cptrobustify\csname\expandafter\@gobble\string#1\endcsname
    }%
 }
 \edef\cpt@parserlist{\cpt@parserlist\@backslashchar}
@@ -1440,6 +1439,7 @@
 \NewDocumentCommand{\newmenumacro}{m O{\tw@default@input@sep} m}{%
    \ifcsundef{\expandafter\@gobble\string#1}{%
       \tw@define@menu@macro{#1}[#2]{#3}%
+      \expandafter\cptrobustify\csname\expandafter\@gobble\string#1\endcsname
    }{
       \tw@mk@error{Menu macro '\string#1' already defined!\MessageBreak
       Use \string\renewmenustyle\space instead.}
