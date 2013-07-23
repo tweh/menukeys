@@ -18,7 +18,7 @@
 % \iffalse
 %<package>\NeedsTeXFormat{LaTeX2e}[2009/01/01]
 %<package>\ProvidesPackage{menukeys}
-%<package>  [2013/05/28 v1.1a a package to format menus paths and shortcuts]
+%<package>  [2013/07/23 v1.2 a package to format menus paths and shortcuts]
 %
 %<*driver>
 \documentclass{ltxdoc}
@@ -178,7 +178,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{880}
+% \CheckSum{890}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -198,6 +198,11 @@
 %
 % \changes{v1.0}{2012/02/23}{Initial version}
 % \changes{v1.1}{2012/02/26}{Improved manual}
+% \changes{v1.2}{2013/07/23}{Tidy up version and date}
+% \changes{v1.2}{2013/07/23}{Fixed GitHub issues \#9, \#10, \#11, \#13, \#17, \#24 and \#26}
+% \changes{v1.2}{2013/07/23}{Added \cs{SPACE} and \cs{spacename}}
+% \changes{v1.2}{2013/07/23}{Added \cs{normalsize} before symbol definitions to make
+%                the \texttt{ex} unit available}
 %
 % \GetFileInfo{menukeys.sty}
 %
@@ -267,6 +272,7 @@
 % \author{Tobias Weh\\
 %   \normalsize\href{mailto:mail@tobias-weh.de}{\texttt{mail@tobias-weh.de}}\\
 %   \normalsize\url{http://www.tobias-weh.de}\\
+%   \normalsize\url{http://github.com/tweh/menukeys}\\
 %   \normalsize\url{http://www.ctan.org/pkg/menukeys}\\
 %   \normalsize\filefolder{macros/latex/contrib/menukeys}}
 % \date{\filedate{} --- \fileversion}
@@ -589,7 +595,7 @@
 %
 % \subsection{Keys}
 % \DM{\shift}\DM{\capslock}\DM{\tab}\DM{\esc}\DM{\ctrl}\DM{\alt}
-% \DM{\AltGr}\DM{\cmd}\DM{\Space}
+% \DM{\AltGr}\DM{\cmd}
 % The \menukeys package comes with some macros to print
 % special keys in the sequences set with |\keys|. Depending on
 % the given OS (see Section~\ref{options}) some macros behave
@@ -601,7 +607,8 @@
 % \DM{\arrowkeyup}\DM{\arrowkeydown}\DM{\arrowkeyleft}\DM{\arrowkeyright}
 % Here is a full list of available macros:
 %  
-%  \medskip{\small
+% \DM{\Space}\DM{\SPACE}\mbox{}\par
+%  \medskip\noindent{\small
 %  \renewcommand{\arraystretch}{1.25}
 %  \begin{minipage}{0.45\textwidth}
 %  \begin{tabular}{lll}
@@ -616,7 +623,8 @@
 %     |\Alt| & alt / \Altmac & \Altwin \\
 %     |\AltGr| & & \AltGr \\
 %     |\cmd|   & cmd / \cmdmac & \\
-%     |\Space| &&\\
+%     |\Space| &  & \\
+%     |\SPACE| & \spacename & \spacename \\
 %     |\return| & \returnmac & \returnwin \\
 %     |\enter| & \entermac & \enterwin \\
 %     \hline
@@ -647,8 +655,8 @@
 % since it takes the direction as a singe character |^|, |v|
 % (lower case v), |>| or |<|.
 % 
-% \DM{\ctrlname}\DM{\delname}The texts for |\ctrl| and 
-% |\del| are saved in |\ctrlname| and |\delname| respectively.
+% \DM{\ctrlname}\DM{\delname}\DM{\spacename}The texts for |\ctrl|, 
+% |\del| and |\SPACE| are saved in |\ctrlname|, |\delname|, |\spacename| respectively.
 % So you can change them with |\renewcommand|.
 % 
 % The rendering of some Mac macros depend on the option \DO{mackeys}\opt{mackeys}
@@ -1378,6 +1386,8 @@
 % \end{macro}
 % \begin{macro}{\tw@define@menu@macro}
 % \changes{v1.1a}{2013/05/28}{Fixed minor bug, that causes a warning about robustifying (issu \#23), by deleting the line to make the command robust.}
+% \changes{v1.2}{2013/07/23}{Replaced \cs{edef} by \cs{protected@edef}}
+% \changes{v1.2}{2013/07/23}{Addded \cs{leavevmode}}
 % Then we set up the internal command to create new menu macros.
 % The list parsing code was essentially provided by Ahmed Musa at
 % \url{http://tex.stackexchange.com/a/44989/4918}. Thank you very much!
@@ -1399,23 +1409,24 @@
       \csdef{tw@parse@menu@list@\expandafter\@gobble\string#1}##1{%
          \iflastindris
             \ifnum\indrisnr=\@ne
-                \edef\CurrentMenuElement{##1}%
+                \protected@edef\CurrentMenuElement{##1}%
                 \@nameuse{tw@style@#3@single}%
             \else
-                \edef\CurrentMenuElement{##1}%
+                \protected@edef\CurrentMenuElement{##1}%
                 \@nameuse{tw@style@#3@sep}\@nameuse{tw@style@#3@last}%
             \fi
          \else
             \ifnum\indrisnr=\@ne
-               \edef\CurrentMenuElement{##1}%
+               \protected@edef\CurrentMenuElement{##1}%
                \@nameuse{tw@style@#3@first}%
             \else
-               \edef\CurrentMenuElement{##1}%
+               \protected@edef\CurrentMenuElement{##1}%
                \@nameuse{tw@style@#3@sep}\@nameuse{tw@style@#3@mid}%
             \fi
          \fi
       }%
       \expandafter\newcommand\csname\expandafter\@gobble\string#1\endcsname[2][#2]{%
+         \leavevmode%
          {\def\tw@current@color@theme{\csname tw@style@#3@color@theme\endcsname}%
          \@nameuse{tw@style@#3@pre}%
          \tw@mk@test@input@sep{##1}{%
@@ -1564,6 +1575,7 @@
 % Now we ar prepared to generate the key macros. I will be nearly the same
 % way for all keys. Step one is to build a |tw@mk@|\meta{key} macro
 %     \begin{macrocode}
+\normalsize
 \tw@make@key@box{shift}{%
    \begin{tikzpicture}[yshift=-0.1ex,baseline={(0,0)},semithick]
       \draw (0.3ex,0) -- (1.1ex,0) -- (1.1ex,1.2ex) -- %
@@ -1671,6 +1683,8 @@
 \tw@make@key@macro*{\cmd}
 
 \providecommand*{\Space}{\expandonce{\rule{3em}{0pt}}}
+\newcommand{\spacename}{Space}
+\providecommand*{\SPACE}{\expandonce{\rule{2em}{0pt}\spacename\rule{2em}{0pt}}}
 
 \tw@make@key@box{return@mac}{%
    \begin{tikzpicture}[semithick]
