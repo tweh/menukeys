@@ -1,75 +1,9 @@
-\documentclass{ltxdoc}
-
-\usepackage[latin1]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage[english]{babel}
-\usepackage[%
-	os=mac,
-	mackeys=symbols,
-%	definekeys=false,
-]{menukeys}
-
-
-\makeatletter
-
-% FEHLEBEHANDLUNG %%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-
-%\changemenuelement{menus}{pre}{%
-%\begingroup%\def\tw@current@color@theme{\csname tw@style@gray@color@theme\endcsname}%
-%}
-%\changemenuelement{menus}{post}{%
-%\endgroup
-%}
-
-\copymenustyle{menusII}{menus}
-\changemenucolortheme{menusII}{blacknwhite}
-
-\newmenumacro{\Menu}[>]{menus}
-\newmenumacro{\filefolder}[/]{pathswithblackfolder}
-\newmenumacro{\MenuII}[>]{menusII}
-
-
-\providemenumacro{\test}{roundedmenus}
-\newcommand{\teststyle}[2]{{%
-   \renewmenumacro{\test}{#1}%
-   \par\vspace{\baselineskip}
-   \noindent\begin{minipage}{\textwidth}
-   Name: \texttt{#1}\index{#1=\texttt{#1}  (style)|usage}%
-   \index{Styles:>\texttt{#1}|usage}\\[0.5\baselineskip]
-   \test{#2}\hfill\test{Single}\\[0.5\baselineskip]
-   This is some more or less blind text, to demonstrate how
-   the sequence looks in text. This is way \test{#2} the
-   style which name is \texttt{#1} prints the list.
-   \end{minipage}
-}}
-
-
-
-\usepackage{shortvrb}
-\MakeShortVerb\|
-
-\makeatother
-
-
+\documentclass{article}
+\usepackage{listings}
+\usepackage{menukeys}
 \begin{document}
-%\setlength{\parindent}{0pt}
-%\setlength{\parskip}{2\baselineskip}
-%\section*{menukeys-Test}
-%
-%\vspace{5cm}
-%
-%\menu{Extras > Einstellungen > Allgemein}
-%
-%
-%\vspace{5cm}
-
-\renewmenumacro{\directory}{pathswithfolder}
-\section{\directory{a/b/c}}
-
-
-
+\begin{itemize}
+   \item \menu{Test \lstinline|test|}
+   \item \keys{Test \lstinline|test|}
+\end{itemize}
 \end{document}
