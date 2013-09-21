@@ -18,7 +18,7 @@
 % \iffalse
 %<package>\NeedsTeXFormat{LaTeX2e}[2009/01/01]
 %<package>\ProvidesPackage{menukeys}
-%<package>  [2013/07/23 v1.2 a package to format menus paths and shortcuts]
+%<package>  [2013/07/23 v1.2a a package to format menus paths and shortcuts]
 %
 %<*driver>
 \documentclass{ltxdoc}
@@ -133,7 +133,7 @@
 \setcounter{IndexColumns}{2}
 
 \makeatletter
-\tikzstyle{tw@menusbig@base}=[%
+\tikzset{tw@menusbig@base/.style={%
    tw@set@tikz@colors,
    rounded corners=0.15ex,
    inner sep=0pt,
@@ -146,23 +146,23 @@
    signal to=nowhere,
    signal pointer angle=110,
    ultra thick,
-]
+}}
 \tw@declare@style*{menusbig}{%
-   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]%
+   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
       \node(tw@node)[tw@menusbig@base,signal to=east]%
-      {\strut\CurrentMenuElement};%
+      {\strut\CurrentMenuElement};}%
 }[\hspace{-0.2em}\hspace{0em plus 0.1em minus 0.05em}]%
 {%
-   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]%
+   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
       \node(tw@node)[tw@menusbig@base,signal from=west,signal to=east]%
-      {\strut\CurrentMenuElement};%
+      {\strut\CurrentMenuElement};}%
 }{%
-   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]%
+   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
       \node(tw@node)[tw@menusbig@base,signal from=west,]%
-      {\strut\CurrentMenuElement};%
+      {\strut\CurrentMenuElement};}%
 }{%
-   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]%
-      \node(tw@node)[tw@menusbig@base]{\strut\CurrentMenuElement};%
+   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
+      \node(tw@node)[tw@menusbig@base]{\strut\CurrentMenuElement};}%
 }{blacknwhite}
 \newmenumacro{\filefolder}[/]{pathswithblackfolder}
 \newmenumacro{\MENU}[,]{menusbig}
@@ -202,7 +202,10 @@
 % \changes{v1.2}{2013/07/23}{Fixed GitHub issues \#9, \#10, \#11, \#13, \#17, \#24 and \#26}
 % \changes{v1.2}{2013/07/23}{Added \cs{SPACE} and \cs{spacename}}
 % \changes{v1.2}{2013/07/23}{Added \cs{normalsize} before symbol definitions to make
-%                the \texttt{ex} unit available}
+%                            the \texttt{ex} unit available}
+% \changes{v1.2a}{2013/09/10}{Replaced obsolete \cs{tikzsytle}}
+% \changes{v1.2a}{2013/09/10}{Added braces to the \cs{tikz} macro since the parser
+%                             seems to crash with \pkg{babels} french option otherwise.}
 %
 % \GetFileInfo{menukeys.sty}
 %
@@ -263,7 +266,7 @@
 %   \PackageWarning,\renewenvironment,\romannumeral,\string,\strut}
 % \DoNotIndex{\csdef,\cslet\csletcs,\letcs,\DeclareDocumentCommand,\ifcsundef,
 %   \RenewDocumentCommand,\NewDocumentCommand,\hspace,\IfBooleanTF,\IfSubStr}
-% \DoNotIndex{\tikz,\node,\draw,\definecolor,\colorlet,\usetikzlibrary,\tikzstyle,
+% \DoNotIndex{\tikz,\node,\draw,\definecolor,\colorlet,\usetikzlibrary,
 %   \texttt,\textcolor,\raisebox,\maxsizebox,\small,\ttfamily,\DeclareBoolOption}
 % \DoNotIndex{\value,\usebox,\sbox,\providecommand,\ProcessKeyvalOptions,\newbox,
 %   \IfStrEq,\hyphenchar,\expandonce,\encodingdefault,\DeclareStringOption}
@@ -898,17 +901,17 @@
       \csdef{tw@style@#2@last}{#4}%
    }{%
       \csdef{tw@style@#2@single}{%
-         \tikz[baseline=(tw@node.base)]%
-         \node(tw@node)[#4]{\strut\CurrentMenuElement};}%
+         \tikz[baseline=(tw@node.base)]{%
+         \node(tw@node)[#4]{\strut\CurrentMenuElement};}}%
       \csdef{tw@style@#2@first}{%
-         \tikz[baseline=(tw@node.base)]%
-         \node(tw@node)[#4]{\strut\CurrentMenuElement};}%
+         \tikz[baseline=(tw@node.base)]{%
+         \node(tw@node)[#4]{\strut\CurrentMenuElement};}}%
       \csdef{tw@style@#2@mid}{%
-         \tikz[baseline=(tw@node.base)]%
-         \node(tw@node)[#4]{\strut\CurrentMenuElement};}%
+         \tikz[baseline=(tw@node.base)]{%
+         \node(tw@node)[#4]{\strut\CurrentMenuElement};}}%
       \csdef{tw@style@#2@last}{%
-         \tikz[baseline=(tw@node.base)]%
-         \node(tw@node)[#4]{\strut\CurrentMenuElement};}%
+         \tikz[baseline=(tw@node.base)]{%
+         \node(tw@node)[#4]{\strut\CurrentMenuElement};}}%
    }%
 }
 %    \end{macrocode}
@@ -940,17 +943,17 @@
       \csdef{tw@style@#2@last}{#7}%
    }{%
       \csdef{tw@style@#2@single}{%
-         \tikz[baseline=(tw@node.base)]%
-         \node(tw@node)[#8]{\strut\CurrentMenuElement};}%
+         \tikz[baseline=(tw@node.base)]{%
+         \node(tw@node)[#8]{\strut\CurrentMenuElement};}}%
       \csdef{tw@style@#2@first}{%
-         \tikz[baseline=(tw@node.base)]%
-         \node(tw@node)[#4]{\strut\CurrentMenuElement};}%
+         \tikz[baseline=(tw@node.base)]{%
+         \node(tw@node)[#4]{\strut\CurrentMenuElement};}}%
       \csdef{tw@style@#2@mid}{%
-         \tikz[baseline=(tw@node.base)]%
-         \node(tw@node)[#6]{\strut\CurrentMenuElement};}%
+         \tikz[baseline=(tw@node.base)]{%
+         \node(tw@node)[#6]{\strut\CurrentMenuElement};}}%
       \csdef{tw@style@#2@last}{%
-         \tikz[baseline=(tw@node.base)]%
-         \node(tw@node)[#7]{\strut\CurrentMenuElement};}%
+         \tikz[baseline=(tw@node.base)]{%
+         \node(tw@node)[#7]{\strut\CurrentMenuElement};}}%
    }%
    \tw@declare@sytle@extra@args%
 }
@@ -1074,8 +1077,8 @@
                \csdef{tw@style@#2@#3}{#4}%
             }{%
             \csdef{tw@style@#2@#3}{%
-               \tikz[baseline=(tw@node.base)]%
-               \node(tw@node)[#4]{\strut\CurrentMenuElement};}%
+               \tikz[baseline=(tw@node.base)]{%
+               \node(tw@node)[#4]{\strut\CurrentMenuElement};}}%
             }%
          }%
       }{\tw@mk@error{No element '#3'. Possible values are\MessageBreak
@@ -1090,18 +1093,18 @@
 % First we define a \TikZ-style to apply the color theme to a node
 % easily
 %    \begin{macrocode}
-\tikzstyle{tw@set@tikz@colors}=[%
+\tikzset{tw@set@tikz@colors/.style={%
    draw=\usemenucolor{br},
    fill=\usemenucolor{bg},
    text=\usemenucolor{txt},
-]
+}}
 %    \end{macrocode}
 % \end{macro}
 % Now we can define the styles. To keep the most settings of
 % a style together we make additional \TikZ-styles instead of setting
 % everything directly to the |node|s.
 %     \begin{macrocode}
-\tikzstyle{tw@menus@base}=[%
+\tikzset{tw@menus@base/.style={%
    tw@set@tikz@colors,
    rounded corners=0.15ex,
    inner sep=0pt,
@@ -1113,26 +1116,26 @@
    signal,
    signal to=nowhere,
    signal pointer angle=110,
-]
+}}
 \tw@declare@style*{menus}{%
-   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]%
+   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
       \node(tw@node)[tw@menus@base,signal to=east]%
-      {\strut\CurrentMenuElement};%
+      {\strut\CurrentMenuElement};}%
 }[\hspace{-0.2em}\hspace{0em plus 0.1em minus 0.05em}]%
 {%
-   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]%
+   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
       \node(tw@node)[tw@menus@base,signal from=west,signal to=east]%
-      {\strut\CurrentMenuElement};%
+      {\strut\CurrentMenuElement};}%
 }{%
-   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]%
+   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
       \node(tw@node)[tw@menus@base,signal from=west,]%
-      {\strut\CurrentMenuElement};%
+      {\strut\CurrentMenuElement};}%
 }{%
-   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]%
-      \node(tw@node)[tw@menus@base]{\strut\CurrentMenuElement};%
+   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
+      \node(tw@node)[tw@menus@base]{\strut\CurrentMenuElement};}%
 }{gray}
 
-\tikzstyle{tw@roundedmenus@base}=[%
+\tikzset{tw@roundedmenus@base/.style={%
    tw@set@tikz@colors,
    rounded corners=0.3ex,
    inner sep=0pt,
@@ -1144,26 +1147,26 @@
    signal,
    signal to=nowhere,
    signal pointer angle=110,
-]
+}}
 \tw@declare@style*{roundedmenus}{%
-   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]%
+   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
       \node(tw@node)[tw@roundedmenus@base,signal to=east]%
-      {\strut\CurrentMenuElement};%
+      {\strut\CurrentMenuElement};}%
 }[\hspace{-0.2em}\hspace{0em plus 0.1em minus 0.05em}]%
 {%
-   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]%
+   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
       \node(tw@node)[tw@roundedmenus@base,signal from=west,signal to=east]%
-      {\strut\CurrentMenuElement};%
+      {\strut\CurrentMenuElement};}%
 }{%
-   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]%
+   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
       \node(tw@node)[tw@roundedmenus@base,signal from=west,]%
-      {\strut\CurrentMenuElement};%
+      {\strut\CurrentMenuElement};}%
 }{%
-   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]%
-      \node(tw@node)[tw@roundedmenus@base]{\strut\CurrentMenuElement};%
+   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
+      \node(tw@node)[tw@roundedmenus@base]{\strut\CurrentMenuElement};}%
 }{gray}
 
-\tikzstyle{tw@angularmenus@base}=[%
+\tikzset{tw@angularmenus@base/.style={%
    tw@set@tikz@colors,
    inner sep=0pt,
    inner xsep=2pt,
@@ -1174,26 +1177,26 @@
    signal,
    signal to=nowhere,
    signal pointer angle=110,
-]
+}}
 \tw@declare@style*{angularmenus}{%
-   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]%
+   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
       \node(tw@node)[tw@angularmenus@base,signal to=east]%
-      {\strut\CurrentMenuElement};%
+      {\strut\CurrentMenuElement};}%
 }[\hspace{-0.2em}\hspace{0em plus 0.1em minus 0.05em}]%
 {%
-   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]%
+   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
       \node(tw@node)[tw@angularmenus@base,signal from=west,signal to=east]%
-      {\strut\CurrentMenuElement};%
+      {\strut\CurrentMenuElement};}%
 }{%
-   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]%
+   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
       \node(tw@node)[tw@angularmenus@base,signal from=west,]%
-      {\strut\CurrentMenuElement};%
+      {\strut\CurrentMenuElement};}%
 }{%
-   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]%
-      \node(tw@node)[tw@angularmenus@base]{\strut\CurrentMenuElement};%
+   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
+      \node(tw@node)[tw@angularmenus@base]{\strut\CurrentMenuElement};}%
 }{gray}
 
-\tikzstyle{tw@roundedkeys@base}=[%
+\tikzset{tw@roundedkeys@base/.style={%
    tw@set@tikz@colors,
    rounded corners=0.3ex,
    inner sep=0pt,
@@ -1202,17 +1205,17 @@
    text depth=0.7ex,
    minimum width=1.5em,
    font=\relsize{-1}\sffamily,
-]
+}}
 \tw@declare@style@simple*{roundedkeys}{%
-   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]%
-      \node(tw@node)[tw@roundedkeys@base]{\strut\CurrentMenuElement};%
+   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
+      \node(tw@node)[tw@roundedkeys@base]{\strut\CurrentMenuElement};}%
 }[%
    \hspace{0.1em plus 0.1em minus 0.05em}%
    \raisebox{0.25ex}{\sffamily\footnotesize+}%
    \hspace{0.1em plus 0.1em minus 0.05em}%
 ]{gray}
 
-\tikzstyle{tw@shadowedroundedkeys@base}=[%
+\tikzset{tw@shadowedroundedkeys@base/.style={%
    tw@set@tikz@colors,
    rounded corners=0.3ex,
    inner sep=0pt,
@@ -1225,17 +1228,17 @@
       shadow xshift=.2ex, shadow yshift=-.15ex,
       fill=black,
    },
-]
+}}
 \tw@declare@style@simple*{shadowedroundedkeys}{%
-   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]%
-      \node(tw@node)[tw@shadowedroundedkeys@base]{\strut\CurrentMenuElement};%
+   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
+      \node(tw@node)[tw@shadowedroundedkeys@base]{\strut\CurrentMenuElement};}%
 }[%
    \hspace{0.2ex}\hspace{0.1em plus 0.1em minus 0.05em}%
    \raisebox{0.25ex}{\sffamily\footnotesize+}%
    \hspace{0.1em plus 0.1em minus 0.05em}%
 ][\hspace{0.2ex}]{gray}
 
-\tikzstyle{tw@angularkeys@base}=[%
+\tikzset{tw@angularkeys@base/.style={%
    tw@set@tikz@colors,
    inner sep=0pt,
    inner xsep=2pt,
@@ -1243,17 +1246,17 @@
    text depth=0.7ex,
    minimum width=1.5em,
    font=\relsize{-1}\sffamily,
-]
+}}
 \tw@declare@style@simple*{angularkeys}{%
-   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]%
-      \node(tw@node)[tw@angularkeys@base]{\strut\CurrentMenuElement};%
+   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
+      \node(tw@node)[tw@angularkeys@base]{\strut\CurrentMenuElement};}%
 }[%
    \hspace{0.1em plus 0.1em minus 0.05em}%
    \raisebox{0.25ex}{\sffamily\footnotesize+}%
    \hspace{0.1em plus 0.1em minus 0.05em}%
 ]{gray}
 
-\tikzstyle{tw@shadowedangularkeys@base}=[%
+\tikzset{tw@shadowedangularkeys@base/.style={%
    tw@set@tikz@colors,
    inner sep=0pt,
    inner xsep=2pt,
@@ -1265,23 +1268,23 @@
       shadow xshift=.2ex, shadow yshift=-.15ex,
       fill=black,
    },
-]
+}}
 \tw@declare@style@simple*{shadowedangularkeys}{%
-   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]%
-      \node(tw@node)[tw@shadowedangularkeys@base]{\strut\CurrentMenuElement};%
+   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
+      \node(tw@node)[tw@shadowedangularkeys@base]{\strut\CurrentMenuElement};}%
 }[%
    \hspace{0.2ex}\hspace{0.1em plus 0.1em minus 0.05em}%
    \raisebox{0.25ex}{\sffamily\footnotesize+}%
    \hspace{0.1em plus 0.1em minus 0.05em}%
 ][\hspace{0.2ex}]{gray}
 
-\tikzstyle{tw@typewriterkeys@base}=[%
+\tikzset{tw@typewriterkeys@base/.style={%
    tw@set@tikz@colors,
    shape=circle,
    minimum size=2ex,
    inner sep=0.5pt, outer sep=1pt,
    font=\ttfamily\relsize{-1},
-]
+}}
 \tw@declare@style@simple*{typewriterkeys}{%
    \def\tw@typewriterkeys@curr@elem{%
       \maxsizebox*{2ex}{2ex}{\CurrentMenuElement}%
@@ -1303,8 +1306,8 @@
 }[%
    \hspace{0.2em plus 0.1em}%
    \raisebox{0.08ex}{%
-      \tikz\fill[\usemenucolor{txt}] (0,0) -- (0.5ex,0.5ex)%
-                -- (0,1ex) -- cycle;%
+      \tikz{\fill[\usemenucolor{txt}] (0,0) -- (0.5ex,0.5ex)%
+                -- (0,1ex) -- cycle;}%
    }%
    \hspace{0.2em plus 0.1em}%
 ]{blacknwhite}
@@ -1331,8 +1334,8 @@
 }[%
    \hspace{0.2em plus 0.1em}%
    \raisebox{0.08ex}{%
-      \tikz\fill[\usemenucolor{txt}] (0,0) -- (0.5ex,0.5ex)%
-                -- (0,1ex) -- cycle;%
+      \tikz{\fill[\usemenucolor{txt}] (0,0) -- (0.5ex,0.5ex)%
+                -- (0,1ex) -- cycle;}%
    }%
    \hspace{0.2em plus 0.1em}%
 ]{blacknwhite}
