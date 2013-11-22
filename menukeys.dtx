@@ -18,7 +18,7 @@
 % \iffalse
 %<package>\NeedsTeXFormat{LaTeX2e}[2009/01/01]
 %<package>\ProvidesPackage{menukeys}
-%<package>  [2013/07/23 v1.2a a package to format menus paths and shortcuts]
+%<package>  [2013/11/22 v1.2c a package to format menus paths and shortcuts]
 %
 %<*driver>
 \documentclass{ltxdoc}
@@ -1390,6 +1390,7 @@
 % \begin{macro}{\tw@define@menu@macro}
 % \changes{v1.1a}{2013/05/28}{Fixed minor bug, that causes a warning about robustifying (issu \#23), by deleting the line to make the command robust.}
 % \changes{v1.2}{2013/07/23}{Replaced \cs{edef} by \cs{protected@edef}}
+% \changes{v1.2c}{2013/07/23}{Replaced \cs{protected@edef} by \cs{def}}
 % \changes{v1.2}{2013/07/23}{Addded \cs{leavevmode}}
 % Then we set up the internal command to create new menu macros.
 % The list parsing code was essentially provided by Ahmed Musa at
@@ -1412,10 +1413,10 @@
       \csdef{tw@parse@menu@list@\expandafter\@gobble\string#1}##1{%
          \iflastindris
             \ifnum\indrisnr=\@ne
-                \protected@edef\CurrentMenuElement{##1}%
+                \def\CurrentMenuElement{##1}%
                 \@nameuse{tw@style@#3@single}%
             \else
-                \protected@edef\CurrentMenuElement{##1}%
+                \def\CurrentMenuElement{##1}%
                 \@nameuse{tw@style@#3@sep}\@nameuse{tw@style@#3@last}%
             \fi
          \else
@@ -1423,7 +1424,7 @@
                \protected@edef\CurrentMenuElement{##1}%
                \@nameuse{tw@style@#3@first}%
             \else
-               \protected@edef\CurrentMenuElement{##1}%
+               \def\CurrentMenuElement{##1}%
                \@nameuse{tw@style@#3@sep}\@nameuse{tw@style@#3@mid}%
             \fi
          \fi
