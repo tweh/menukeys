@@ -206,6 +206,8 @@
 % \changes{v1.2a}{2013/09/10}{Replaced obsolete \cs{tikzsytle}}
 % \changes{v1.2a}{2013/09/10}{Added braces to the \cs{tikz} macro since the parser
 %                             seems to crash with \pkg{babels} french option otherwise.}
+% \changes{v1.3}{2014/03/10}{Improved key symbols.}
+% \changes{v1.3}{2014/03/10}{Added \TikZ-styles for the key symbols.}
 %
 % \GetFileInfo{menukeys.sty}
 %
@@ -1421,7 +1423,7 @@
             \fi
          \else
             \ifnum\indrisnr=\@ne
-               \protected@edef\CurrentMenuElement{##1}%
+               \def\CurrentMenuElement{##1}%
                \@nameuse{tw@style@#3@first}%
             \else
                \def\CurrentMenuElement{##1}%
@@ -1571,7 +1573,19 @@
 }
 %    \end{macrocode}
 % \end{macro}
-% 
+%
+% Next thing to do is to set up some \TikZ-styles.
+%     \begin{macrocode}
+\tikzset{
+   menukeys key symbol/.style={
+      rounded corners=0pt,
+      line width=0.1ex,
+      baseline={(0,0)},
+   },
+   menukeys thick/.style={line width=0.25ex},
+}
+%    \end{macrocode}
+%
 % \begin{macro}{\shift}\begin{macro}{\capslock}\begin{macro}{\tab}
 % \begin{macro}{\esc}\begin{macro}{\ctrl}\begin{macro}{\alt}
 % \begin{macro}{\AltGr}\begin{macro}{\cmd}\begin{macro}{\Space}
@@ -1582,7 +1596,7 @@
 %     \begin{macrocode}
 \normalsize
 \tw@make@key@box{shift}{%
-   \begin{tikzpicture}[yshift=-0.1ex,baseline={(0,0)},menukeys key symbol]
+   \begin{tikzpicture}[yshift=-0.1ex,menukeys key symbol]
       \draw (0.3ex,0) -- (1.1ex,0) -- (1.1ex,1.2ex) -- %
             (1.5ex,1.2ex) -- (0.7ex,1.9ex) -- (-0.1ex,1.2ex) -- %
             (0.3ex,1.2ex) -- cycle;
@@ -1598,7 +1612,7 @@
 % and |tw@mk@|\meta{key}|@win|:
 %     \begin{macrocode}
 \tw@make@key@box{capslock@mac}{%
-   \begin{tikzpicture}[yshift=-0.1ex,baseline={(0,0)},menukeys key symbol]
+   \begin{tikzpicture}[yshift=-0.1ex,menukeys key symbol]
       \draw (0.3ex,0.7ex) -- (1.1ex,0.7ex) -- (1.1ex,1.2ex) -- %
             (1.5ex,1.2ex) -- (0.7ex,1.9ex) -- (-0.1ex,1.2ex) -- %
             (0.3ex,1.2ex) -- cycle;
@@ -1606,7 +1620,7 @@
    \end{tikzpicture}%
 }
 \tw@make@key@box{capslock@win}{%
-   \begin{tikzpicture}[yscale=-1,yshift=-1.8ex,baseline={(0,0)},menukeys key symbol]
+   \begin{tikzpicture}[yscale=-1,yshift=-1.8ex,menukeys key symbol]
       \draw (0.3ex,0) -- (1.1ex,0) -- (1.1ex,1.2ex) -- %
             (1.5ex,1.2ex) -- (0.7ex,1.9ex) -- (-0.1ex,1.2ex) -- %
             (0.3ex,1.2ex) -- cycle;
@@ -1622,17 +1636,17 @@
 % Here are the other macros:
 %    \begin{macrocode}
 \tw@make@key@box{tab@mac}{%
-   \begin{tikzpicture}[yshift=0.5ex,baseline={(0,0)},menukeys key symbol]
+   \begin{tikzpicture}[yshift=0.6ex,menukeys key symbol]
       \draw [->] (0,0) -- (1em,0);
-      \draw [menukeys thin] (1em,-0.35ex) -- (1em,0.35ex);
+      \draw (1em,-0.35ex) -- (1em,0.35ex);
    \end{tikzpicture}%
 }
 \tw@make@key@box{tab@win}{%
-   \begin{tikzpicture}[yshift=0.1ex,baseline={(0,0)},menukeys key symbol]
+   \begin{tikzpicture}[yshift=0.1ex,menukeys key symbol]
       \draw [->] (0.2em,0) -- (1.2em,0);
-      \draw [menukeys thin] (1.2em,-0.35ex) -- (1.2em,0.35ex);
+      \draw (1.2em,-0.35ex) -- (1.2em,0.35ex);
       \draw [<-] (0,1ex) -- (1em,1ex);
-      \draw [menukeys thin] (0,0.65ex) -- (0,1.35ex);
+      \draw (0,0.65ex) -- (0,1.35ex);
    \end{tikzpicture}%
 }
 \tw@make@key@macro*{\tab}
@@ -1642,7 +1656,7 @@
    \def\tw@mk@esc@mac{esc}
 }{%
    \tw@make@key@box{esc@mac}{%
-      \begin{tikzpicture}[yshift=-0.1ex,baseline={(0,0)},menukeys key symbol]
+      \begin{tikzpicture}[yshift=-0.1ex,menukeys key symbol]
          \draw [->] (0.5ex,0.5ex) -- ++(45:1.1ex);
          \draw (0.5ex,0.5ex) ++(15:0.6ex) arc (15:-285:0.6ex);
       \end{tikzpicture}%
@@ -1660,7 +1674,7 @@
    \def\tw@mk@Alt@mac{alt}%
 }{%
    \tw@make@key@box{Alt@mac}{%
-      \begin{tikzpicture}[yshift=-0.1ex,baseline={(0,0)},menukeys key symbol]
+      \begin{tikzpicture}[yshift=-0.1ex,menukeys key symbol]
          \draw (0,1ex) -- (0.5ex,1ex) -- (1ex,0.3ex) -- (1.8ex,0.3ex);
          \draw (0.8ex,1ex) -- (1.8ex,1ex);
       \end{tikzpicture}%
@@ -1677,7 +1691,7 @@
    \def\tw@mk@cmd@mac{cmd}%
 }{%
    \tw@make@key@box{cmd@mac}{%
-      \begin{tikzpicture}[yshift=-0.15ex,baseline={(0,0)},menukeys key symbol]
+      \begin{tikzpicture}[yshift=-0.15ex,menukeys key symbol]
          \draw (0.5ex,0.7ex) -- (0.5ex,1.25ex) arc (0:270:0.25ex) -- %
                (1.25ex,1ex) arc (-90:180:0.25ex) -- (1ex,0.25ex) %
                arc (-180:90:0.25ex) -- (0.25ex,0.5ex) arc (90:360:0.25ex) %
@@ -1692,7 +1706,7 @@
 \providecommand*{\SPACE}{\expandonce{\rule{2em}{0pt}\spacename\rule{2em}{0pt}}}
 
 \tw@make@key@box{return@mac}{%
-   \begin{tikzpicture}[menukeys key symbol]
+   \begin{tikzpicture}[yshift=0.25ex,menukeys key symbol]
       \draw [->, rounded corners=0.2ex] (1.25ex,1ex) -| %
             (2ex,0) -- (0,0);
    \end{tikzpicture}%
@@ -1717,7 +1731,7 @@
    \tw@mk@warning{'\string\winmenu' only for Windows!}%
 }
 \tw@make@key@box{winmenu@win}{%
-   \begin{tikzpicture}[yshift=-0.2ex,baseline={(0,0)},menukeys key symbol]
+   \begin{tikzpicture}[yshift=-0.2ex,menukeys key symbol]
       \draw (0,0) rectangle (1.5ex,1.8ex);
       \draw (0.25ex,1.4ex) -- ++(1ex,0);
       \draw (0.25ex,1ex) -- ++(1ex,0);
@@ -1727,8 +1741,8 @@
 \tw@make@key@macro*{\winmenu}
 
 \tw@make@key@box{backspace}{%
-   \begin{tikzpicture}[yshift=0.5ex,baseline={(0,0)},menukeys key symbol]
-      \draw [<-,menukeys thick] (0,0) -- (1.25em,0);
+   \begin{tikzpicture}[yshift=0.65ex,menukeys key symbol]
+      \draw [<-,menukeys thick] (0,0) -- (1.35em,0);
    \end{tikzpicture}%
 }
 \tw@make@key@macro{\backspace}
@@ -1739,8 +1753,8 @@
    \def\tw@mk@del@mac{\delname}%
 }{%
    \tw@make@key@box{del@mac}{%
-      \begin{tikzpicture}[menukeys key symbol]
-         \draw [menukeys thin] (0,0) -- (1.5ex,0) -- (2ex,0.5ex) --%
+      \begin{tikzpicture}[yshift=0.2ex,menukeys key symbol]
+         \draw (0,0) -- (1.5ex,0) -- (2ex,0.5ex) --%
                (1.5ex,1ex) -- (0,1ex) -- cycle;
          \draw (0.5ex,0.2ex) -- (1.1ex,0.8ex);
          \draw (0.5ex,0.8ex) -- (1.1ex,0.2ex);
@@ -1757,28 +1771,28 @@
 % Lastly we define the arrow macros:
 %     \begin{macrocode}
 \tw@make@key@box{arrowkeyup}{%
-   \begin{tikzpicture}[yshift=-0.2ex,baseline={(0,0)},menukeys key symbol]
+   \begin{tikzpicture}[yshift=-0.2ex,menukeys key symbol]
       \draw [->] (0,0) -- (0,0.8em);
    \end{tikzpicture}%
 }
 \tw@make@key@macro{\arrowkeyup}
 
 \tw@make@key@box{arrowkeydown}{%
-   \begin{tikzpicture}[yshift=0.7em,baseline={(0,0)},menukeys key symbol]
+   \begin{tikzpicture}[yshift=0.7em,menukeys key symbol]
       \draw [->] (0,0) -- (0,-0.8em);
    \end{tikzpicture}%
 }
 \tw@make@key@macro{\arrowkeydown}
 
 \tw@make@key@box{arrowkeyright}{%
-   \begin{tikzpicture}[yshift=0.5ex,baseline={(0,0)},menukeys key symbol]
+   \begin{tikzpicture}[yshift=0.5ex,menukeys key symbol]
       \draw [->] (0,0) -- (0.8em,0);
    \end{tikzpicture}%
 }
 \tw@make@key@macro{\arrowkeyright}
 
 \tw@make@key@box{arrowkeyleft}{%
-   \begin{tikzpicture}[yshift=0.5ex,baseline={(0,0)},menukeys key symbol]
+   \begin{tikzpicture}[yshift=0.5ex,menukeys key symbol]
       \draw [->] (0,0) -- (-0.8em,0);
    \end{tikzpicture}%
 }
