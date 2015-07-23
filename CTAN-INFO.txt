@@ -1,0 +1,16 @@
+Name of your contribution:   menukeys
+Version number:              1.3
+Author:                      Tobias Weh
+Your Name:                   
+Your email:                  mail@tobiw.de (*)
+Summary description:         Format menu sequences, paths and keystrokes from lists
+Suggested CTAN directory:    /macros/latex/contrib/menukeys
+Type of Upload:              
+Changes:                     
+Administrative notes:        
+
+License Type:                LaTeX Project Public License (version 1.3)
+
+
+(*) Am 23.7.15 beim Upload von metrix v1.1a um Änderung in mail@tobiw.de
+    bei allen Paketen gebeten.
