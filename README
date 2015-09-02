@@ -4,7 +4,8 @@
 
 
           Tobias Weh
-          www.tobias-weh.de
+          mail@tobiw.de
+          http://tobiw.de/en
           
 
           ctan.org/pkg/menukeys
@@ -12,17 +13,16 @@
 
 
 
-This package is designed to format menu sequences,
-paths and keyboard shortcuts automatically. There
-are serval predefined styles and one can define
-his own styles in a flexible way.
+This package is designed to format menu sequences, paths
+and keyboard shortcuts automatically. There are serval
+predefined styles and one can define his own styles in
+a flexible way.
 
 
 License:
-This material is subject to the LaTeX Project
-Public License. See http://www.ctan.org/tex-
-archive/help/Catalogue/licenses.lppl.html for
-the details of that license.
+This material is subject to the LaTeX Project Public License.
+See http://mirror.ctan.org/help/Catalogue/licenses.lppl.html
+for the details of that license.
 
 
 Files:
