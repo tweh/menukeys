@@ -599,7 +599,7 @@
 % \end{verbatim}
 %
 % \subsection{Keys}
-% \DM{\shift}\DM{\capslock}\DM{\tab}\DM{\esc}\DM{\ctrl}\DM{\alt}
+% \DM{\shift}\DM{\capslock}\DM{\tab}\DM{\esc}\DM{\oldesc}\DM{\ctrl}\DM{\alt}
 % \DM{\AltGr}\DM{\cmd}
 % The \menukeys package comes with some macros to print
 % special keys in the sequences set with |\keys|. Depending on
@@ -624,6 +624,7 @@
 %     |\capslock| & \capslockmac & \capslockwin\\
 %     |\tab| & \tabmac & \tabwin\\
 %     |\esc| & esc / \escmac  & \escwin\\
+%     |\oldesc| & esc / \oldescmac  & \oldescwin\\
 %     |\ctrl| & \ctrlmac & \ctrlwin{}\\
 %     |\Alt| & alt / \Altmac & \Altwin \\
 %     |\AltGr| & & \AltGr \\
@@ -1590,7 +1591,9 @@
 % \begin{macro}{\esc}\begin{macro}{\ctrl}\begin{macro}{\alt}
 % \begin{macro}{\AltGr}\begin{macro}{\cmd}\begin{macro}{\Space}
 % \begin{macro}{\return}\begin{macro}{\enter}\begin{macro}{\winmenu}
-% \begin{macro}{\backspace}\begin{macro}{\del}
+% \begin{macro}{\backspace}\begin{macro}{\del}\begin{macro}{\backdel}
+% \changes{v1.4}{2016/04/17}{Fixed direction of \cs{escmac}; added \cs{oldesc}}
+% \changes{v1.4}{2016/04/17}{Added \cs{backdel}}
 % Now we ar prepared to generate the key macros. I will be nearly the same
 % way for all keys. Step one is to build a |tw@mk@|\meta{key} macro
 %     \begin{macrocode}
@@ -1663,6 +1666,19 @@
    }%
 }
 \tw@make@key@macro*{\esc}
+
+\def\tw@mk@oldesc@win{Esc}
+\tw@define@mackey{%
+   \def\tw@mk@oldesc@mac{esc}
+}{%
+   \tw@make@key@box{oldesc@mac}{%
+      \begin{tikzpicture}[yshift=-0.1ex,menukeys key symbol]
+         \draw [->] (0.5ex,0.5ex) -- ++(45:1.1ex);
+         \draw (0.5ex,0.5ex) ++(15:0.6ex) arc (15:-285:0.6ex);
+      \end{tikzpicture}%
+   }%
+}
+\tw@make@key@macro*{\oldesc}
 
 \providecommand\ctrlname{Ctrl}
 \def\tw@mk@ctrl@win{\ctrlname}
@@ -1762,9 +1778,24 @@
    }%
 }
 \tw@make@key@macro*{\del}
+\def\tw@mk@backdel@win{\delname}
+\tw@define@mackey{%
+   \def\tw@mk@backdel@mac{\delname}%
+}{%
+   \tw@make@key@box{backdel@mac}{%
+      \begin{tikzpicture}[yshift=0.2ex,menukeys key symbol]
+         \draw (2ex,0) -- (0.5ex,0) -- (0,0.5ex) --%
+               (0.5ex,1ex) -- (2ex,1ex) -- cycle;
+         \draw (1ex,0.2ex) -- (1.6ex,0.8ex);
+         \draw (1ex,0.8ex) -- (1.6ex,0.2ex);
+      \end{tikzpicture}%
+   }%
+}
+\tw@make@key@macro*{\backdel}
 %    \end{macrocode}
 % \end{macro}\end{macro}\end{macro}\end{macro}\end{macro}\end{macro}\end{macro}
 % \end{macro}\end{macro}\end{macro}\end{macro}\end{macro}\end{macro}\end{macro}
+% \end{macro}\end{macro}
 %
 % \begin{macro}{\arrowkeyup}\begin{macro}{\arrowkeydown}
 % \begin{macro}{\arrowkeyleft}\begin{macro}{\arrowkeyright}
