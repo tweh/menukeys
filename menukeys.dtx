@@ -597,24 +597,21 @@
 % \end{verbatim}
 %
 % \subsection{Keys}
-% \DM{\shift}\DM{\capslock}\DM{\tab}\DM{\esc}\DM{\oldesc}\DM{\ctrl}\DM{\alt}
-% \DM{\AltGr}\DM{\cmd}
 % The \menukeys package comes with some macros to print
 % special keys in the sequences set with |\keys|. Depending on
-% the given OS (see Section~\ref{options}) some macros behave
+% the given OS (see section~\ref{options}) some macros behave
 % differently to be able to use a key even if it's undefined
 % via the \opt{os} option macros like |\|\meta{key}|mac| and
 % |\|\meta{key}|win| that will always give the right symbol.
-% 
-% \DM{\return}\DM{\enter}\DM{\winmenu}\DM{\backspace}\DM{\del}
-% \DM{\arrowkeyup}\DM{\arrowkeydown}\DM{\arrowkeyleft}\DM{\arrowkeyright}
-% Here is a full list of available macros:
-%  
-% \DM{\Space}\DM{\SPACE}\mbox{}\par
-%  \medskip\noindent{\small
+%
+% The full ist of key macros is shown in table~\ref{tab:keys}.
+%
+% \begin{table}[ht]
+%  \caption{Overview of all key macros.}\label{tab:keys}
+%  \small
 %  \renewcommand{\arraystretch}{1.25}
-%  \begin{minipage}{0.45\textwidth}
-%  \begin{tabular}{lll}
+%  \begin{minipage}[t]{0.45\textwidth}
+%  \begin{tabular}[t]{lll}
 %     \hline
 %     \textbf{Macro} & \textbf{Mac} & \textbf{Win.} \\
 %     \hline
@@ -627,21 +624,22 @@
 %     |\Alt| & alt / \Altmac & \Altwin \\
 %     |\AltGr| & & \AltGr \\
 %     |\cmd|   & cmd / \cmdmac & \\
-%     |\Space| &  & \\
+%     |\Space| & [empty sp.] & [empty sp.] \\
 %     |\SPACE| & \spacename & \spacename \\
 %     |\return| & \returnmac & \returnwin \\
 %     |\enter| & \entermac & \enterwin \\
 %     \hline
 %  \end{tabular}
 %  \end{minipage}\hfill
-%  \begin{minipage}{0.45\textwidth}
-%  \begin{tabular}{lll}
+%  \begin{minipage}[t]{0.45\textwidth}
+%  \begin{tabular}[t]{lll}
 %     \hline
 %     \textbf{Macro} & \textbf{Mac} & \textbf{Win.} \\
 %     \hline
 %     |\winmenu| & & \winmenuwin \\
 %     |\backspace| & \backspace & \backspace\\
 %     |\del| & Del. / \delmac & \delwin{}\\
+%     |\backdel| & Del. / \backdelmac & \backdelwin{}\\
 %     |\arrowkey{^}| & \arrowkey{^} & \arrowkey{^} \\
 %     |\arrowkeyup| & \arrowkeyup & \arrowkeyup\\
 %     |\arrowkey{v}| & \arrowkey{v} & \arrowkey{v} \\
@@ -652,9 +650,10 @@
 %     |\arrowkeyleft| & \arrowkeyleft & \arrowkeyleft\\
 %     \hline
 %  \end{tabular}
-%  \end{minipage}}
-% 
-% \medskip\DM{\arrowkey}
+%  \end{minipage}
+% \end{table}
+%
+% \DM{\arrowkey}
 % The macro |\arrowkey|\marg{direction} is a little special
 % since it takes the direction as a singe character |^|, |v|
 % (lower case v), |>| or |<|.
@@ -711,7 +710,7 @@
 %    \end{macrocode}
 % the color package \pkg{xcolor} and \pkg{adjustbox} for the
 % |typewriterkeys| sytle.
-%     \begin{macrocode}
+%    \begin{macrocode}
 \RequirePackage{xcolor}
 \RequirePackage{adjustbox}
 %    \end{macrocode}
@@ -722,7 +721,7 @@
 %    \end{macrocode}
 % To define the list parsing commands and allow |\| as
 % a seperator we load \pkg{catoptions}
-%     \begin{macrocode}
+%    \begin{macrocode}
 \RequirePackage{catoptions}[2011/12/07]
 %    \end{macrocode}
 %
@@ -744,7 +743,7 @@
 % \end{macro}\end{macro}\end{macro}
 % \begin{macro}{\tw@mk@tempa}\begin{macro}{\tw@mk@tempb}
 % Some commads for temporary use:
-%     \begin{macrocode}
+%    \begin{macrocode}
 \def\tw@mk@tempa{}
 \def\tw@mk@tempb{}
 %    \end{macrocode}
@@ -761,7 +760,7 @@
 %
 % \subsection{Options}
 % First we declare and process the package options
-%     \begin{macrocode}
+%    \begin{macrocode}
 \RequirePackage{kvoptions}
 \SetupKeyvalOptions{
   family=tw@mk,
@@ -774,7 +773,7 @@
 \ProcessKeyvalOptions{tw@mk}\relax
 %    \end{macrocode}
 % Now we have to do some error treatment:
-%     \begin{macrocode}
+%    \begin{macrocode}
 \IfSubStr{.mac.win.}{.\tw@mk@os.}{}{%
    \tw@mk@error{Unknown value for option 'os'\MessageBreak
    Possible values are 'mac' or 'win'.}%
@@ -814,7 +813,7 @@
 % \end{macro}\end{macro}
 % \begin{macro}{\changemenucolor}\begin{macro}{\copymenucolortheme}
 % Lastyle we define the changing and copying commands
-%     \begin{macrocode}
+%    \begin{macrocode}
 \newcommand*{\changemenucolor}[4]{%
    \IfSubStr{ bg br txt }{ #2 }{%
       \definecolor{tw@color@theme@#1@#2}{#3}{#4}%
@@ -837,7 +836,7 @@
 % \end{macro}\end{macro}
 % \begin{macro}{\changemenucolortheme}
 % To be able to change the color theme of a style we must define this:
-%     \begin{macrocode}
+%    \begin{macrocode}
 \newcommand{\changemenucolortheme}[2]{%
    \ifcsundef{tw@style@#1@pre}{%
       \tw@mk@error{Style '#1' undefined!\MessageBreak
@@ -854,7 +853,7 @@
 % \end{macro}
 % \begin{macro}{\usemenucolor}
 % To use a color of a theme we define |\usemenucolor| as following.
-%     \begin{macrocode}
+%    \begin{macrocode}
 \newcommand{\usemenucolor}[1]{%
    tw@color@theme@\tw@current@color@theme @#1%
 }
@@ -862,7 +861,7 @@
 % \end{macro}
 % \subsubsection{Predefined themes}
 % There are two predefined color themes
-%     \begin{macrocode}
+%    \begin{macrocode}
 \tw@make@color@theme{gray}{gray}{0.95}{0.3}{0}
 \tw@make@color@theme{blacknwhite}{gray}{1}{0}{0}
 %    \end{macrocode}
@@ -887,7 +886,7 @@
 % Now we can define the internal commands.
 % \begin{macro}{\tw@declare@style@simple}
 % Our first step is to define the simple command.
-%     \begin{macrocode}
+%    \begin{macrocode}
 \DeclareDocumentCommand{\tw@declare@style@simple}{%
    s m O{\tw@default@pre} m O{\tw@default@sep} O{\tw@default@post} m
 }{%
@@ -921,7 +920,7 @@
 % The next step is to create the extended command. This command must have
 % ten arguments (including the star) so we have to define a helping macro
 % to grab the last two macros.
-%     \begin{macrocode}
+%    \begin{macrocode}
 \DeclareDocumentCommand{\tw@declare@sytle@extra@args}{%
    O{\tw@default@post} m
 }{%
@@ -965,7 +964,7 @@
 % \begin{macro}{providemenustylesimple}\begin{macro}{newmenustyle}\begin{macro}%
 % {renewmenustyle}\begin{macro}{providemenustyle}
 % It's time to define the user-level commands now:
-%     \begin{macrocode}
+%    \begin{macrocode}
 \NewDocumentCommand{\newmenustylesimple}{s m}{%
    \ifcsundef{tw@style@#2@pre}{%
       \IfBooleanTF{#1}{%
@@ -1042,7 +1041,7 @@
 % \begin{macro}{\copymenustyle}
 % The last two steps in this part are to define a comand to copy
 % styles
-%     \begin{macrocode}
+%    \begin{macrocode}
 \newcommand*{\copymenustyle}[2]{%
    \ifcsundef{tw@style@#1@pre}{%
       \ifcsundef{tw@style@#2@pre}{%
@@ -1104,7 +1103,7 @@
 % Now we can define the styles. To keep the most settings of
 % a style together we make additional \TikZ-styles instead of setting
 % everything directly to the |node|s.
-%     \begin{macrocode}
+%    \begin{macrocode}
 \tikzset{tw@menus@base/.style={%
    tw@set@tikz@colors,
    rounded corners=0.15ex,
@@ -1379,7 +1378,7 @@
 % \subsubsection{Internal commands}
 % \begin{macro}{\tw@default@input@sep}
 % First we define our default input seperator
-%     \begin{macrocode}
+%    \begin{macrocode}
 \edef\tw@default@input@sep{,}
 %    \end{macrocode}
 % \end{macro}
@@ -1396,7 +1395,7 @@
 % Then we set up the internal command to create new menu macros.
 % The list parsing code was essentially provided by Ahmed Musa at
 % \url{http://tex.stackexchange.com/a/44989/4918}. Thank you very much!
-%     \begin{macrocode}
+%    \begin{macrocode}
 \begingroup
 \lccode`\,=1
 \lowercase{\endgroup
@@ -1497,13 +1496,13 @@
 %    \end{macrocode}
 % \end{macro}\end{macro}\end{macro}
 % Lastly we close the |definemacros| if statment:
-%     \begin{macrocode}
+%    \begin{macrocode}
 \fi
 %    \end{macrocode}
 %
 % \subsection{Keys}
 % Before we define anything we check if the user allows it:
-%     \begin{macrocode}
+%    \begin{macrocode}
 \iftw@mk@definekeys
 %    \end{macrocode}
 %
@@ -1514,7 +1513,7 @@
 % to store the |{tikzpicture}|, that will draw the key later.
 % This is necessary because otherwise the picture will inherit
 % the style of the key sequence |node|.
-%     \begin{macrocode}
+%    \begin{macrocode}
 \NewDocumentCommand{\tw@make@key@box}{m m}{%
 %   \expandafter\newbox\csname tw@mk@box@#1\endcsname
 %   \expandafter\sbox\csname tw@mk@box@#1\endcsname{%
@@ -1533,7 +1532,7 @@
 % if the apperance differs between Mac and Windows.
 % To use this macro we assume that the |tw@mk@|\meta{key} commads
 % are defined.
-%     \begin{macrocode}
+%    \begin{macrocode}
 \NewDocumentCommand{\tw@make@key@macro}{s m}{%
    \IfBooleanTF{#1}{%
       \expandafter\providecommand\csname\expandafter\@gobble\string#2\endcsname{%
@@ -1564,7 +1563,7 @@
 % \begin{macro}{\tw@define@mackey}
 % The last helping macro is |\tw@define@mackey|. We use it to exequte
 % code depending on the |mackeys| option.
-%     \begin{macrocode}
+%    \begin{macrocode}
 \newcommand*{\tw@define@mackey}[2]{%
    \IfStrEq{text}{\tw@mk@mackeys}{#1}{%
       \IfStrEq{symbols}{\tw@mk@mackeys}{#2}{}%
@@ -1574,7 +1573,7 @@
 % \end{macro}
 %
 % Next thing to do is to set up some \TikZ-styles.
-%     \begin{macrocode}
+%    \begin{macrocode}
 \tikzset{
    menukeys key symbol/.style={
       rounded corners=0pt,
@@ -1585,16 +1584,11 @@
 }
 %    \end{macrocode}
 %
-% \begin{macro}{\shift}\begin{macro}{\capslock}\begin{macro}{\tab}
-% \begin{macro}{\esc}\begin{macro}{\ctrl}\begin{macro}{\alt}
-% \begin{macro}{\AltGr}\begin{macro}{\cmd}\begin{macro}{\Space}
-% \begin{macro}{\return}\begin{macro}{\enter}\begin{macro}{\winmenu}
-% \begin{macro}{\backspace}\begin{macro}{\del}\begin{macro}{\backdel}
-% \changes{v1.4}{2016/04/17}{Fixed direction of \cs{escmac}; added \cs{oldesc}}
-% \changes{v1.4}{2016/04/17}{Added \cs{backdel}}
 % Now we ar prepared to generate the key macros. I will be nearly the same
 % way for all keys. Step one is to build a |tw@mk@|\meta{key} macro
-%     \begin{macrocode}
+% and then we define the user-level command |\|\meta{key}
+% \begin{macro}{\shift}
+%    \begin{macrocode}
 \normalsize
 \tw@make@key@box{shift}{%
    \begin{tikzpicture}[yshift=-0.1ex,menukeys key symbol]
@@ -1603,15 +1597,17 @@
             (0.3ex,1.2ex) -- cycle;
    \end{tikzpicture}%
 }
-%    \end{macrocode}
-% and then we define the user-level command |\|\meta{key}
-%     \begin{macrocode}
 \tw@make@key@macro{\shift}
 %    \end{macrocode}
-% It's a little more complicated if the apperance should differ depending
-% on the OS. The first step again is to define |tw@mk@|\meta{key}|@mac|
-% and |tw@mk@|\meta{key}|@win|:
-%     \begin{macrocode}
+% \end{macro}
+% It's a little more complicated if the apperance should differ depending on the
+% OS: The first step again is to define |tw@mk@|\meta{key}|@mac| and
+% |tw@mk@|\meta{key}|@win|. And then use the starred version
+% |\tw@make@key@macro*| which creates |\|\meta{key} that depends on the |os|
+% option, |\|\meta{key}|mac| and |\|\meta{key}|win|, that are not affected by
+% |os|.
+% \begin{macro}{\capslock}
+%    \begin{macrocode}
 \tw@make@key@box{capslock@mac}{%
    \begin{tikzpicture}[yshift=-0.1ex,menukeys key symbol]
       \draw (0.3ex,0.7ex) -- (1.1ex,0.7ex) -- (1.1ex,1.2ex) -- %
@@ -1627,14 +1623,11 @@
             (0.3ex,1.2ex) -- cycle;
    \end{tikzpicture}%
 }
-%    \end{macrocode}
-% And then use the starred version |\tw@make@key@macro*| which creates
-% |\|\meta{key} that depends on the |os| option, |\|\meta{key}|mac|
-% and |\|\meta{key}|win|, that are not affected by |os|.
-%     \begin{macrocode}
 \tw@make@key@macro*{\capslock}
 %    \end{macrocode}
+% \end{macro}
 % Here are the other macros:
+% \begin{macro}{\tab}
 %    \begin{macrocode}
 \tw@make@key@box{tab@mac}{%
    \begin{tikzpicture}[yshift=0.6ex,menukeys key symbol]
@@ -1651,7 +1644,11 @@
    \end{tikzpicture}%
 }
 \tw@make@key@macro*{\tab}
-
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\esc}\begin{macro}{\oldesc}
+% \changes{v1.4}{2016/04/17}{Fixed direction of \cs{escmac}; added \cs{oldesc}}
+%    \begin{macrocode}
 \def\tw@mk@esc@win{Esc}
 \tw@define@mackey{%
    \def\tw@mk@esc@mac{esc}
@@ -1664,7 +1661,6 @@
    }%
 }
 \tw@make@key@macro*{\esc}
-
 \def\tw@mk@oldesc@win{Esc}
 \tw@define@mackey{%
    \def\tw@mk@oldesc@mac{esc}
@@ -1677,12 +1673,19 @@
    }%
 }
 \tw@make@key@macro*{\oldesc}
-
+%    \end{macrocode}
+% \end{macro}\end{macro}
+% \begin{macro}{\ctrl}
+%    \begin{macrocode}
 \providecommand\ctrlname{Ctrl}
 \def\tw@mk@ctrl@win{\ctrlname}
 \def\tw@mk@ctrl@mac{ctrl}
 \tw@make@key@macro*{\ctrl}
-
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\alt}
+% \begin{macro}{\AltGr}
+%    \begin{macrocode}
 \def\tw@mk@Alt@win{Alt}
 \tw@define@mackey{%
    \def\tw@mk@Alt@mac{alt}%
@@ -1695,9 +1698,11 @@
    }%
 }
 \tw@make@key@macro*{\Alt}
-
 \providecommand*{\AltGr}{Alt\,Gr}
-
+%    \end{macrocode}
+% \end{macro}\end{macro}
+% \begin{macro}{\cmd}
+%    \begin{macrocode}
 \def\tw@mk@cmd@win{%
    \tw@mk@warning{'\string\cmd' only for Mac!}%
 }
@@ -1714,11 +1719,17 @@
    }%
 }
 \tw@make@key@macro*{\cmd}
-
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\Space}\begin{macro}{\SPACE}
+%    \begin{macrocode}
 \providecommand*{\Space}{\expandonce{\rule{3em}{0pt}}}
 \newcommand{\spacename}{Space}
 \providecommand*{\SPACE}{\expandonce{\rule{2em}{0pt}\spacename\rule{2em}{0pt}}}
-
+%    \end{macrocode}
+% \end{macro}\end{macro}
+% \begin{macro}{\return}
+%    \begin{macrocode}
 \tw@make@key@box{return@mac}{%
    \begin{tikzpicture}[yshift=0.25ex,menukeys key symbol]
       \draw [->, rounded corners=0.2ex] (1.25ex,1ex) -| %
@@ -1731,7 +1742,10 @@
    \end{tikzpicture}%
 }
 \tw@make@key@macro*{\return}
-
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\enter}
+%    \begin{macrocode}
 \def\tw@mk@enter@win{Enter}
 \tw@make@key@box{enter@mac}{%
    \begin{tikzpicture}[menukeys key symbol]
@@ -1740,7 +1754,10 @@
    \end{tikzpicture}%
 }
 \tw@make@key@macro*{\enter}
-
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\winmenu}
+%    \begin{macrocode}
 \def\tw@mk@winmenu@mac{%
    \tw@mk@warning{'\string\winmenu' only for Windows!}%
 }
@@ -1753,14 +1770,21 @@
    \end{tikzpicture}%
 }
 \tw@make@key@macro*{\winmenu}
-
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\backspace}
+%    \begin{macrocode}
 \tw@make@key@box{backspace}{%
    \begin{tikzpicture}[yshift=0.65ex,menukeys key symbol]
       \draw [<-,menukeys thick] (0,0) -- (1.35em,0);
    \end{tikzpicture}%
 }
 \tw@make@key@macro{\backspace}
-
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\del}\begin{macro}{\backdel}
+% \changes{v1.4}{2016/04/17}{Added \cs{backdel}}
+%    \begin{macrocode}
 \providecommand{\delname}{Del.}
 \def\tw@mk@del@win{\delname}
 \tw@define@mackey{%
@@ -1791,14 +1815,12 @@
 }
 \tw@make@key@macro*{\backdel}
 %    \end{macrocode}
-% \end{macro}\end{macro}\end{macro}\end{macro}\end{macro}\end{macro}\end{macro}
-% \end{macro}\end{macro}\end{macro}\end{macro}\end{macro}\end{macro}\end{macro}
 % \end{macro}\end{macro}
 %
 % \begin{macro}{\arrowkeyup}\begin{macro}{\arrowkeydown}
 % \begin{macro}{\arrowkeyleft}\begin{macro}{\arrowkeyright}
 % Lastly we define the arrow macros:
-%     \begin{macrocode}
+%    \begin{macrocode}
 \tw@make@key@box{arrowkeyup}{%
    \begin{tikzpicture}[yshift=-0.2ex,menukeys key symbol]
       \draw [->] (0,0) -- (0,0.8em);
@@ -1830,7 +1852,7 @@
 % \end{macro}\end{macro}\end{macro}\end{macro}
 % \begin{macro}{\arrowkey}
 % And the |\arrowkey| macro that get's it's direction as argument.
-%     \begin{macrocode}
+%    \begin{macrocode}
 \newcommand{\arrowkey}[1]{%
    \IfStrEq{^}{#1}{\arrowkeyup}{%
       \IfStrEq{v}{#1}{\arrowkeydown}{%
@@ -1846,7 +1868,7 @@
 %    \end{macrocode}
 % \end{macro}
 % Close the |\iftw@mk@definekeys|
-%     \begin{macrocode}
+%    \begin{macrocode}
 \fi
 %    \end{macrocode}
 %
