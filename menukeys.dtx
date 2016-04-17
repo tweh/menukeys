@@ -350,7 +350,12 @@
 %    pdflatex menukeys.dtx
 % \end{verbatim}
 %
-% \section{Package options}\label{options}
+% \section{Package loading and options}\label{options}
+% Since \menukeys uses \pkg{catoptions}, which does some heavy changes on key-value
+% options, it is recommended to load \menukeys as the \textbf{last package}
+% (even after \pkg{hyperref}\footnote{See \url{http://tex.stackexchange.com/q/237683/4918}
+% and \url{https://github.com/tweh/menukeys/issues/41}.})!
+% 
 % These are the possible options:
 % \begin{description}
 %    \item [definemenumacros:] Most of \menukeys' macros should not
@@ -689,9 +694,6 @@
 %       Hello World!
 %    \end{document}
 %    \end{verbatim}
-%    \item Since \menukeys uses \pkg{catoptions} it may cause some problems
-%        with other packages because of \pkg{catoptions} option handling.
-%        I recommend to load \menukeys as a later package in your preamble.
 % \end{itemize}
 % If you find something to add to this list please send me an e-mail.
 %
