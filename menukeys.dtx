@@ -208,6 +208,8 @@
 %                             seems to crash with \pkg{babel}'s french option otherwise.}
 % \changes{v1.3}{2014/03/10}{Improved key symbols.}
 % \changes{v1.3}{2014/03/10}{Added \TikZ-styles for the key symbols.}
+% \changes{v1.4}{2016/04/17}{The \texttt{path...} styles now use the text color
+%                            of the selected color theme (fix issue \#16).}
 %
 % \GetFileInfo{menukeys.sty}
 %
@@ -1393,7 +1395,8 @@
 %    \end{macrocode}
 % \end{macro}
 % \begin{macro}{\tw@define@menu@macro}
-% \changes{v1.1a}{2013/05/28}{Fixed minor bug, that causes a warning about robustifying (issu \#23), by deleting the line to make the command robust.}
+% \changes{v1.1a}{2013/05/28}{Fixed minor bug, that causes a warning about robustifying (issue \#23),
+%    by deleting the line to make the command robust.}
 % \changes{v1.2}{2013/07/23}{Replaced \cs{edef} by \cs{protected@edef}}
 % \changes{v1.2c}{2013/07/23}{Replaced \cs{protected@edef} by \cs{def}}
 % \changes{v1.2}{2013/07/23}{Addded \cs{leavevmode}}
@@ -1491,7 +1494,8 @@
 \iftw@mk@definemenumacros
 %    \end{macrocode}
 % \begin{macro}{\menu}\begin{macro}{\directory}%
-% \changes{v1.1}{2012/02/27}{Renamed \cmd{\path} to \cmd{\directory} becuase it crashes with \pkg{biblatex}}
+% \changes{v1.1}{2012/02/27}{Renamed \cmd{\path} to \cmd{\directory} becuase it
+%    crashes with \pkg{biblatex}}
 % \begin{macro}{\keys}
 % And then we define three basic macros.
 %    \begin{macrocode}
