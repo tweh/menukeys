@@ -58,12 +58,13 @@
 \newcommand*{\fnt}[1]{\texttt{#1}}
 \newcommand*{\opt}[1]{\texttt{#1}}
 \newcommand{\DO}[1]{%
-\marginpar{\raggedleft\texttt{#1} \footnotesize(opt.)}%
-\index{#1=\texttt{#1}  (option)|usage}%
-\index{Options:>\texttt{#1}|usage}%
+   \marginpar{\raggedleft\texttt{#1} \footnotesize(opt.)}%
+   \index{#1=\texttt{#1}  (option)|usage}%
+   \index{Options:>\texttt{#1}|usage}%
+   \ignorespaces
 }
-\newcommand{\DM}[1]{\DescribeMacro{#1}}
-\newcommand{\DE}[1]{\DescribeEnv{#1}}
+\newcommand{\DM}[1]{\DescribeMacro{#1}\ignorespaces}
+\newcommand{\DE}[1]{\DescribeEnv{#1}\ignorespaces}
 \newcommand{\AST}{\meta{\texttt{*}}}
 
 \newcommand{\minisec}[1]{\par\medskip\noindent{\sffamily\bfseries#1}\quad}
@@ -78,8 +79,9 @@
    \index{Styles:>\texttt{#1}|usage}\\[0.5\baselineskip]
    \test{#2}\hfill\test{Single}\\[0.5\baselineskip]
    This is some more or less blind text, to demonstrate how
-   the sequence looks in text. This is way \test{#2} the
-   style which name is \texttt{#1} prints the list.
+   the sequence looks in text. This \test{#2} is the result
+   of a style which name is \texttt{#1}. And again some
+   blind text without any sense.
    \end{minipage}
 }}
 \makeatletter
@@ -203,7 +205,7 @@
 %                            the \texttt{ex} unit available}
 % \changes{v1.2a}{2013/09/10}{Replaced obsolete \cs{tikzsytle}}
 % \changes{v1.2a}{2013/09/10}{Added braces to the \cs{tikz} macro since the parser
-%                             seems to crash with \pkg{babels} french option otherwise.}
+%                             seems to crash with \pkg{babel}'s french option otherwise.}
 % \changes{v1.3}{2014/03/10}{Improved key symbols.}
 % \changes{v1.3}{2014/03/10}{Added \TikZ-styles for the key symbols.}
 %
@@ -286,7 +288,7 @@
 %    \noindent
 %    This package is build to format menu sequences, paths and keystrokes.
 %    \par\medskip\noindent
-%    You're welcome to send me feedback, questions, bug reports and feature request.
+%    You're welcome to send me feedback, questions, bug reports and feature requests.
 %    If you like to support this package -- especially improving or proofreading the
 %    manual -- send me an e-mail, please.
 %    \par\bigskip\noindent
@@ -300,13 +302,13 @@
 % The \menukeys package is mainly designed to parse and print
 % sequences of software menus, folders and files or keystrokes.
 % The most predefined styles use the power of \TikZ\footnote{See
-% \url{http://www.ctan.org/pkg/pgf}.} to format the output
+% \url{http://www.ctan.org/pkg/pgf}.} to format the output.
 % 
 % For example if you want to tell the reader of a manual how to set the ruler
 % unit you may type
 % \begin{verbatim}
 %    To set the unit of the rulers go to \menu{Extras > Settings > Rulers}
-%    and choose between millimetres, inches and pixels. The short cut
+%    and choose between millimetres, inches and pixels. The shortcut
 %    to view the rulers is \keys{cmd + R}. Pressing these keys again
 %    will hide the rulers.
 %    
@@ -318,7 +320,7 @@
 % 
 % \medskip
 %    To set the unit of the rulers go to \menu{Extras > Settings > Rulers}
-%    and choose between millimetres, inches and pixels. The short cut
+%    and choose between millimetres, inches and pixels. The shortcut
 %    to view the rulers is \keys{cmd + R}. Pressing these keys again
 %    will hide the rulers.
 %    
@@ -353,10 +355,10 @@
 % \begin{description}
 %    \item [definemenumacros:] Most of \menukeys' macros should not
 %       conflict with other packages\footnote{If you find a conflict send an e-mail.}
-%       but the predefined menu macros should be short and easy to read
+%       but the predefined menu macros should be short and easy-to-read
 %       commands, which means that |\menu{A,B,C}| is preferred against
-%       |\printmenusequence{A,B,C}|. For that it's not unlikely that these
-%       conflict with other packages. To prevent this you cant tell
+%       |\printmenusequence{A,B,C}|. For that it's not unlikely that they
+%       conflict with other packages. To prevent this you can tell
 %       \menukeys to not define them by calling the option \DO{definemenumacros}
 %       |definemenumacros=false|. The default value is |true|.
 %       
@@ -364,11 +366,11 @@
 %       for details.
 %    \item [definekeys:] Equal to |definemenumacros|  \DO{definekeys}  for the key macros.
 %       The default value is |true|.
-%    \item [mackeys:] This option \DO{mackeys} allows you to decide wether the mac keys
+%    \item [mackeys:] This option \DO{mackeys} allows you to decide whether the mac keys
 %       are shown as text (|mackeys=text|) or symbols  (|mackeys=symbols|). The default
-%       value is |symbols|
+%       value is |symbols|.
 %    \item [os:] You can specify the OS \DO{os} by saying |os=mac| or |os=win|. This will cause
-%       some key macros to be rendered different. The default value is |mac|.
+%       some key macros to be rendered differently. The default value is |mac|.
 % \end{description}
 % 
 % \section{Usage}
@@ -386,7 +388,7 @@
 % 
 % The possible input separators are |/|, |=|, |*|, |+|, |,|, |;|, |:|, |-|, |>|,
 % |<| and |bslash| (to use |\| as separator).  You can hide a separator from the
-% parser by putting a part of the sequence in braces. Spaces around the seperator
+% parser by putting a part of the sequence in braces. Spaces around the separator
 % will be ignored, i.e. |\keys{\ctrl+C}| equals |\keys{\ctrl + C}|.
 % \example |\menu[,]{Extras,Settings,{Units, rulers and origin}}| gives 
 % \menu[,]{Extras,Settings,{Units, rulers and origin}}
@@ -410,7 +412,7 @@
 % \teststyle{pathswithblackfolder}{C:,User,Folder,MyFile.tex}
 % 
 % \bigskip
-% The following three styles allow paths elements to be hyphened, but
+% The following three styles allow paths elements to be hyphenated, but
 % they insert only a line break without a hyphen dash. Note that they only
 % work with |T1| and |OT1| encoding, at least I tested only these ones.
 % \teststyle{hyphenatepaths}{C:,Database,User,ALongUserNameHere,%
@@ -439,8 +441,8 @@
 %    \item [post] is the code which is executed after a menu macro.
 %    \item [theme] is a color theme (see section~\ref{colors}).
 % \end{description}
-% \example Let us consider we want a list that prints a frame around it's
-% elements and seperates them by a star. We can use
+% \example Let us consider we want a list that prints a frame around its
+% elements and separates them by a star. We can use
 % \begin{verbatim}
 %    \newmenustylesimple{mystyle}{draw}[$\ast$]{mycolors}
 % \end{verbatim}
@@ -474,7 +476,7 @@
 %       {draw}{draw,red}{draw,dashed}[$\bullet$]
 % \end{verbatim}
 % 
-% If the \TikZ |node| system doesn't fit you needs there are the \textbf{starred versions}:
+% If the \TikZ |node| system doesn't fit your needs there are the \textbf{starred versions}:
 % Use them and the arguments \meta{first}, 
 % \meta{mid}, \meta{last}, \meta{single} can be any \LaTeX{} code. To access the
 % current list element use \DM{\CurrentMenuElement}|\CurrentMenuElement|.
@@ -490,7 +492,7 @@
 % section~\ref{colors} for details about possible elements).
 % 
 % \subsubsection{Copying styles}
-% To copy an existing style to a new style us \DM{\copymenustyle}|\copymenustyle|%
+% To copy an existing style to a new style use \DM{\copymenustyle}|\copymenustyle|%
 % \marg{copy}\marg{original}.
 % \example To copy the definition of |mystyle| to |mycopy| use
 % \begin{verbatim}
@@ -502,7 +504,7 @@
 % an existing style. For the first case there is \DM{\changemenuelement}
 % |\changemenuelement|\AST\marg{name} \marg{element}\marg{definition}, where the starred
 % version works like the one of |\newmenustyle| does.
-% \example to change the single element of |mystyle| frome dashed to solid use the
+% \example To change the single element of |mystyle| from dashed to solid use the
 % following code. You may save the original style by copying it as described above.
 % \begin{verbatim}
 %    \changemenuelement{mystyle}{single}{draw}
@@ -515,13 +517,13 @@
 % \end{verbatim}
 % 
 % \DM{\renewmenustylesimple}\DM{\providemenustylesimple}\DM{\renewmenustyle}%
-% \DM{\providemenustyle} The next level is redefing a style. This package provides
+% \DM{\providemenustyle} The next level is redefining a style. This package provides
 % the following  macros the work like their \LaTeX-paragons and have the same
 % arguments as the above described macros: |\renewmenustylesimple|,
 % |\providemenustylesimple|, |\renewmenustyle| and |\providemenustyle|.
 %
 % \subsection{Color themes}\label{colors}%
-% To make the colors of a style became changeable without
+% To make the colors of a style become changeable without
 % touching the style itself, \menukeys uses ``color themes''. Every color theme
 % must contain three color definitions that can be used to draw a |node| 
 % background, a |node| frame and a text color.
@@ -563,7 +565,7 @@
 % It works with the same arguments as |\newmenucolortheme|.
 %
 % \subsection{Menu macros}\label{menumacros}%
-% The ``menu marcos'' take a list seperated by a special symbol to
+% The ``menu marcos'' take a list separated by a special symbol to
 % print it with a menu style.
 % \subsubsection{Predefined menu macros}
 % See section~\ref{basics}.
@@ -572,7 +574,7 @@
 % \oarg{input sep}\marg{style}.
 % \begin{description}
 %    \item [name] is a \LaTeX{} control sequence name.
-%    \item [input sep] is the default seperator used in the input list 
+%    \item [input sep] is the default separator used in the input list 
 %       (see section~\ref{basics} for a list of valid separators).
 %    
 %       If you don't give it the package's default (|,|) is used.
@@ -589,8 +591,8 @@
 % 
 % \DM{\providemenumacro}\DM{\renewmenumacro}There are also the two commands
 % |\providemenumacro| and |\renewmenumacro| which take the same arguments as
-% |\newmenumacro| and word like their \LaTeX{} analogons.
-% \example To change the default input seperator of |\menu| you must know
+% |\newmenumacro| and work like the \LaTeX{} macros |\renewcommand| and |\providecommand|.
+% \example To change the default input separator of |\menu| you must know
 % the default style (which is |menus|) and then you can say
 % \begin{verbatim}
 %    \renewmenumacro{\menu}[,]{menus}
@@ -687,8 +689,8 @@
 %       Hello World!
 %    \end{document}
 %    \end{verbatim}
-%    \item Since \menukeys uses \pkg{catoptions} it may causes some problems
-%        with orther packages becaus of \pkg{catoptions} option handling.
+%    \item Since \menukeys uses \pkg{catoptions} it may cause some problems
+%        with other packages because of \pkg{catoptions} option handling.
 %        I recommend to load \menukeys as a later package in your preamble.
 % \end{itemize}
 % If you find something to add to this list please send me an e-mail.
@@ -703,7 +705,7 @@
 \RequirePackage{xstring}
 \RequirePackage{etoolbox}
 %    \end{macrocode}
-% Furthermore we need \TikZ and some of it's libraries,
+% Furthermore we need \TikZ and some of its libraries,
 %    \begin{macrocode}
 \RequirePackage{tikz}
    \usetikzlibrary{calc,shapes.symbols,shadows}
@@ -720,7 +722,7 @@
 \RequirePackage{relsize}
 %    \end{macrocode}
 % To define the list parsing commands and allow |\| as
-% a seperator we load \pkg{catoptions}
+% a separator we load \pkg{catoptions}
 %    \begin{macrocode}
 \RequirePackage{catoptions}[2011/12/07]
 %    \end{macrocode}
@@ -742,7 +744,7 @@
 %    \end{macrocode}
 % \end{macro}\end{macro}\end{macro}
 % \begin{macro}{\tw@mk@tempa}\begin{macro}{\tw@mk@tempb}
-% Some commads for temporary use:
+% Some commands for temporary use:
 %    \begin{macrocode}
 \def\tw@mk@tempa{}
 \def\tw@mk@tempb{}
@@ -812,7 +814,7 @@
 %    \end{macrocode}
 % \end{macro}\end{macro}
 % \begin{macro}{\changemenucolor}\begin{macro}{\copymenucolortheme}
-% Lastyle we define the changing and copying commands
+% Lastly we define the changing and copying commands
 %    \begin{macrocode}
 \newcommand*{\changemenucolor}[4]{%
    \IfSubStr{ bg br txt }{ #2 }{%
@@ -872,7 +874,7 @@
 % \begin{macro}{\tw@default@pre}
 % \begin{macro}{\tw@default@post}
 % Before we can define the internal
-% declaring macro to use it later in the the user level commands, we have to set
+% declaring macro to use it later in the user level commands, we have to set
 % some defaults for the optional arguments
 %    \begin{macrocode}
 \newcommand{\tw@default@sep}{%
@@ -959,7 +961,7 @@
 }
 %    \end{macrocode}
 % \end{macro}\end{macro}
-% \subsubsection{User-level commads}
+% \subsubsection{User-level commands}
 % \begin{macro}{newmenustylesimple}\begin{macro}{renewmenustylesimple}%
 % \begin{macro}{providemenustylesimple}\begin{macro}{newmenustyle}\begin{macro}%
 % {renewmenustyle}\begin{macro}{providemenustyle}
@@ -1039,7 +1041,7 @@
 % 
 % \subsubsection{Copying and changing}
 % \begin{macro}{\copymenustyle}
-% The last two steps in this part are to define a comand to copy
+% The last two steps in this part are to define a command to copy
 % styles
 %    \begin{macrocode}
 \newcommand*{\copymenustyle}[2]{%
@@ -1377,7 +1379,7 @@
 % \subsection{Menu macros}
 % \subsubsection{Internal commands}
 % \begin{macro}{\tw@default@input@sep}
-% First we define our default input seperator
+% First we define our default input separator
 %    \begin{macrocode}
 \edef\tw@default@input@sep{,}
 %    \end{macrocode}
@@ -1507,7 +1509,7 @@
 %    \end{macrocode}
 %
 % Before define the key macros we create some macros that save some typing by
-% condensing the similarities between the key marcros.
+% condensing the similarities between the key macros.
 % \begin{macro}{\tw@make@key@box}
 % The first of these macros helps us building save boxes
 % to store the |{tikzpicture}|, that will draw the key later.
@@ -1530,7 +1532,7 @@
 % The next macro defines the user level command by accessing a
 % macro like |tw@mk@|\meta{key} or |tw@mk@|\meta{key}|@|\meta{os},
 % if the apperance differs between Mac and Windows.
-% To use this macro we assume that the |tw@mk@|\meta{key} commads
+% To use this macro we assume that the |tw@mk@|\meta{key} commands
 % are defined.
 %    \begin{macrocode}
 \NewDocumentCommand{\tw@make@key@macro}{s m}{%
