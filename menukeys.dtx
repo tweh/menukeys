@@ -71,28 +71,43 @@
 \newcommand{\example}{\minisec{Example}\xspace}
 
 \providemenumacro{\test}{roundedmenus}
-\newcommand{\teststyle}[2]{{%
-   \renewmenumacro{\test}{#1}%
-   \par\vspace{\baselineskip}
-   \noindent\begin{minipage}{\textwidth}
-   Name: \texttt{#1}\index{#1=\texttt{#1}  (style)|usage}%
-   \index{Styles:>\texttt{#1}|usage}\\[0.5\baselineskip]
-   \test{#2}\hfill\test{Single}\\[0.5\baselineskip]
+\NewDocumentCommand{\teststyle}{ o m m m }{{%
+   \renewmenumacro{\test}{#2}%
+   \par\vspace{1.5\baselineskip plus 0.5\baselineskip minus 0.25\baselineskip}
+   \noindent
+   \fbox{\begin{minipage}{0.97\textwidth}
+   Name: \texttt{#2}
+      \index{#2=\texttt{#2}  (style)|usage}%
+      \index{Styles:>\texttt{#2}|usage}
+   \par\vspace{0.5\baselineskip}%
+   \test{#3}
+   \par\vspace{0.5\baselineskip}%
+   \test{#4}%
+   \par\vspace{0.5\baselineskip}%
    This is some more or less blind text, to demonstrate how
-   the sequence looks in text. This \test{#2} is the result
-   of a style which name is \texttt{#1}. And again some
-   blind text without any sense.
-   \end{minipage}
+   the sequence looks in text. This \test{#3} is the result
+   of a style which name is \texttt{#2}. And again some
+   blind text without any sense.%
+   \IfValueT{#1}{{%
+      \par\vspace{0.5\baselineskip}%
+      \itshape\footnotesize#1\par
+   }}%
+   \end{minipage}}%
 }}
 \makeatletter
-\newcommand{\colortest}[1]{%
-   \par\vspace{\baselineskip}
+\newcommand{\colortest}[1]{{%
+   \par\vspace{\baselineskip}%
+   \setlength{\fboxsep}{0pt}%
    \noindent Name: \texttt{#1}\index{#1=\texttt{#1}  (theme)|usage}%
-   \index{Color themes:>\texttt{#1}|usage}%\\[0.5\baselineskip]
-   \qquad\colorbox{tw@color@theme@#1@bg}{\strut Background}\qquad
-   \fcolorbox{tw@color@theme@#1@br}{white}{\strut Border \rule{1ex}{1ex}}\qquad
-   \textcolor{tw@color@theme@#1@txt}{\strut Text \rule{1ex}{1ex}}
-}
+   \index{Color themes:>\texttt{#1}|usage}
+   \\[0.5\baselineskip]
+   Background: \fbox{\textcolor{tw@color@theme@#1@bg}{\rule[-0.4ex]{2.2ex}{2.2ex}}}
+   \quad Border: \fbox{\textcolor{tw@color@theme@#1@br}{\rule[-0.4ex]{2.2ex}{2.2ex}}}
+   \quad Text: \fbox{\textcolor{tw@color@theme@#1@txt}{\rule[-0.4ex]{2.2ex}{2.2ex}}}
+   \quad (A: \fbox{\textcolor{tw@color@theme@#1@a}{\rule[-0.4ex]{2.2ex}{2.2ex}}}
+   \quad B: \fbox{\textcolor{tw@color@theme@#1@b}{\rule[-0.4ex]{2.2ex}{2.2ex}}}
+   \quad C: \fbox{\textcolor{tw@color@theme@#1@c}{\rule[-0.4ex]{2.2ex}{2.2ex}}}\kern2pt)
+}}
 \makeatother
 
 \MakeShortVerb{\|}
@@ -210,6 +225,7 @@
 % \changes{v1.3}{2014/03/10}{Added \TikZ-styles for the key symbols.}
 % \changes{v1.4}{2016/04/17}{The \texttt{path...} styles now use the text color
 %                            of the selected color theme (fix issue \#16).}
+% \changes{v1.4}{2016/04/18}{Extended color theme features.}
 %
 % \GetFileInfo{menukeys.sty}
 %
@@ -406,31 +422,64 @@
 % created by the user.
 % \subsubsection{Predefined styles}
 % 
-% \teststyle{menus}{File,Extras,Preferences}
-% \teststyle{roundedmenus}{File,Extras,Preferences}
-% \teststyle{angularmenus}{File,Extras,Preferences}
-% \teststyle{roundedkeys}{Ctrl,Alt,Q}
-% \teststyle{shadowedroundedkeys}{Ctrl,Alt,Q}
-% \teststyle{angularkeys}{Ctrl,Alt,Q}
-% \teststyle{shadowedangularkeys}{Ctrl,Alt,Q}
-% \teststyle{typewriterkeys}{Alt,Q}
-% \teststyle{paths}{C:,User,Folder,MyFile.tex}
-% \teststyle{pathswithfolder}{C:,User,Folder,MyFile.tex}
-% \teststyle{pathswithblackfolder}{C:,User,Folder,MyFile.tex}
+% \teststyle{menus}{File,Extras,Preferences}{Menu}
+% \teststyle{roundedmenus}{File,Extras,Preferences}{Menu}
+% \teststyle{angularmenus}{File,Extras,Preferences}{Menu}
+% \teststyle[The color of + is taken from optional color B.]
+%    {roundedkeys}{Ctrl,Alt,Q}{S}
+% \teststyle[The color of + is taken from optional color B.\\
+%    The shadow color is taken from optional color C.]
+%    {shadowedroundedkeys}{Ctrl,Alt,Q}{S}
+% \teststyle[The color of + is taken from optional color B.]
+%    {angularkeys}{Ctrl,Alt,Q}{S}
+% \teststyle[The color of + is taken from optional color B.\\
+%    The shadow color is taken from optional color C.]
+%    {shadowedangularkeys}{Ctrl,Alt,Q}{S}
+% \teststyle[The color of + is taken from optional color B.]
+%    {typewriterkeys}{Alt,Q}{S}
+% \teststyle[The sep color is taken from optional color C.]
+%    {paths}{C:,User,Folder,MyFile.tex}{MyFile.tex}
+% \teststyle[%
+%    The folder draw color is taken from optional color B.\\
+%    The folder fill color is taken from optional color A.\\
+%    The sep color is taken from optional color C.%
+%    ]
+%    {pathswithfolder}{C:,User,Folder,MyFile.tex}{MyFile.tex}
+% \teststyle[%
+%    The folder draw color is taken from optional color B.\\
+%    The folder fill color is taken from optional color C.\\
+%    The sep color is taken from optional color C.%
+%    ]
+%    {pathswithblackfolder}{C:,User,Folder,MyFile.tex}{MyFile.tex}
 % 
-% \bigskip
+% \bigskip\noindent
 % The following three styles allow paths elements to be hyphenated, but
 % they insert only a line break without a hyphen dash. Note that they only
-% work with |T1| and |OT1| encoding, at least I tested only these ones.
-% \teststyle{hyphenatepaths}{C:,Database,User,ALongUserNameHere,%
-%    ALongerFolderNameAtThisPlace,MyFile.tex}
-% \teststyle{hyphenatepathswithfolder}{C:,Database,User,ALongUserNameHere,%
-%    ALongerFolderNameAtThisPlace,MyFile.tex}
-% \teststyle{hyphenatepathswithblackfolder}{C:,Database,User,ALongUserNameHere,%
-%    ALongerFolderNameAtThisPlace,MyFile.tex}
+% work with |T1| and |OT1| encoding (at least I tested only these ones)
+% and that this in some cases doesn't work very well.
+% \teststyle[The sep color is taken from optional color C.]
+%    {hyphenatepaths}{C:,Database,User,ALongUserNameHere,%
+%    ALongerFolderNameAtThisPlace,MyFile.tex}{MyFile.tex}
+% \teststyle[%
+%    The folder draw color is taken from optional color B.\\
+%    The folder fill color is taken from optional color A.\\
+%    The sep color is taken from optional color C.%
+%    ]
+%    {hyphenatepathswithfolder}{C:,Database,User,ALongUserNameHere,%
+%    ALongerFolderNameAtThisPlace,MyFile.tex}{MyFile.tex}
+% \teststyle[%
+%    The folder draw color is taken from optional color B.\\
+%    The folder fill color is taken from optional color C.\\
+%    The sep color is taken from optional color C.%
+%    ]
+%    {hyphenatepathswithblackfolder}{C:,Database,User,ALongUserNameHere,%
+%    ALongerFolderNameAtThisPlace,MyFile.tex}{MyFile.tex}
 %
+% \bigskip\pagebreak
 % \minisec{Hint} The folder is drawn with the command \DM{\drawtikzfolder}
-% |\drawtikzfolder|\oarg{frontcolor} which is part of \menukeys.
+% |\drawtikzfolder| which is part of \menukeys and has two optional arguments
+% to change the color of the lines and the fill color of the front:\\
+% |\drawtikzfolder|\oarg{front fill}\oarg{draw}
 % 
 % \subsubsection{Declaring styles}
 % The simplest way to define a new style is to use \DM{\newmenustylesimple}
@@ -533,13 +582,15 @@
 % To make the colors of a style become changeable without
 % touching the style itself, \menukeys uses ``color themes''. Every color theme
 % must contain three color definitions that can be used to draw a |node| 
-% background, a |node| frame and a text color.
+% background, a |node| frame and a text color, and aditionally two optional
+% colors used by some themes.
 % \subsubsection{Predefined themes}
 % There are two predefined color themes
 % \colortest{gray}\colortest{blacknwhite}
 % \subsubsection{Create a theme}
 % \DM{\newmenucolortheme}To create a new theme use |\newmenucolortheme|. It uses the
-% following five arguments: |\newmenucolortheme|\marg{name}\marg{model}\marg{bg}\marg{br}\marg{txt}
+% following arguments:\\
+% |\newmenucolortheme|\marg{name}\marg{model}\marg{bg}\marg{br}\marg{txt}\oarg{a}\oarg{b}\oarg{c}
 % \begin{description}
 %    \item [name] is the name of the theme and must contain only letters.
 %    \item [model] is the \pkg{xcolor} color model which is used to define a color, e.g.
@@ -547,6 +598,9 @@
 %    \item [bg] is the color definition for the |node| background.
 %    \item [br] is the color definition for the |node| border.
 %    \item [txt] is the color definition for the |node|'s text.
+%    \item [a] is an optional aditional color (by default same as bg).
+%    \item [b] is an optional aditional color (by default same as br).
+%    \item [c] is an optional aditional color (by default same as txt).
 % \end{description}
 % \example To create a theme called |mycolors| we can say
 % \begin{verbatim}
@@ -795,26 +849,31 @@
 % \begin{macro}{\tw@make@color@theme}
 % First we define an internal command to make a color theme
 %    \begin{macrocode}
-\newcommand*{\tw@make@color@theme}[5]{%
+\newcommand*{\tw@make@color@theme}[8]{%
    \definecolor{tw@color@theme@#1@bg}{#2}{#3}%
    \definecolor{tw@color@theme@#1@br}{#2}{#4}%
    \definecolor{tw@color@theme@#1@txt}{#2}{#5}%
+   \definecolor{tw@color@theme@#1@a}{#2}{#6}%
+   \definecolor{tw@color@theme@#1@b}{#2}{#7}%
+   \definecolor{tw@color@theme@#1@c}{#2}{#8}%
 }
 %    \end{macrocode}
 % \end{macro}
 % \subsubsection{User-level commands}
-% \begin{macro}{\newmenucolortheme}\begin{macro}{\newmenucolortheme}
+% \begin{macro}{\newmenucolortheme}\begin{macro}{\renewmenucolortheme}
 % After that we define the user-level commands:
 %    \begin{macrocode}
-\newcommand*{\newmenucolortheme}[5]{%
+\NewDocumentCommand{\newmenucolortheme}{ m m m m m O{#3} O{#4} O{#5} }{%
    \@ifundefinedcolor{tw@color@theme@#1@bg}{%
-      \tw@make@color@theme{#1}{#2}{#3}{#4}{#5}
+      \tw@make@color@theme{#1}{#2}{#3}{#4}{#5}{#6}{#7}{#8}%
    }{%
       \tw@mk@error{Color theme '#1' already defined!\MessageBreak
-      Use \string\renewmenucolortheme\space instead.}
+      Use \string\renewmenucolortheme\space instead.}%
    }
 }
-\let\renewmenucolortheme\tw@make@color@theme
+\NewDocumentCommand{\renewmenucolortheme}{ m m m m m O{#3} O{#4} O{#5} }{%
+   \tw@make@color@theme{#1}{#2}{#3}{#4}{#5}{#6}{#7}{#8}%
+}
 %    \end{macrocode}
 % \end{macro}\end{macro}
 % \begin{macro}{\changemenucolor}\begin{macro}{\copymenucolortheme}
@@ -833,6 +892,9 @@
       \colorlet{tw@color@theme@#1@bg}{tw@color@theme@#2@bg}%
       \colorlet{tw@color@theme@#1@br}{tw@color@theme@#2@br}%
       \colorlet{tw@color@theme@#1@txt}{tw@color@theme@#2@txt}%
+      \colorlet{tw@color@theme@#1@a}{tw@color@theme@#2@a}%
+      \colorlet{tw@color@theme@#1@b}{tw@color@theme@#2@b}%
+      \colorlet{tw@color@theme@#1@c}{tw@color@theme@#2@c}%
    }{%
       \tw@mk@error{Color theme '#1' already defined!\MessageBreak
       Use \string\renewmenucolortheme\space instead.}
@@ -868,8 +930,8 @@
 % \subsubsection{Predefined themes}
 % There are two predefined color themes
 %    \begin{macrocode}
-\tw@make@color@theme{gray}{gray}{0.95}{0.3}{0}
-\tw@make@color@theme{blacknwhite}{gray}{1}{0}{0}
+\newmenucolortheme{gray}{gray}{0.95}{0.3}{0}[0.95][0][0]
+\newmenucolortheme{blacknwhite}{gray}{1}{0}{0}[1][0][0]
 %    \end{macrocode}
 % \subsection{Styles}
 % The style generating commands will set some commands that are named
@@ -1084,7 +1146,7 @@
             }{%
             \csdef{tw@style@#2@#3}{%
                \tikz[baseline=(tw@node.base)]{%
-               \node(tw@node)[#4]{\strut\CurrentMenuElement};}}%
+               \node(tw@node)[#4]{\strut\color{\usemenucolor{txt}}\CurrentMenuElement};}}%
             }%
          }%
       }{\tw@mk@error{No element '#3'. Possible values are\MessageBreak
@@ -1126,19 +1188,19 @@
 \tw@declare@style*{menus}{%
    \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
       \node(tw@node)[tw@menus@base,signal to=east]%
-      {\strut\CurrentMenuElement};}%
+      {\strut\color{\usemenucolor{txt}}\CurrentMenuElement};}%
 }[\hspace{-0.2em}\hspace{0em plus 0.1em minus 0.05em}]%
 {%
    \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
       \node(tw@node)[tw@menus@base,signal from=west,signal to=east]%
-      {\strut\CurrentMenuElement};}%
+      {\strut\color{\usemenucolor{txt}}\CurrentMenuElement};}%
 }{%
    \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
       \node(tw@node)[tw@menus@base,signal from=west,]%
-      {\strut\CurrentMenuElement};}%
+      {\strut\color{\usemenucolor{txt}}\CurrentMenuElement};}%
 }{%
    \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
-      \node(tw@node)[tw@menus@base]{\strut\CurrentMenuElement};}%
+      \node(tw@node)[tw@menus@base]{\strut\color{\usemenucolor{txt}}\CurrentMenuElement};}%
 }{gray}
 
 \tikzset{tw@roundedmenus@base/.style={%
@@ -1157,19 +1219,19 @@
 \tw@declare@style*{roundedmenus}{%
    \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
       \node(tw@node)[tw@roundedmenus@base,signal to=east]%
-      {\strut\CurrentMenuElement};}%
+      {\strut\color{\usemenucolor{txt}}\CurrentMenuElement};}%
 }[\hspace{-0.2em}\hspace{0em plus 0.1em minus 0.05em}]%
 {%
    \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
       \node(tw@node)[tw@roundedmenus@base,signal from=west,signal to=east]%
-      {\strut\CurrentMenuElement};}%
+      {\strut\color{\usemenucolor{txt}}\CurrentMenuElement};}%
 }{%
    \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
       \node(tw@node)[tw@roundedmenus@base,signal from=west,]%
-      {\strut\CurrentMenuElement};}%
+      {\strut\color{\usemenucolor{txt}}\CurrentMenuElement};}%
 }{%
    \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
-      \node(tw@node)[tw@roundedmenus@base]{\strut\CurrentMenuElement};}%
+      \node(tw@node)[tw@roundedmenus@base]{\strut\color{\usemenucolor{txt}}\CurrentMenuElement};}%
 }{gray}
 
 \tikzset{tw@angularmenus@base/.style={%
@@ -1187,19 +1249,19 @@
 \tw@declare@style*{angularmenus}{%
    \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
       \node(tw@node)[tw@angularmenus@base,signal to=east]%
-      {\strut\CurrentMenuElement};}%
+      {\strut\color{\usemenucolor{txt}}\CurrentMenuElement};}%
 }[\hspace{-0.2em}\hspace{0em plus 0.1em minus 0.05em}]%
 {%
    \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
       \node(tw@node)[tw@angularmenus@base,signal from=west,signal to=east]%
-      {\strut\CurrentMenuElement};}%
+      {\strut\color{\usemenucolor{txt}}\CurrentMenuElement};}%
 }{%
    \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
       \node(tw@node)[tw@angularmenus@base,signal from=west,]%
-      {\strut\CurrentMenuElement};}%
+      {\strut\color{\usemenucolor{txt}}\CurrentMenuElement};}%
 }{%
    \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
-      \node(tw@node)[tw@angularmenus@base]{\strut\CurrentMenuElement};}%
+      \node(tw@node)[tw@angularmenus@base]{\strut\color{\usemenucolor{txt}}\CurrentMenuElement};}%
 }{gray}
 
 \tikzset{tw@roundedkeys@base/.style={%
@@ -1214,10 +1276,11 @@
 }}
 \tw@declare@style@simple*{roundedkeys}{%
    \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
-      \node(tw@node)[tw@roundedkeys@base]{\strut\CurrentMenuElement};}%
+      \node(tw@node)[tw@roundedkeys@base]%
+         {\strut\color{\usemenucolor{txt}}\CurrentMenuElement};}%
 }[%
    \hspace{0.1em plus 0.1em minus 0.05em}%
-   \raisebox{0.25ex}{\sffamily\relsize{-2}+}%
+   \textcolor{\usemenucolor{b}}{\raisebox{0.25ex}{\sffamily\relsize{-2}+}}%
    \hspace{0.1em plus 0.1em minus 0.05em}%
 ]{gray}
 
@@ -1232,15 +1295,17 @@
    font=\relsize{-1}\sffamily,
    general shadow={%
       shadow xshift=.2ex, shadow yshift=-.15ex,
-      fill=black,
+      fill=\usemenucolor{c},
    },
 }}
 \tw@declare@style@simple*{shadowedroundedkeys}{%
    \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
-      \node(tw@node)[tw@shadowedroundedkeys@base]{\strut\CurrentMenuElement};}%
+      \node(tw@node)[tw@shadowedroundedkeys@base]%
+         {\strut\color{\usemenucolor{txt}}\CurrentMenuElement};%
+   }%
 }[%
    \hspace{0.2ex}\hspace{0.1em plus 0.1em minus 0.05em}%
-   \raisebox{0.25ex}{\sffamily\relsize{-2}+}%
+   \textcolor{\usemenucolor{b}}{\raisebox{0.25ex}{\sffamily\relsize{-2}+}}%
    \hspace{0.1em plus 0.1em minus 0.05em}%
 ][\hspace{0.2ex}]{gray}
 
@@ -1255,10 +1320,11 @@
 }}
 \tw@declare@style@simple*{angularkeys}{%
    \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
-      \node(tw@node)[tw@angularkeys@base]{\strut\CurrentMenuElement};}%
+      \node(tw@node)[tw@angularkeys@base]%
+         {\strut\color{\usemenucolor{txt}}\CurrentMenuElement};}%
 }[%
    \hspace{0.1em plus 0.1em minus 0.05em}%
-   \raisebox{0.25ex}{\sffamily\relsize{-2}+}%
+   \textcolor{\usemenucolor{b}}{\raisebox{0.25ex}{\sffamily\relsize{-2}+}}%
    \hspace{0.1em plus 0.1em minus 0.05em}%
 ]{gray}
 
@@ -1272,15 +1338,16 @@
    font=\relsize{-1}\sffamily,
    general shadow={%
       shadow xshift=.2ex, shadow yshift=-.15ex,
-      fill=black,
+      fill=\usemenucolor{c},
    },
 }}
 \tw@declare@style@simple*{shadowedangularkeys}{%
    \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
-      \node(tw@node)[tw@shadowedangularkeys@base]{\strut\CurrentMenuElement};}%
+      \node(tw@node)[tw@shadowedangularkeys@base]%
+         {\strut\color{\usemenucolor{txt}}\CurrentMenuElement};}%
 }[%
    \hspace{0.2ex}\hspace{0.1em plus 0.1em minus 0.05em}%
-   \raisebox{0.25ex}{\sffamily\relsize{-2}+}%
+   \textcolor{\usemenucolor{b}}{\raisebox{0.25ex}{\sffamily\relsize{-2}+}}%
    \hspace{0.1em plus 0.1em minus 0.05em}%
 ][\hspace{0.2ex}]{gray}
 
@@ -1298,21 +1365,22 @@
    \begin{tikzpicture}[baseline={($(tw@node.south)+(0,0.8ex)$)}]%
       \node(tw@node)[%
          tw@typewriterkeys@base, inner sep=1.25pt, line width=0.6pt%
-      ]{\tw@typewriterkeys@curr@elem};
-      \node[tw@typewriterkeys@base]{\tw@typewriterkeys@curr@elem};
+      ]{\color{\usemenucolor{txt}}\tw@typewriterkeys@curr@elem};
+      \node[tw@typewriterkeys@base]%
+         {\color{\usemenucolor{txt}}\tw@typewriterkeys@curr@elem};
    \end{tikzpicture}%
 }[%
    \hspace{0.2ex}\hspace{0.1em plus 0.1em minus 0.05em}%
-   \raisebox{0.25ex}{\sffamily\relsize{-2}+}%
+   \textcolor{\usemenucolor{b}}{\raisebox{0.25ex}{\sffamily\relsize{-2}+}}%
    \hspace{0.1em plus 0.1em minus 0.05em}%
 ]{blacknwhite}
 
 \tw@declare@style@simple*{paths}{%
-   {\ttfamily\CurrentMenuElement}%
+   {\ttfamily\color{\usemenucolor{txt}}\CurrentMenuElement}%
 }[%
    \hspace{0.2em plus 0.1em}%
    \raisebox{0.08ex}{%
-      \tikz{\fill[\usemenucolor{txt}] (0,0) -- (0.5ex,0.5ex)%
+      \tikz{\fill[\usemenucolor{c}] (0,0) -- (0.5ex,0.5ex)%
                 -- (0,1ex) -- cycle;}%
    }%
    \hspace{0.2em plus 0.1em}%
@@ -1341,42 +1409,42 @@
 }[%
    \hspace{0.2em plus 0.1em}%
    \raisebox{0.08ex}{%
-      \tikz{\fill[\usemenucolor{txt}] (0,0) -- (0.5ex,0.5ex)%
+      \tikz{\fill[\usemenucolor{c}] (0,0) -- (0.5ex,0.5ex)%
                 -- (0,1ex) -- cycle;}%
    }%
    \hspace{0.2em plus 0.1em}%
 ]{blacknwhite}
 
-\newcommand*{\drawtikzfolder}[1][white]{%
+\NewDocumentCommand{\drawtikzfolder}{O{white} O{black}}{%
    \begin{tikzpicture}[rounded corners=0.02ex,scale=0.7]
-      \draw (0,0) -- (1em,0) -- (1em,1.5ex) -- (0.5em,1.5ex) -- %
+      \draw [#2] (0,0) -- (1em,0) -- (1em,1.5ex) -- (0.5em,1.5ex) -- %
             (0.4em,1.7ex) -- (0.1em,1.7ex) -- (0,1.5ex) -- cycle;
-      \draw [fill=#1] (0,0) -- (1em,0) -- (0.85em,1.15ex) -- %
+      \draw [#2,fill=#1] (0,0) -- (1em,0) -- (0.85em,1.15ex) -- %
             ++(-1em,0) -- cycle;
    \end{tikzpicture}%
 }
 
 \copymenustyle{pathswithfolder}{paths}
 \changemenuelement{pathswithfolder}{pre}{%
-   \textcolor{\usemenucolor{txt}}{\drawtikzfolder}%
+   \drawtikzfolder[\usemenucolor{a}][\usemenucolor{b}]%
    \hspace{0.2em plus 0.1em}%
 }
 
 \copymenustyle{pathswithblackfolder}{paths}
 \changemenuelement{pathswithblackfolder}{pre}{%
-   \textcolor{\usemenucolor{txt}}{\drawtikzfolder[\usemenucolor{txt}]}%
+   \drawtikzfolder[\usemenucolor{c}][\usemenucolor{b}]%
    \hspace{0.2em plus 0.1em}%
 }
 
 \copymenustyle{hyphenatepathswithfolder}{hyphenatepaths}
 \changemenuelement{hyphenatepathswithfolder}{pre}{%
-   \textcolor{\usemenucolor{txt}}{\drawtikzfolder}%
+   \drawtikzfolder[\usemenucolor{a}][\usemenucolor{b}]%
    \hspace{0.2em plus 0.1em}%
 }
 
 \copymenustyle{hyphenatepathswithblackfolder}{hyphenatepaths}
 \changemenuelement{hyphenatepathswithblackfolder}{pre}{%
-   \textcolor{\usemenucolor{txt}}{\drawtikzfolder[\usemenucolor{txt}]}%
+   \drawtikzfolder[\usemenucolor{c}][\usemenucolor{b}]%
    \hspace{0.2em plus 0.1em}%
 }
 %    \end{macrocode}
