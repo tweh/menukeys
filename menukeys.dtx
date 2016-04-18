@@ -326,7 +326,7 @@
 % unit you may type
 % \begin{verbatim}
 %    To set the unit of the rulers go to \menu{Extras > Settings > Rulers}
-%    and choose between millimetres, inches and pixels. The shortcut
+%    and choose between millimeters, inches and pixels. The shortcut
 %    to view the rulers is \keys{cmd + R}. Pressing these keys again
 %    will hide the rulers.
 %    
@@ -338,7 +338,7 @@
 % 
 % \medskip
 %    To set the unit of the rulers go to \menu{Extras > Settings > Rulers}
-%    and choose between millimetres, inches and pixels. The shortcut
+%    and choose between millimeters, inches and pixels. The shortcut
 %    to view the rulers is \keys{cmd + R}. Pressing these keys again
 %    will hide the rulers.
 %    
@@ -516,11 +516,11 @@
 %    \item [sep] is the code executed between the lists elements, e.g. some
 %       space or a symbol.
 %    \item [mid] is the style for all elements between the first and the
-%       last one. It has to be a \TikZ-sytle.
+%       last one. It has to be a \TikZ sytle.
 %    \item [last] is the style for the last list element.
-%       It has to be a \TikZ-sytle.
+%       It has to be a \TikZ sytle.
 %    \item [single] this style is used if the list contains only one element.
-%       It has to be a \TikZ-sytle.
+%       It has to be a \TikZ sytle.
 %    \item [post] is the code which is executed after a menu macro.
 %    \item [theme] is a color theme (see section~\ref{colors}).
 % \end{description}
@@ -582,7 +582,7 @@
 % To make the colors of a style become changeable without
 % touching the style itself, \menukeys uses ``color themes''. Every color theme
 % must contain three color definitions that can be used to draw a |node| 
-% background, a |node| frame and a text color, and aditionally two optional
+% background, a |node| frame and a text color, and additionally two optional
 % colors used by some themes.
 % \subsubsection{Predefined themes}
 % There are two predefined color themes
@@ -598,9 +598,9 @@
 %    \item [bg] is the color definition for the |node| background.
 %    \item [br] is the color definition for the |node| border.
 %    \item [txt] is the color definition for the |node|'s text.
-%    \item [a] is an optional aditional color (by default same as bg).
-%    \item [b] is an optional aditional color (by default same as br).
-%    \item [c] is an optional aditional color (by default same as txt).
+%    \item [a] is an optional additional color (by default same as bg).
+%    \item [b] is an optional additional color (by default same as br).
+%    \item [c] is an optional additional color (by default same as txt).
 % \end{description}
 % \example To create a theme called |mycolors| we can say
 % \begin{verbatim}
@@ -729,7 +729,7 @@
 % The different versions are shown in the table (left: |text|, right: |symbols|).
 %
 % \bigskip\noindent
-% I apologise that there are no commands for the windows key
+% I apologize that there are no commands for the windows key
 % and the apple logo, but that would be a copyright infringement.
 % 
 % \section{Known issues and bugs}
@@ -768,7 +768,7 @@
    \usetikzlibrary{calc,shapes.symbols,shadows}
 %    \end{macrocode}
 % the color package \pkg{xcolor} and \pkg{adjustbox} for the
-% |typewriterkeys| sytle.
+% |typewriterkeys| style.
 %    \begin{macrocode}
 \RequirePackage{xcolor}
 \RequirePackage{adjustbox}
@@ -1561,7 +1561,7 @@
 \iftw@mk@definemenumacros
 %    \end{macrocode}
 % \begin{macro}{\menu}\begin{macro}{\directory}%
-% \changes{v1.1}{2012/02/27}{Renamed \cmd{\path} to \cmd{\directory} becuase it
+% \changes{v1.1}{2012/02/27}{Renamed \cmd{\path} to \cmd{\directory} because it
 %    crashes with \pkg{biblatex}}
 % \begin{macro}{\keys}
 % And then we define three basic macros.
@@ -1571,7 +1571,7 @@
 \newmenumacro{\keys}[+]{roundedkeys}
 %    \end{macrocode}
 % \end{macro}\end{macro}\end{macro}
-% Lastly we close the |definemacros| if statment:
+% Lastly we close the |definemacros| if statement:
 %    \begin{macrocode}
 \fi
 %    \end{macrocode}
@@ -1605,7 +1605,7 @@
 % \begin{macro}{\tw@make@key@macro}
 % The next macro defines the user level command by accessing a
 % macro like |tw@mk@|\meta{key} or |tw@mk@|\meta{key}|@|\meta{os},
-% if the apperance differs between Mac and Windows.
+% if the appearance differs between Mac and Windows.
 % To use this macro we assume that the |tw@mk@|\meta{key} commands
 % are defined.
 %    \begin{macrocode}
@@ -1637,7 +1637,7 @@
 %    \end{macrocode}
 % \end{macro}
 % \begin{macro}{\tw@define@mackey}
-% The last helping macro is |\tw@define@mackey|. We use it to exequte
+% The last helping macro is |\tw@define@mackey|. We use it to execute
 % code depending on the |mackeys| option.
 %    \begin{macrocode}
 \newcommand*{\tw@define@mackey}[2]{%
@@ -1676,7 +1676,7 @@
 \tw@make@key@macro{\shift}
 %    \end{macrocode}
 % \end{macro}
-% It's a little more complicated if the apperance should differ depending on the
+% It's a little more complicated if the appearance should differ depending on the
 % OS: The first step again is to define |tw@mk@|\meta{key}|@mac| and
 % |tw@mk@|\meta{key}|@win|. And then use the starred version
 % |\tw@make@key@macro*| which creates |\|\meta{key} that depends on the |os|
