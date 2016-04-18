@@ -34,7 +34,7 @@ Files:
 
 Installation:
 It’s recommended to use your package manager to
-installe the current version from CTAN. To install
+install the current version from CTAN. To install
 this package manually download alls files and then
 navigate to the folder that contains menukeys.ins.
 Run
