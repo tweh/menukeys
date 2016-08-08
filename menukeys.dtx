@@ -394,6 +394,9 @@
 %       value is |symbols|.
 %    \item [os:] You can specify the OS \DO{os} by saying |os=mac| or |os=win|. This will cause
 %       some key macros to be rendered differently. The default value is |mac|.
+%    \item [hyperrefcolorlinks:] Use this if you want \pkg{hyperref}'s \DO{hyperrefcolorlinks}
+%       colored links, since you can't use the \pkg{hyperref} option \opt{colorlinks} directly
+%       (see sec.~\ref{sec:issues} and~\ref{sec:hyperref-colorlinks}).
 % \end{description}
 % 
 % \section{Usage}
@@ -732,7 +735,7 @@
 % I apologize that there are no commands for the windows key
 % and the apple logo, but that would be a copyright infringement.
 % 
-% \section{Known issues and bugs}
+% \section{Known issues and bugs}\label{sec:issues}
 % \begin{itemize}
 %    \item If you use the \pkg{inputenc} package \menukeys must be
 %       loaded after it. Otherwise some key macros get corrupted.
@@ -749,8 +752,13 @@
 %       Hello World!
 %    \end{document}
 %    \end{verbatim}
+%   \item Using \pkg{hyperref} with the \opt{colorlinks} options causes
+%      an option clash. If you want colored links please load \pkg{hyperref}
+%      \emph{without} this option and load \pkg{menukeys} with \opt{hyperrefcolorlinks}.
 % \end{itemize}
-% If you find something to add to this list please send me an e-mail.
+%
+% If you find something to add to this list please send me an e-mail or report a
+% bug on GitHub (\url{https://github.com/tweh/menukeys}).
 %
 % \StopEventually{\clearpage\PrintChanges\PrintIndex}
 %
@@ -827,6 +835,7 @@
 }
 \DeclareBoolOption[true]{definemenumacros}
 \DeclareBoolOption[true]{definekeys}
+\DeclareBoolOption[false]{hyperrefcolorlinks}
 \DeclareStringOption[mac]{os}
 \DeclareStringOption[symbols]{mackeys}
 \ProcessKeyvalOptions{tw@mk}\relax
@@ -841,6 +850,36 @@
    \tw@mk@error{Unknown value for option 'mackeys'\MessageBreak
    Possible values are 'symbols' or 'text'.}%
 }
+%    \end{macrocode}
+%
+% \subsection{Workarounds}
+% Some workarounds to ``slove'' some incompatibilities:
+% \subsubsection{\pkg{hyperref}'s \opt{colorlinks} option}\label{sec:hyperref-colorlinks}
+% \changes{v1.5}{2016/08/08}{New option \opt{hyperrefcolorlinks}}
+% Since the \opt{colorlinks} option of \pkg{hyperref} loads \pkg{color} (with
+% some kind of |\AtBeginDocument|) it results in an option clas due to the
+% changes made by \pkg{catoptions}. Thus one can't use \opt{colorlinks}. Here we
+% provide the code to activate colored links without the extra loading of
+% \pkg{color}.
+%    \begin{macrocode}
+\iftw@mk@hyperrefcolorlinks
+   \Hy@AtBeginDocument{%  (hyperref.sty, line 4790)
+       \def\@pdfborder{0 0 0}% (hyperref.sty, line 4806...)
+       \let\@pdfborderstyle\@empty
+%       \ifHy@typexml% <--------------+
+%       \else%                        | This part
+%         \Hy@CatcodeWrapper{%        | bust be
+%           \RequirePackage{color}%   | omitted
+%         }%                          |
+%       \fi% <------------------------+
+       \def\Hy@colorlink#1{%
+         \begingroup
+         \HyColor@UseColor#1%
+       }%
+       \def\Hy@endcolorlink{\endgroup}%
+       \Hy@Info{Link coloring ON}%
+   }
+\fi
 %    \end{macrocode}
 %
 % \subsection{Color themes}
