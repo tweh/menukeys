@@ -2,18 +2,16 @@
 ## package base name
 CONTRIBUTION = menukeys
 ## package list
-PACKAGES = ${CONTRIBUTION}.sty
-## TDS-ZIP file name
-TDS = ${CONTRIBUTION}.tds.zip
+PACKAGE = ${CONTRIBUTION}.sty
 ## final ZIP file name
 ZIP = ${CONTRIBUTION}.zip
 ## cleanup command
-CLEANUP = find -E . -type f -regex "\./menukeys(.?|-doc)\.(aux|glo|gls|hd|idx|ilg|ind|lof|log|lot|out|pdf|toc)" -delete
+CLEANUP = find -E . -type f -regex "\./metrix(.?|-doc)\.(aux|glo|gls|hd|idx|ilg|ind|lof|log|lot|out|pdf|toc)" -delete
 
 # generate ZIP
-${ZIP}: ${CONTRIBUTION}.dtx ${CONTRIBUTION}.ins ${PACKAGES} README ${CONTRIBUTION}.pdf
+${ZIP}: ${CONTRIBUTION}.dtx ${CONTRIBUTION}.ins README ${CONTRIBUTION}.pdf
 	# ctanify
-	ctanify ${CONTRIBUTION}.ins ${PACKAGES} README ${CONTRIBUTION}.pdf
+	zip ${ZIP} ${CONTRIBUTION}.dtx ${CONTRIBUTION}.ins README ${CONTRIBUTION}.pdf
 	# tidy up
 	$(CLEANUP)
 	rm ${CONTRIBUTION}.sty
@@ -30,6 +28,6 @@ ${CONTRIBUTION}.pdf: ${CONTRIBUTION}.dtx ${CONTRIBUTION}.sty
 	pdflatex ${CONTRIBUTION}.dtx 
 	pdflatex ${CONTRIBUTION}.dtx
 	makeindex -s gglo.ist -o ${CONTRIBUTION}.gls ${CONTRIBUTION}.glo
-	makeindex -s gind.ist -o ${CONTRIBUTION}.ind ${CONTRIBUTION}.idx
+	makeindex -s l3doc.ist -o ${CONTRIBUTION}.ind ${CONTRIBUTION}.idx
 	pdflatex ${CONTRIBUTION}.dtx
 	pdflatex ${CONTRIBUTION}.dtx
