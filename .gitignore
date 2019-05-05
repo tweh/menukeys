@@ -1,0 +1,17 @@
+.DS_STORE
+_TODO.txt
+*.aux
+*.glo
+*.gls
+*.hd
+*.idx
+*.ilg
+*.ind
+*.log
+*.out
+*.toc
+*.lo?
+*.pdf
+*.sty
+*.tex
+/CTAN-INFO.txt
