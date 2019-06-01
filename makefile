@@ -10,8 +10,10 @@ CLEANUP = find -E . -type f -regex "\./metrix(.?|-doc)\.(aux|glo|gls|hd|idx|ilg|
 
 # generate ZIP
 ${ZIP}: ${CONTRIBUTION}.dtx ${CONTRIBUTION}.ins README ${CONTRIBUTION}.pdf
-	# ctanify
-	zip ${ZIP} ${CONTRIBUTION}.dtx ${CONTRIBUTION}.ins README ${CONTRIBUTION}.pdf
+	# ZIP
+	mkdir ${CONTRIBUTION}
+	cp ${CONTRIBUTION}.dtx ${CONTRIBUTION}.ins ${CONTRIBUTION}.pdf README ${CONTRIBUTION}
+	zip ${CONTRIBUTION}.zip ./${CONTRIBUTION}/*
 	# tidy up
 	$(CLEANUP)
 	rm ${CONTRIBUTION}.sty
