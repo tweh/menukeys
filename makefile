@@ -17,6 +17,7 @@ ${ZIP}: ${CONTRIBUTION}.dtx ${CONTRIBUTION}.ins README ${CONTRIBUTION}.pdf
 	# tidy up
 	$(CLEANUP)
 	rm ${CONTRIBUTION}.sty
+	rm -r ${CONTRIBUTION}
 	
 # generate *.sty files
 %.sty: ${CONTRIBUTION}.ins ${CONTRIBUTION}.dtx
