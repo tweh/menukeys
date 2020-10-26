@@ -819,7 +819,10 @@
 %    \end{macrocode}
 % Our stack will use another sequence in which the definitions of the parent
 % call will be stored for the sequence and the integer. The other variables put
-% on a stack by |\indrisloop| aren't required.
+% on a stack by |\indrisloop| aren't required. The synopsis of
+% |\tw@mk@indrisloop| will be different to the one provided by \pkg{catoptions}.
+% The delimiter will be a mandatory argument (not in brackets), and there is no
+% starred version.
 %    \begin{macrocode}
 \cs_new_protected:Npn \__twmk_pushseq:
   {
