@@ -797,7 +797,8 @@
 %    \end{macrocode}
 % The replacement for |\indrisloop| will not set the conditional
 % |\iflastindris|, instead we can check whether the sequence is empty to see
-% whether this is the last element.
+% whether this is the last element. This test will not use a TeX-like
+% |\iflastindris...\else...\fi| construct but instead two branches.
 %    \begin{macrocode}
 \cs_new:Npn \tw@mk@iflastindris
   {
