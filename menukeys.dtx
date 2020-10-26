@@ -22,7 +22,6 @@
 \usepackage[english]{babel}
 \usepackage{menukeys}
 \usepackage{xspace}
-\usepackage{lmodern}
 \usepackage[hang]{footmisc}
 \usepackage{dblfnote}
 \setlength{\footnotemargin}{1em}
@@ -262,10 +261,10 @@
 % \DoNotIndex{\viipt,\vipt,\vskip,\vspace}
 % \DoNotIndex{\wd,\xiipt,\year,\z@}
 % \expandafter\DoNotIndex{\,}
-% \DoNotIndex{\next,\unexpanded,\xifinsetTF,\robust@def,\@backslashchar,
-%   \@ifundefinedcolor,\@nameuse,\detokenize,\cpt@parserlist,\cptexpanded
-%   \cptrobustify,\cpttrimspaces,\cslet,\csname,\edef,\endcsname,\iflastindris,
-%   \indrisloop,\indrisnr,\NewDocumentCommand,\cptexpanded}
+% \DoNotIndex{\next,\unexpanded,\@backslashchar,
+%   \@ifundefinedcolor,\@nameuse,\detokenize,
+%   \cslet,\csname,\edef,\endcsname,
+%   \NewDocumentCommand}
 % \DoNotIndex{\@afterheading,\@afterindentfalse,\@ifpackageloaded,\ ,
 %   \appto,\AtBeginDocument,\AtEndPreamble,\baselineskip,\BODY,
 %   \centering,\contentspage,\CurrentOption,\dots,\endquote,\fill,\filright,
@@ -780,9 +779,95 @@
 \RequirePackage{relsize}
 %    \end{macrocode}
 % To define the list parsing commands and allow |\| as
-% a separator we load \pkg{catoptions}
+% a separator we used to load \pkg{catoptions}. Instead we now use some
+% \pkg{expl3} functions to replace the macros we required from \pkg{catoptions}.
+%
+% The first few of these functions are more or less direct equivalents. A bit of
+% attention has to be paid for |\tw@mk@xifinsetTF| as it requires the arguments
+% to get swapped.
 %    \begin{macrocode}
-\RequirePackage{catoptions}[2011/12/07]
+\ExplSyntaxOn
+\cs_new_eq:NN \tw@mk@trimspaces \tl_trim_spaces:n
+\cs_new_eq:NN \tw@mk@expanded \use:x
+\prg_generate_conditional_variant:Nnn \tl_if_in:nn { xx } { TF }
+\cs_new:Npn \tw@mk@xifinsetTF #1 #2
+  {
+    \tl_if_in:xxTF {#2} {#1}
+  }
+%    \end{macrocode}
+% The replacement for |\indrisloop| will not set the conditional
+% |\iflastindris|, instead we can check whether the sequence is empty to see
+% whether this is the last element.
+%    \begin{macrocode}
+\cs_new:Npn \tw@mk@iflastindris
+  {
+    \seq_if_empty:NTF \twmk_indris_seq
+  }
+%    \end{macrocode}
+% Replacing |\indrisloop| is a bit more work as it requires us to push some
+% values to a stack (to allow nested usage, this may not be necessary for
+% \pkg{menukeys}, but it is part of the original |\indrisloop| so we should
+% play nice here). First we'll need a few variables.
+%    \begin{macrocode}
+\seq_new:N \l__twmk_indris_seq
+\int_new:N \l__twmk_indris_int
+\tl_new:N  \l__twmk_indris_tl
+\cs_new_eq:NN \tw@mk@indrisnr \l__twmk_indris_int
+\seq_new:N \l__twmk_indris_seqstack_seq
+\seq_new:N \l__twmk_indris_intstack_seq
+%    \end{macrocode}
+% Our stack will use another sequence in which the definitions of the parent
+% call will be stored for the sequence and the integer. The other variables put
+% on a stack by |\indrisloop| aren't required.
+%    \begin{macrocode}
+\cs_new_protected:Npn \__twmk_pushseq:
+  {
+    \seq_push:No \l__twmk_indris_seqstack_seq \l__twmk_indris_seq
+  }
+\cs_new_protected:Npn \__twmk_pushint:
+  {
+    \seq_push:NV \l__twmk_indris_intstack_seq \l__twmk_indris_int
+  }
+\cs_new_protected:Npn \__twmk_popseq:
+  {
+    \seq_if_empty:NTF \l__twmk_indris_seqstack_seq
+      { \seq_clear:N \l__twmk_indris_seq }
+      { \seq_pop:NN \l__twmk_indris_seqstack_seq \l__twmk_indris_seq }
+  }
+\cs_new_protected:Npn \__twmk_popint:
+  {
+    \seq_if_empty:NTF \l__twmk_indris_intstack_seq
+      { \int_zero:N \l__twmk_indris_int }
+      {
+        \seq_pop:NN \l__twmk_indris_intstack_seq \l__twmk_indris_tl
+        \int_set:Nn \l__twmk_indris_int \l__twmk_indris_tl
+      }
+  }
+%    \end{macrocode}
+% The true loop works by first splitting the input into a sequence according to
+% the delimiter in |#1|. Then this sequence is stepped through, but instead of
+% using |\seq_map:NN| we'll have to pop the sequence into a local variable so
+% that our test for the last element works. The parameter |#2| has to be
+% expanded once as it is handed in as a token storing the real argument in later
+% use.
+%    \begin{macrocode}
+\cs_generate_variant:Nn \seq_set_split:Nnn { Nno }
+\cs_new_protected:Npn \tw@mk@indrisloop #1 #2 #3
+  {
+    \__twmk_pushseq:
+    \__twmk_pushint:
+    \seq_set_split:Nno \l__twmk_indris_seq {#1} {#2}
+    \int_zero:N \l__twmk_indris_int
+    \bool_do_while:nn { \bool_not_p:n { \seq_if_empty_p:N \l__twmk_indris_seq } }
+      {
+        \int_incr:N \l__twmk_indris_int
+        \seq_pop_left:NN \l__twmk_indris_seq \l__twmk_indris_tl
+        \exp_args:No #3 \l__twmk_indris_tl
+      }
+    \__twmk_popseq:
+    \__twmk_popint:
+  }
+\ExplSyntaxOff
 %    \end{macrocode}
 %
 % \subsection{Helper macros}
@@ -1506,9 +1591,13 @@
 \begingroup
 \lccode`\,=1
 \lowercase{\endgroup
-  \robust@def*\tw@mk@test@input@sep#1{%
-    \xifinsetTF{,\cpttrimspaces{#1},}{,bslash,backslash,directory,location,}%
-  }%
+  \@ifdefinable\tw@mk@test@input@sep
+    {%
+      \protected\def\tw@mk@test@input@sep#1{%
+        \tw@mk@xifinsetTF
+          {,\tw@mk@trimspaces{#1},}{,bslash,backslash,directory,location,}%
+      }%
+    }%
 }
 \NewDocumentCommand{\tw@define@menu@macro}{%
    m O{\tw@default@input@sep} m
@@ -1518,40 +1607,41 @@
       because the style '#3' is not available!}
    }{%
       \csdef{tw@parse@menu@list@\expandafter\@gobble\string#1}##1{%
-         \iflastindris
-            \ifnum\indrisnr=\@ne
+         \tw@mk@iflastindris
+          {%
+            \ifnum\tw@mk@indrisnr=\@ne
                 \def\CurrentMenuElement{##1}%
                 \@nameuse{tw@style@#3@single}%
             \else
                 \def\CurrentMenuElement{##1}%
                 \@nameuse{tw@style@#3@sep}\@nameuse{tw@style@#3@last}%
             \fi
-         \else
-            \ifnum\indrisnr=\@ne
+          }
+          {%
+            \ifnum\tw@mk@indrisnr=\@ne
                \def\CurrentMenuElement{##1}%
                \@nameuse{tw@style@#3@first}%
             \else
                \def\CurrentMenuElement{##1}%
                \@nameuse{tw@style@#3@sep}\@nameuse{tw@style@#3@mid}%
             \fi
-         \fi
+          }%
       }%
-      \expandafter\newcommand\csname\expandafter\@gobble\string#1\endcsname[2][#2]{%
+      \NewDocumentCommand #1 { +O{#2} +m }{%
          \leavevmode%
          {\def\tw@current@color@theme{\csname tw@style@#3@color@theme\endcsname}%
          \@nameuse{tw@style@#3@pre}%
          \tw@mk@test@input@sep{##1}{%
             \edef\tw@menu@list{\detokenize{##2}}\edef\tw@mk@tempa{\@backslashchar}%
          }{%
-            \edef\tw@menu@list{\unexpanded{##2}}\edef\tw@mk@tempa{\cpttrimspaces{##1}}%
+            \edef\tw@menu@list{\unexpanded{##2}}\edef\tw@mk@tempa{\tw@mk@trimspaces{##1}}%
          }%
          {\letcs{\tw@mk@tempb}{tw@parse@menu@list@\expandafter\@gobble\string#1}%
-         \cptexpanded{\indrisloop*[\tw@mk@tempa]}\tw@menu@list\tw@mk@tempb}%
+         \tw@mk@expanded{\tw@mk@indrisloop{\tw@mk@tempa}}\tw@menu@list\tw@mk@tempb}%
          \@nameuse{tw@style@#3@post}}%
       }%
    }%
 }
-\edef\cpt@parserlist{\cpt@parserlist\@backslashchar}
 %    \end{macrocode}
 % \end{macro}
 % \subsubsection{User-level commands}
@@ -1564,7 +1654,6 @@
 \NewDocumentCommand{\newmenumacro}{m O{\tw@default@input@sep} m}{%
    \ifcsundef{\expandafter\@gobble\string#1}{%
       \tw@define@menu@macro{#1}[#2]{#3}%
-      \expandafter\cptrobustify\csname\expandafter\@gobble\string#1\endcsname
    }{
       \tw@mk@error{Menu macro '\string#1' already defined!\MessageBreak
       Use \string\renewmenustyle\space instead.}
