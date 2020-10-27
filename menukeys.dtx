@@ -11,7 +11,7 @@
 %%
 %<package>\NeedsTeXFormat{LaTeX2e}[2009/01/01]
 %<package>\ProvidesPackage{menukeys}
-%<package>  [2019/MM/DD v1.6 -- A package to format menus, paths and shortcuts]
+%<package>  [2020/10/27 v1.6 -- A package to format menus, paths and shortcuts]
 %
 %<*driver>
 \documentclass{ltxdoc}
@@ -361,10 +361,12 @@
 % \end{verbatim}
 %
 % \section{Package loading and options}\label{options}
-% Since \menukeys uses \pkg{catoptions}, which does some heavy changes on key-value
-% options, it is recommended to load \menukeys as the \textbf{last package}
+% \changes{v1.6}{2020/10/27}{Load order no longer important}
+% Since \menukeys used to use \pkg{catoptions}, which does some heavy changes on key-value
+% options, it \textbf{was} recommended to load \menukeys as the last package
 % (even after \pkg{hyperref}\footnote{See \url{http://tex.stackexchange.com/q/237683/4918}
-% and \url{https://github.com/tweh/menukeys/issues/41}.})!
+% and \url{https://github.com/tweh/menukeys/issues/41}.}).
+% \textbf{This is no longer the case!}
 % 
 % These are the possible options:
 % \begin{description}
@@ -386,8 +388,7 @@
 %       value is |symbols|.
 %    \item [os:] You can specify the OS \DO{os} by saying |os=mac| or |os=win|. This will cause
 %       some key macros to be rendered differently. The default value is |mac|.
-%    \item [hyperrefcolorlinks:] Use this if you want \pkg{hyperref}'s \DO{hyperrefcolorlinks}
-%       colored links, since you can't use the \pkg{hyperref} option \opt{colorlinks} directly
+%    \item [hyperrefcolorlinks:] \emph{Obsolete}
 %       (see sec.~\ref{sec:issues} and~\ref{sec:hyperref-colorlinks}).
 % \end{description}
 % 
@@ -735,18 +736,17 @@
 %       \menukeys must be loaded after \pkg{xcolor}, if you load
 %       the latter with options. Otherwise you'll get an option clash
 %       Since \menukeys loads \pkg{xcolor} internally you may pass
-%       options as global options via |\documentclass|.
+%       options as global options via |\documentclass| or directly to it via
+%       |\PassOptionsToPackage|.
 %       \example Set \pkg{xcolor} to |cmyk| model:
 %       \begin{verbatim}
-%    \documentclass[cmyk]{article}
+%    \documentclass{article}
+%    \PassOptionsToPackage{cmyk}{xcolor}
 %    \usepackage{menukeys}
 %    \begin{document}
 %       Hello World!
 %    \end{document}
 %    \end{verbatim}
-%   \item Using \pkg{hyperref} with the \opt{colorlinks} options causes
-%      an option clash. If you want colored links please load \pkg{hyperref}
-%      \emph{without} this option and load \pkg{menukeys} with \opt{hyperrefcolorlinks}.
 % \end{itemize}
 %
 % If you find something to add to this list please send me an e-mail or report a
@@ -848,7 +848,7 @@
       }
   }
 %    \end{macrocode}
-% The true loop works by first splitting the input into a sequence according to
+% The real loop works by first splitting the input into a sequence according to
 % the delimiter in |#1|. Then this sequence is stepped through, but instead of
 % using |\seq_map:NN| we'll have to pop the sequence into a local variable so
 % that our test for the last element works. The parameter |#2| has to be
@@ -935,32 +935,22 @@
 %    \end{macrocode}
 %
 % \subsection{Workarounds}
-% Some workarounds to ``slove'' some incompatibilities:
+% Some workarounds to ``solve'' some incompatibilities:
 % \subsubsection{\pkg{hyperref}'s \opt{colorlinks} option}\label{sec:hyperref-colorlinks}
+% \changes{v1.6}{2020/10/27}{\opt{hyperrefcolorlinks} obsolete}
 % \changes{v1.5}{2016/08/08}{New option \opt{hyperrefcolorlinks}}
-% Since the \opt{colorlinks} option of \pkg{hyperref} loads \pkg{color} (with
-% some kind of |\AtBeginDocument|) it results in an option clas due to the
-% changes made by \pkg{catoptions}. Thus one can't use \opt{colorlinks}. Here we
-% provide the code to activate colored links without the extra loading of
-% \pkg{color}.
+% There used to be an issue with using the \opt{colorlinks} option of
+% \pkg{hyperref} due to \pkg{catoptions} being loaded. Since \pkg{catoptions}
+% isn't required any more, this workaround isn't necessary. For backwards
+% compatibility the \opt{hyperrefcolorlinks} option is still evaluated and just
+% uses |\hypersetup| or |\PassOptionsToPackage| depending on whether
+% \pkg{hyperref} is already loaded.
 %    \begin{macrocode}
 \iftw@mk@hyperrefcolorlinks
-   \Hy@AtBeginDocument{%  (hyperref.sty, line 4790)
-       \def\@pdfborder{0 0 0}% (hyperref.sty, line 4806...)
-       \let\@pdfborderstyle\@empty
-%       \ifHy@typexml% <--------------+
-%       \else%                        | This part
-%         \Hy@CatcodeWrapper{%        | bust be
-%           \RequirePackage{color}%   | omitted
-%         }%                          |
-%       \fi% <------------------------+
-       \def\Hy@colorlink#1{%
-         \begingroup
-         \HyColor@UseColor#1%
-       }%
-       \def\Hy@endcolorlink{\endgroup}%
-       \Hy@Info{Link coloring ON}%
-   }
+  \tw@mk@warning{The option `hyperrefcolorlinks' is obsolete}
+  \@ifpackageloaded{hyperref}
+    {\hypersetup{colorlinks}}
+    {\PassOptionsToPackage{colorlinks}{hyperref}}
 \fi
 %    \end{macrocode}
 %
