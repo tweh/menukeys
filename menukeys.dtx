@@ -1579,6 +1579,8 @@
 % \changes{v1.2}{2013/07/23}{Replaced \cs{edef} by \cs{protected@edef}}
 % \changes{v1.2c}{2013/07/23}{Replaced \cs{protected@edef} by \cs{def}}
 % \changes{v1.2}{2013/07/23}{Addded \cs{leavevmode}}
+% \changes{v1.6}{2020/10/27}{Don't use \cs{NewDocumentCommand} for
+% \cs{tw@define@menu@macro}}
 % Then we set up the internal command to create new menu macros.
 % The list parsing code was essentially provided by Ahmed Musa at
 % \url{http://tex.stackexchange.com/a/44989/4918}. Thank you very much!
@@ -1640,8 +1642,11 @@
 % \subsubsection{User-level commands}
 % \begin{macro}{\newmenumacro}
 % \changes{v1.1a}{2013/05/28}{Added a line to make a new macro robust.}
+% \changes{v1.6}{2020/10/27}{\cs{newmenumacro} uses \cs{NewDocumentCommand}}
 % \begin{macro}{\renewmenumacro}
+% \changes{v1.6}{2020/10/27}{\cs{renewmenumacro} uses \cs{RenewDocumentCommand}}
 % \begin{macro}{\providemenumacro}
+% \changes{v1.6}{2020/10/27}{\cs{providemenumacro} uses \cs{ProvideDocumentCommand}}
 % Now it's time to build the user-level commands
 %    \begin{macrocode}
 \NewDocumentCommand{\newmenumacro}{m O{\tw@default@input@sep} m}{%
