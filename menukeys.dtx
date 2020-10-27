@@ -277,7 +277,8 @@
 % \DoNotIndex{\lccode,\listof,\lowercase,\PackageWarningNoLine,\PackageError,
 %   \PackageWarning,\renewenvironment,\romannumeral,\string,\strut}
 % \DoNotIndex{\csdef,\cslet\csletcs,\letcs,\DeclareDocumentCommand,\ifcsundef,
-%   \RenewDocumentCommand,\NewDocumentCommand,\hspace,\IfBooleanTF,\IfSubStr}
+%   \RenewDocumentCommand,\ProvideDocumentCommand,\NewDocumentCommand,\hspace,
+%   \IfBooleanTF,\IfSubStr}
 % \DoNotIndex{\tikz,\node,\draw,\definecolor,\colorlet,\usetikzlibrary,
 %   \texttt,\textcolor,\raisebox,\maxsizebox,\small,\ttfamily,\DeclareBoolOption}
 % \DoNotIndex{\value,\usebox,\sbox,\providecommand,\ProcessKeyvalOptions,\newbox,
@@ -1593,9 +1594,7 @@
       }%
     }%
 }
-\NewDocumentCommand{\tw@define@menu@macro}{%
-   m m O{\tw@default@input@sep} m
-}{%
+\newcommand\tw@define@menu@macro[4]{%
    \ifcsundef{tw@style@#4@sep}{%
       \tw@mk@error{Can't define menu macro \string#2\space,\MessageBreak
       because the style '#4' is not available!}
@@ -1647,21 +1646,21 @@
 %    \begin{macrocode}
 \NewDocumentCommand{\newmenumacro}{m O{\tw@default@input@sep} m}{%
    \ifcsundef{\expandafter\@gobble\string#1}{%
-      \tw@define@menu@macro\NewDocumentCommand{#1}[#2]{#3}%
-   }{
+      \tw@define@menu@macro\NewDocumentCommand{#1}{#2}{#3}%
+   }{%
       \tw@mk@error{Menu macro '\string#1' already defined!\MessageBreak
-      Use \string\renewmenustyle\space instead.}
+      Use \string\renewmenustyle\space instead.}%
    }%
 }
 \NewDocumentCommand{\renewmenumacro}{m O{\tw@default@input@sep} m}{%
-   \tw@define@menu@macro\RenewDocumentCommand{#1}[#2]{#3}%
+   \tw@define@menu@macro\RenewDocumentCommand{#1}{#2}{#3}%
 }
 \NewDocumentCommand{\providemenumacro}{m O{\tw@default@input@sep} m}{%
    \ifcsundef{\expandafter\@gobble\string#1}{%
-      \tw@define@menu@macro\ProvideDocumentCommand{#1}[#2]{#3}%
-   }{
+      \tw@define@menu@macro\ProvideDocumentCommand{#1}{#2}{#3}%
+   }{%
       \tw@mk@warning{Menu macro '\string#1' already defined!\MessageBreak
-      Use \string\renewmenustyle\space to redefine it.}
+      Use \string\renewmenustyle\space to redefine it.}%
    }%
 }
 %    \end{macrocode}
