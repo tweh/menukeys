@@ -1594,45 +1594,45 @@
     }%
 }
 \NewDocumentCommand{\tw@define@menu@macro}{%
-   m O{\tw@default@input@sep} m
+   m m O{\tw@default@input@sep} m
 }{%
-   \ifcsundef{tw@style@#3@sep}{%
-      \tw@mk@error{Can't define menu macro \string#1\space,\MessageBreak
-      because the style '#3' is not available!}
+   \ifcsundef{tw@style@#4@sep}{%
+      \tw@mk@error{Can't define menu macro \string#2\space,\MessageBreak
+      because the style '#4' is not available!}
    }{%
-      \csdef{tw@parse@menu@list@\expandafter\@gobble\string#1}##1{%
+      \csdef{tw@parse@menu@list@\expandafter\@gobble\string#2}##1{%
          \tw@mk@iflastindris
           {%
             \ifnum\tw@mk@indrisnr=\@ne
                 \def\CurrentMenuElement{##1}%
-                \@nameuse{tw@style@#3@single}%
+                \@nameuse{tw@style@#4@single}%
             \else
                 \def\CurrentMenuElement{##1}%
-                \@nameuse{tw@style@#3@sep}\@nameuse{tw@style@#3@last}%
+                \@nameuse{tw@style@#4@sep}\@nameuse{tw@style@#4@last}%
             \fi
           }
           {%
             \ifnum\tw@mk@indrisnr=\@ne
                \def\CurrentMenuElement{##1}%
-               \@nameuse{tw@style@#3@first}%
+               \@nameuse{tw@style@#4@first}%
             \else
                \def\CurrentMenuElement{##1}%
-               \@nameuse{tw@style@#3@sep}\@nameuse{tw@style@#3@mid}%
+               \@nameuse{tw@style@#4@sep}\@nameuse{tw@style@#4@mid}%
             \fi
           }%
       }%
-      \NewDocumentCommand #1 { +O{#2} +m }{%
+      #1 #2 { +O{#3} +m }{%
          \leavevmode%
-         {\def\tw@current@color@theme{\csname tw@style@#3@color@theme\endcsname}%
-         \@nameuse{tw@style@#3@pre}%
+         {\def\tw@current@color@theme{\csname tw@style@#4@color@theme\endcsname}%
+         \@nameuse{tw@style@#4@pre}%
          \tw@mk@test@input@sep{##1}{%
             \edef\tw@menu@list{\detokenize{##2}}\edef\tw@mk@tempa{\@backslashchar}%
          }{%
             \edef\tw@menu@list{\unexpanded{##2}}\edef\tw@mk@tempa{\tw@mk@trimspaces{##1}}%
          }%
-         {\letcs{\tw@mk@tempb}{tw@parse@menu@list@\expandafter\@gobble\string#1}%
+         {\letcs{\tw@mk@tempb}{tw@parse@menu@list@\expandafter\@gobble\string#2}%
          \tw@mk@expanded{\tw@mk@indrisloop{\tw@mk@tempa}}\tw@menu@list\tw@mk@tempb}%
-         \@nameuse{tw@style@#3@post}}%
+         \@nameuse{tw@style@#4@post}}%
       }%
    }%
 }
@@ -1647,19 +1647,18 @@
 %    \begin{macrocode}
 \NewDocumentCommand{\newmenumacro}{m O{\tw@default@input@sep} m}{%
    \ifcsundef{\expandafter\@gobble\string#1}{%
-      \tw@define@menu@macro{#1}[#2]{#3}%
+      \tw@define@menu@macro\NewDocumentCommand{#1}[#2]{#3}%
    }{
       \tw@mk@error{Menu macro '\string#1' already defined!\MessageBreak
       Use \string\renewmenustyle\space instead.}
    }%
 }
 \NewDocumentCommand{\renewmenumacro}{m O{\tw@default@input@sep} m}{%
-   \cslet{\expandafter\@gobble\string#1}{\relax}%
-   \tw@define@menu@macro{#1}[#2]{#3}%
+   \tw@define@menu@macro\RenewDocumentCommand{#1}[#2]{#3}%
 }
 \NewDocumentCommand{\providemenumacro}{m O{\tw@default@input@sep} m}{%
    \ifcsundef{\expandafter\@gobble\string#1}{%
-      \tw@define@menu@macro{#1}[#2]{#3}%
+      \tw@define@menu@macro\ProvideDocumentCommand{#1}[#2]{#3}%
    }{
       \tw@mk@warning{Menu macro '\string#1' already defined!\MessageBreak
       Use \string\renewmenustyle\space to redefine it.}
