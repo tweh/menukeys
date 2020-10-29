@@ -11,7 +11,7 @@
 %%
 %<package>\NeedsTeXFormat{LaTeX2e}[2009/01/01]
 %<package>\ProvidesPackage{menukeys}
-%<package>  [2019/MM/DD v1.6 -- A package to format menus, paths and shortcuts]
+%<package>  [2020/10/27 v1.6 -- A package to format menus, paths and shortcuts]
 %
 %<*driver>
 \documentclass{ltxdoc}
@@ -22,7 +22,6 @@
 \usepackage[english]{babel}
 \usepackage{menukeys}
 \usepackage{xspace}
-\usepackage{lmodern}
 \usepackage[hang]{footmisc}
 \usepackage{dblfnote}
 \setlength{\footnotemargin}{1em}
@@ -262,10 +261,10 @@
 % \DoNotIndex{\viipt,\vipt,\vskip,\vspace}
 % \DoNotIndex{\wd,\xiipt,\year,\z@}
 % \expandafter\DoNotIndex{\,}
-% \DoNotIndex{\next,\unexpanded,\xifinsetTF,\robust@def,\@backslashchar,
-%   \@ifundefinedcolor,\@nameuse,\detokenize,\cpt@parserlist,\cptexpanded
-%   \cptrobustify,\cpttrimspaces,\cslet,\csname,\edef,\endcsname,\iflastindris,
-%   \indrisloop,\indrisnr,\NewDocumentCommand,\cptexpanded}
+% \DoNotIndex{\next,\unexpanded,\@backslashchar,
+%   \@ifundefinedcolor,\@nameuse,\detokenize,
+%   \cslet,\csname,\edef,\endcsname,
+%   \NewDocumentCommand}
 % \DoNotIndex{\@afterheading,\@afterindentfalse,\@ifpackageloaded,\ ,
 %   \appto,\AtBeginDocument,\AtEndPreamble,\baselineskip,\BODY,
 %   \centering,\contentspage,\CurrentOption,\dots,\endquote,\fill,\filright,
@@ -278,7 +277,8 @@
 % \DoNotIndex{\lccode,\listof,\lowercase,\PackageWarningNoLine,\PackageError,
 %   \PackageWarning,\renewenvironment,\romannumeral,\string,\strut}
 % \DoNotIndex{\csdef,\cslet\csletcs,\letcs,\DeclareDocumentCommand,\ifcsundef,
-%   \RenewDocumentCommand,\NewDocumentCommand,\hspace,\IfBooleanTF,\IfSubStr}
+%   \RenewDocumentCommand,\ProvideDocumentCommand,\NewDocumentCommand,\hspace,
+%   \IfBooleanTF,\IfSubStr}
 % \DoNotIndex{\tikz,\node,\draw,\definecolor,\colorlet,\usetikzlibrary,
 %   \texttt,\textcolor,\raisebox,\maxsizebox,\small,\ttfamily,\DeclareBoolOption}
 % \DoNotIndex{\value,\usebox,\sbox,\providecommand,\ProcessKeyvalOptions,\newbox,
@@ -303,9 +303,13 @@
 %    If you like to support this package -- especially improving or proofreading the
 %    manual -- send me an e-mail, please.
 %    \par\bigskip\noindent
-%    \emph{Many thanks to Ahmed Musa, who provided the list parsing code at
-%    \url{http://tex.stackexchange.com/a/44989/4918}.}
-% \end{abstract}
+%    \emph{Many thanks to Ahmed Musa, who provided the original list parsing
+%    code at \url{http://tex.stackexchange.com/a/44989/4918}.}
+%    \par\bigskip\noindent
+%    \emph{The changes in v1.6 were made by Jonathan P.\@ Spratte to remove the
+%    \pkg{catoptions} dependency so that \pkg{menukeys} works with \LaTeX\
+%    releases starting from 2020/10/01.}
+%   \end{abstract}
 % 
 % \newpage\tableofcontents\newpage
 %
@@ -362,10 +366,12 @@
 % \end{verbatim}
 %
 % \section{Package loading and options}\label{options}
-% Since \menukeys uses \pkg{catoptions}, which does some heavy changes on key-value
-% options, it is recommended to load \menukeys as the \textbf{last package}
+% \changes{v1.6}{2020/10/27}{Load order no longer important}
+% Since \menukeys used to use \pkg{catoptions}, which does some heavy changes on key-value
+% options, it \textbf{was} recommended to load \menukeys as the last package
 % (even after \pkg{hyperref}\footnote{See \url{http://tex.stackexchange.com/q/237683/4918}
-% and \url{https://github.com/tweh/menukeys/issues/41}.})!
+% and \url{https://github.com/tweh/menukeys/issues/41}.}).
+% \textbf{This is no longer the case!}
 % 
 % These are the possible options:
 % \begin{description}
@@ -387,8 +393,7 @@
 %       value is |symbols|.
 %    \item [os:] You can specify the OS \DO{os} by saying |os=mac| or |os=win|. This will cause
 %       some key macros to be rendered differently. The default value is |mac|.
-%    \item [hyperrefcolorlinks:] Use this if you want \pkg{hyperref}'s \DO{hyperrefcolorlinks}
-%       colored links, since you can't use the \pkg{hyperref} option \opt{colorlinks} directly
+%    \item [hyperrefcolorlinks:] \emph{Obsolete}
 %       (see sec.~\ref{sec:issues} and~\ref{sec:hyperref-colorlinks}).
 % \end{description}
 % 
@@ -736,18 +741,17 @@
 %       \menukeys must be loaded after \pkg{xcolor}, if you load
 %       the latter with options. Otherwise you'll get an option clash
 %       Since \menukeys loads \pkg{xcolor} internally you may pass
-%       options as global options via |\documentclass|.
+%       options as global options via |\documentclass| or directly to it via
+%       |\PassOptionsToPackage|.
 %       \example Set \pkg{xcolor} to |cmyk| model:
 %       \begin{verbatim}
-%    \documentclass[cmyk]{article}
+%    \documentclass{article}
+%    \PassOptionsToPackage{cmyk}{xcolor}
 %    \usepackage{menukeys}
 %    \begin{document}
 %       Hello World!
 %    \end{document}
 %    \end{verbatim}
-%   \item Using \pkg{hyperref} with the \opt{colorlinks} options causes
-%      an option clash. If you want colored links please load \pkg{hyperref}
-%      \emph{without} this option and load \pkg{menukeys} with \opt{hyperrefcolorlinks}.
 % \end{itemize}
 %
 % If you find something to add to this list please send me an e-mail or report a
@@ -757,6 +761,7 @@
 %
 % \section{Implementation}
 % \subsection{Required packages}
+% \changes{v1.6}{2020/10/27}{Don't load \pkg{catoptions}}
 % Load the required packages
 %    \begin{macrocode}
 \RequirePackage{xparse}
@@ -780,9 +785,102 @@
 \RequirePackage{relsize}
 %    \end{macrocode}
 % To define the list parsing commands and allow |\| as
-% a separator we load \pkg{catoptions}
+% a separator we used to load \pkg{catoptions}. Instead we now use some
+% \pkg{expl3} functions to replace the macros we required from \pkg{catoptions}.
+%
+% The first few of these functions are more or less direct equivalents. A bit of
+% attention has to be paid for |\tw@mk@xifinsetTF| as it requires the arguments
+% to get swapped.
 %    \begin{macrocode}
-\RequirePackage{catoptions}[2011/12/07]
+\ExplSyntaxOn
+\cs_new_eq:NN \tw@mk@trimspaces \tl_trim_spaces:n
+\cs_new_eq:NN \tw@mk@expanded \use:x
+\prg_generate_conditional_variant:Nnn \tl_if_in:nn { xx } { TF }
+\cs_new:Npn \tw@mk@xifinsetTF #1 #2
+  {
+    \tl_if_in:xxTF {#2} {#1}
+  }
+%    \end{macrocode}
+% The replacement for |\indrisloop| will not set the conditional
+% |\iflastindris|, instead we can check whether the sequence is empty to see
+% whether this is the last element. This test will not use a TeX-like
+% |\iflastindris...\else...\fi| construct but instead two branches.
+%    \begin{macrocode}
+\cs_new:Npn \tw@mk@iflastindris
+  {
+    \seq_if_empty:NTF \l__twmk_indris_seq
+  }
+%    \end{macrocode}
+% Replacing |\indrisloop| is a bit more work as it requires us to push some
+% values to a stack (to allow nested usage, this may not be necessary for
+% \pkg{menukeys}, but it is part of the original |\indrisloop| so we should
+% play nice here). First we'll need a few variables.
+%    \begin{macrocode}
+\seq_new:N \l__twmk_indris_seq
+\int_new:N \l__twmk_indris_int
+\tl_new:N  \l__twmk_indris_tl
+\cs_new_eq:NN \tw@mk@indrisnr \l__twmk_indris_int
+\seq_new:N \l__twmk_indris_seqstack_seq
+\seq_new:N \l__twmk_indris_intstack_seq
+%    \end{macrocode}
+% Our stack will use another sequence in which the definitions of the parent
+% call will be stored for the sequence and the integer. The other variables put
+% on a stack by |\indrisloop| aren't required. The synopsis of
+% |\tw@mk@indrisloop| will be different to the one provided by \pkg{catoptions}.
+% The delimiter will be a mandatory argument (not in brackets), and there is no
+% starred version.
+%    \begin{macrocode}
+\cs_new_protected:Npn \__twmk_pushseq:
+  {
+    \seq_push:No \l__twmk_indris_seqstack_seq \l__twmk_indris_seq
+  }
+\cs_new_protected:Npn \__twmk_pushint:
+  {
+    \seq_push:NV \l__twmk_indris_intstack_seq \l__twmk_indris_int
+  }
+\cs_new_protected:Npn \__twmk_popseq:
+  {
+    \seq_if_empty:NTF \l__twmk_indris_seqstack_seq
+      { \seq_clear:N \l__twmk_indris_seq }
+      { \seq_pop:NN \l__twmk_indris_seqstack_seq \l__twmk_indris_seq }
+  }
+\cs_new_protected:Npn \__twmk_popint:
+  {
+    \seq_if_empty:NTF \l__twmk_indris_intstack_seq
+      { \int_zero:N \l__twmk_indris_int }
+      {
+        \group_begin:
+          \seq_pop:NN \l__twmk_indris_intstack_seq \l__twmk_indris_tl
+          \exp_args:NNNo
+        \group_end:
+        \int_set:Nn \l__twmk_indris_int \l__twmk_indris_tl
+      }
+  }
+%    \end{macrocode}
+% The real loop works by first splitting the input into a sequence according to
+% the delimiter in |#1|. Then this sequence is stepped through, but instead of
+% using |\seq_map:NN| we'll have to pop the sequence into a local variable so
+% that our test for the last element works. The parameter |#2| has to be
+% expanded once as it is handed in as a token storing the real argument in later
+% use.
+%    \begin{macrocode}
+\cs_generate_variant:Nn \seq_set_split:Nnn { Nno }
+\cs_new_protected:Npn \tw@mk@indrisloop #1 #2 #3
+  {
+    \__twmk_pushseq:
+    \__twmk_pushint:
+    \seq_set_split:Nno \l__twmk_indris_seq {#1} {#2}
+    \int_zero:N \l__twmk_indris_int
+    \bool_do_while:nn { \bool_not_p:n { \seq_if_empty_p:N \l__twmk_indris_seq } }
+      {
+        \int_incr:N \l__twmk_indris_int
+        \seq_pop_left:NN \l__twmk_indris_seq \l__twmk_indris_tl
+        \exp_args:No #3 \l__twmk_indris_tl
+      }
+    \__twmk_popseq:
+    \__twmk_popint:
+  }
+\ExplSyntaxOff
 %    \end{macrocode}
 %
 % \subsection{Helper macros}
@@ -846,32 +944,22 @@
 %    \end{macrocode}
 %
 % \subsection{Workarounds}
-% Some workarounds to ``slove'' some incompatibilities:
+% Some workarounds to ``solve'' some incompatibilities:
 % \subsubsection{\pkg{hyperref}'s \opt{colorlinks} option}\label{sec:hyperref-colorlinks}
+% \changes{v1.6}{2020/10/27}{\opt{hyperrefcolorlinks} obsolete}
 % \changes{v1.5}{2016/08/08}{New option \opt{hyperrefcolorlinks}}
-% Since the \opt{colorlinks} option of \pkg{hyperref} loads \pkg{color} (with
-% some kind of |\AtBeginDocument|) it results in an option clas due to the
-% changes made by \pkg{catoptions}. Thus one can't use \opt{colorlinks}. Here we
-% provide the code to activate colored links without the extra loading of
-% \pkg{color}.
+% There used to be an issue with using the \opt{colorlinks} option of
+% \pkg{hyperref} due to \pkg{catoptions} being loaded. Since \pkg{catoptions}
+% isn't required any more, this workaround isn't necessary. For backwards
+% compatibility the \opt{hyperrefcolorlinks} option is still evaluated and just
+% uses |\hypersetup| or |\PassOptionsToPackage| depending on whether
+% \pkg{hyperref} is already loaded.
 %    \begin{macrocode}
 \iftw@mk@hyperrefcolorlinks
-   \Hy@AtBeginDocument{%  (hyperref.sty, line 4790)
-       \def\@pdfborder{0 0 0}% (hyperref.sty, line 4806...)
-       \let\@pdfborderstyle\@empty
-%       \ifHy@typexml% <--------------+
-%       \else%                        | This part
-%         \Hy@CatcodeWrapper{%        | bust be
-%           \RequirePackage{color}%   | omitted
-%         }%                          |
-%       \fi% <------------------------+
-       \def\Hy@colorlink#1{%
-         \begingroup
-         \HyColor@UseColor#1%
-       }%
-       \def\Hy@endcolorlink{\endgroup}%
-       \Hy@Info{Link coloring ON}%
-   }
+  \tw@mk@warning{The option `hyperrefcolorlinks' is obsolete}
+  \@ifpackageloaded{hyperref}
+    {\hypersetup{colorlinks}}
+    {\PassOptionsToPackage{colorlinks}{hyperref}}
 \fi
 %    \end{macrocode}
 %
@@ -1498,7 +1586,8 @@
 %    by deleting the line to make the command robust.}
 % \changes{v1.2}{2013/07/23}{Replaced \cs{edef} by \cs{protected@edef}}
 % \changes{v1.2c}{2013/07/23}{Replaced \cs{protected@edef} by \cs{def}}
-% \changes{v1.2}{2013/07/23}{Addded \cs{leavevmode}}
+% \changes{v1.2}{2013/07/23}{Added \cs{leavevmode}}
+% \changes{v1.6}{2020/10/27}{Don't use \cs{NewDocumentCommand}}
 % Then we set up the internal command to create new menu macros.
 % The list parsing code was essentially provided by Ahmed Musa at
 % \url{http://tex.stackexchange.com/a/44989/4918}. Thank you very much!
@@ -1506,80 +1595,84 @@
 \begingroup
 \lccode`\,=1
 \lowercase{\endgroup
-  \robust@def*\tw@mk@test@input@sep#1{%
-    \xifinsetTF{,\cpttrimspaces{#1},}{,bslash,backslash,directory,location,}%
-  }%
-}
-\NewDocumentCommand{\tw@define@menu@macro}{%
-   m O{\tw@default@input@sep} m
-}{%
-   \ifcsundef{tw@style@#3@sep}{%
-      \tw@mk@error{Can't define menu macro \string#1\space,\MessageBreak
-      because the style '#3' is not available!}
-   }{%
-      \csdef{tw@parse@menu@list@\expandafter\@gobble\string#1}##1{%
-         \iflastindris
-            \ifnum\indrisnr=\@ne
-                \def\CurrentMenuElement{##1}%
-                \@nameuse{tw@style@#3@single}%
-            \else
-                \def\CurrentMenuElement{##1}%
-                \@nameuse{tw@style@#3@sep}\@nameuse{tw@style@#3@last}%
-            \fi
-         \else
-            \ifnum\indrisnr=\@ne
-               \def\CurrentMenuElement{##1}%
-               \@nameuse{tw@style@#3@first}%
-            \else
-               \def\CurrentMenuElement{##1}%
-               \@nameuse{tw@style@#3@sep}\@nameuse{tw@style@#3@mid}%
-            \fi
-         \fi
+  \@ifdefinable\tw@mk@test@input@sep
+    {%
+      \protected\def\tw@mk@test@input@sep#1{%
+        \tw@mk@xifinsetTF
+          {,\tw@mk@trimspaces{#1},}{,bslash,backslash,directory,location,}%
       }%
-      \expandafter\newcommand\csname\expandafter\@gobble\string#1\endcsname[2][#2]{%
+    }%
+}
+\newcommand\tw@define@menu@macro[4]{%
+   \ifcsundef{tw@style@#4@sep}{%
+      \tw@mk@error{Can't define menu macro \string#2\space,\MessageBreak
+      because the style '#4' is not available!}
+   }{%
+      \csdef{tw@parse@menu@list@\expandafter\@gobble\string#2}##1{%
+         \tw@mk@iflastindris
+          {%
+            \ifnum\tw@mk@indrisnr=\@ne
+                \def\CurrentMenuElement{##1}%
+                \@nameuse{tw@style@#4@single}%
+            \else
+                \def\CurrentMenuElement{##1}%
+                \@nameuse{tw@style@#4@sep}\@nameuse{tw@style@#4@last}%
+            \fi
+          }
+          {%
+            \ifnum\tw@mk@indrisnr=\@ne
+               \def\CurrentMenuElement{##1}%
+               \@nameuse{tw@style@#4@first}%
+            \else
+               \def\CurrentMenuElement{##1}%
+               \@nameuse{tw@style@#4@sep}\@nameuse{tw@style@#4@mid}%
+            \fi
+          }%
+      }%
+      #1 #2 { +O{#3} +m }{%
          \leavevmode%
-         {\def\tw@current@color@theme{\csname tw@style@#3@color@theme\endcsname}%
-         \@nameuse{tw@style@#3@pre}%
+         {\def\tw@current@color@theme{\csname tw@style@#4@color@theme\endcsname}%
+         \@nameuse{tw@style@#4@pre}%
          \tw@mk@test@input@sep{##1}{%
             \edef\tw@menu@list{\detokenize{##2}}\edef\tw@mk@tempa{\@backslashchar}%
          }{%
-            \edef\tw@menu@list{\unexpanded{##2}}\edef\tw@mk@tempa{\cpttrimspaces{##1}}%
+            \edef\tw@menu@list{\unexpanded{##2}}\edef\tw@mk@tempa{\tw@mk@trimspaces{##1}}%
          }%
-         {\letcs{\tw@mk@tempb}{tw@parse@menu@list@\expandafter\@gobble\string#1}%
-         \cptexpanded{\indrisloop*[\tw@mk@tempa]}\tw@menu@list\tw@mk@tempb}%
-         \@nameuse{tw@style@#3@post}}%
+         {\letcs{\tw@mk@tempb}{tw@parse@menu@list@\expandafter\@gobble\string#2}%
+         \tw@mk@expanded{\tw@mk@indrisloop{\tw@mk@tempa}}\tw@menu@list\tw@mk@tempb}%
+         \@nameuse{tw@style@#4@post}}%
       }%
    }%
 }
-\edef\cpt@parserlist{\cpt@parserlist\@backslashchar}
 %    \end{macrocode}
 % \end{macro}
 % \subsubsection{User-level commands}
 % \begin{macro}{\newmenumacro}
 % \changes{v1.1a}{2013/05/28}{Added a line to make a new macro robust.}
+% \changes{v1.6}{2020/10/27}{use \cs{NewDocumentCommand}}
 % \begin{macro}{\renewmenumacro}
+% \changes{v1.6}{2020/10/27}{use \cs{RenewDocumentCommand}}
 % \begin{macro}{\providemenumacro}
+% \changes{v1.6}{2020/10/27}{use \cs{ProvideDocumentCommand}}
 % Now it's time to build the user-level commands
 %    \begin{macrocode}
 \NewDocumentCommand{\newmenumacro}{m O{\tw@default@input@sep} m}{%
    \ifcsundef{\expandafter\@gobble\string#1}{%
-      \tw@define@menu@macro{#1}[#2]{#3}%
-      \expandafter\cptrobustify\csname\expandafter\@gobble\string#1\endcsname
-   }{
+      \tw@define@menu@macro\NewDocumentCommand{#1}{#2}{#3}%
+   }{%
       \tw@mk@error{Menu macro '\string#1' already defined!\MessageBreak
-      Use \string\renewmenustyle\space instead.}
+      Use \string\renewmenustyle\space instead.}%
    }%
 }
 \NewDocumentCommand{\renewmenumacro}{m O{\tw@default@input@sep} m}{%
-   \cslet{\expandafter\@gobble\string#1}{\relax}%
-   \tw@define@menu@macro{#1}[#2]{#3}%
+   \tw@define@menu@macro\RenewDocumentCommand{#1}{#2}{#3}%
 }
 \NewDocumentCommand{\providemenumacro}{m O{\tw@default@input@sep} m}{%
    \ifcsundef{\expandafter\@gobble\string#1}{%
-      \tw@define@menu@macro{#1}[#2]{#3}%
-   }{
+      \tw@define@menu@macro\ProvideDocumentCommand{#1}{#2}{#3}%
+   }{%
       \tw@mk@warning{Menu macro '\string#1' already defined!\MessageBreak
-      Use \string\renewmenustyle\space to redefine it.}
+      Use \string\renewmenustyle\space to redefine it.}%
    }%
 }
 %    \end{macrocode}
