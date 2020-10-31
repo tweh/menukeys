@@ -6,7 +6,7 @@ PACKAGE = ${CONTRIBUTION}.sty
 ## final ZIP file name
 ZIP = ${CONTRIBUTION}.zip
 ## cleanup command
-CLEANUP = find -E . -type f -regex "\./metrix(.?|-doc)\.(aux|glo|gls|hd|idx|ilg|ind|lof|log|lot|out|pdf|toc)" -delete
+CLEANUP = find -E . -type f -regex "\./${CONTRIBUTION}(.?|-doc)\.(aux|glo|gls|hd|idx|ilg|ind|lof|log|lot|out|pdf|toc)" -delete
 
 # generate ZIP
 ${ZIP}: ${CONTRIBUTION}.dtx ${CONTRIBUTION}.ins README ${CONTRIBUTION}.pdf
@@ -34,3 +34,7 @@ ${CONTRIBUTION}.pdf: ${CONTRIBUTION}.dtx ${CONTRIBUTION}.sty
 	makeindex -s l3doc.ist -o ${CONTRIBUTION}.ind ${CONTRIBUTION}.idx
 	pdflatex ${CONTRIBUTION}.dtx
 	pdflatex ${CONTRIBUTION}.dtx
+
+clean:
+	# tidy up
+	$(CLEANUP)
