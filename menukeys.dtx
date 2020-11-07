@@ -10,8 +10,6 @@
 %%    http://www.latex-project.org/lppl.txt
 %%
 %<package>\NeedsTeXFormat{LaTeX2e}[2009/01/01]
-%<package>\ProvidesPackage{menukeys}
-%<package>  [2020/10/31 v1.6 -- A package to format menus, paths and shortcuts]
 %
 %<*driver>
 \documentclass{ltxdoc}
@@ -760,15 +758,35 @@
 % \StopEventually{\clearpage\PrintChanges\PrintIndex}
 %
 % \section{Implementation}
+% \subsection{Rollback support}
+% Version 1.6 was the last version supporting the original syntax and the first
+% version working with both new and old versions of the \LaTeX\ kernel. We use
+% \LaTeX's rollback code to support using that version for legacy documents. If
+% \LaTeX's rollback code isn't available, we fall back to directly load that
+% version.
+%    \begin{macrocode}
+\@ifundefined{DeclareRelease}
+  {\input{menukeys-2020-10-31.sty}\endinput}
+  {}
+\DeclareRelease{v1}{2020/10/31}{menukeys-2020-10-31.sty}
+\DeclareCurrentRelease{v2}{2020/11/07}
+%    \end{macrocode}
+%
+% \subsection{Current version}
+% Start of the current release code.
+%    \end{macrocode}
+\RequirePackage{expl3}
+\ProvidesExplPackage{menukeys}{2020-11-07}{2.0}
+  {A package to format menus, paths and shortcuts}
+%    \end{macrocode}
+%
 % \subsection{Required packages}
-% \changes{v1.6}{2020/10/27}{Don't load \pkg{catoptions}}
 % Load the required packages
 %    \begin{macrocode}
 \RequirePackage{xparse}
-\RequirePackage{xstring}
-\RequirePackage{etoolbox}
+\RequirePackage{l3keys2e}
 %    \end{macrocode}
-% Furthermore we need \TikZ and some of its libraries,
+% For the output we'll need Ti\textit{k}Z and some of its libraries
 %    \begin{macrocode}
 \RequirePackage{tikz}
    \usetikzlibrary{calc,shapes.symbols,shadows}
@@ -780,1301 +798,248 @@
 \RequirePackage{adjustbox}
 %    \end{macrocode}
 % Load \pkg{relsize} to be able to change the font size
-% relative to the surrounding text.
+% relative to the surrounding text
 %    \begin{macrocode}
 \RequirePackage{relsize}
 %    \end{macrocode}
-% To define the list parsing commands and allow |\| as
-% a separator we used to load \pkg{catoptions}. Instead we now use some
-% \pkg{expl3} functions to replace the macros we required from \pkg{catoptions}.
+% and \pkg{accsupp} to be able to create nicely copyable strings.
+%    \begin{macrocode}
+\RequirePackage{accsupp}
+%    \end{macrocode}
 %
-% The first few of these functions are more or less direct equivalents. A bit of
-% attention has to be paid for |\tw@mk@xifinsetTF| as it requires the arguments
-% to get swapped.
 %    \begin{macrocode}
-\ExplSyntaxOn
-\cs_new_eq:NN \tw@mk@trimspaces \tl_trim_spaces:n
-\cs_new_eq:NN \tw@mk@expanded \use:x
-\prg_generate_conditional_variant:Nnn \tl_if_in:nn { xx } { TF }
-\cs_new:Npn \tw@mk@xifinsetTF #1 #2
-  {
-    \tl_if_in:xxTF {#2} {#1}
-  }
+%<@@=twmk>
 %    \end{macrocode}
-% The replacement for |\indrisloop| will not set the conditional
-% |\iflastindris|, instead we can check whether the sequence is empty to see
-% whether this is the last element. This test will not use a TeX-like
-% |\iflastindris...\else...\fi| construct but instead two branches.
+%
+% \subsection{Variables}
 %    \begin{macrocode}
-\cs_new:Npn \tw@mk@iflastindris
-  {
-    \seq_if_empty:NTF \l__twmk_indris_seq
-  }
+\bool_new:N \l_@@_skip_empty_first_bool
+\bool_new:N \l_@@_skip_empty_mid_bool
+\bool_new:N \l_@@_skip_empty_last_bool
+\int_new:N \l_@@_element_int
+\seq_new:N \l_@@_loop_seq
+\tl_new:N \CurrentMenuElement
+\tl_new:N \l_@@_os_tl
+\tl_new:N \l_@@_mac_keys_tl
 %    \end{macrocode}
-% Replacing |\indrisloop| is a bit more work as it requires us to push some
-% values to a stack (to allow nested usage, this may not be necessary for
-% \pkg{menukeys}, but it is part of the original |\indrisloop| so we should
-% play nice here). First we'll need a few variables.
+%
+% \subsection{Messages}
+%
 %    \begin{macrocode}
-\seq_new:N \l__twmk_indris_seq
-\int_new:N \l__twmk_indris_int
-\tl_new:N  \l__twmk_indris_tl
-\cs_new_eq:NN \tw@mk@indrisnr \l__twmk_indris_int
-\seq_new:N \l__twmk_indris_seqstack_seq
-\seq_new:N \l__twmk_indris_intstack_seq
+\msg_new:nnn { menukeys } { unknown-choice }
+  {
+    The ~ key ~ `#1' ~ only ~ doesn't ~ accept ~ the ~ choice ~ `#3'. \\
+    The ~ valid ~ choices ~ are: \\
+    \ \ #2
+  }
+\msg_new:nnn { menukeys } { only-package-option }
+  { The ~ key ~ `#1' ~ can ~ only ~ be ~ used ~ as ~ a ~ package ~ option. }
 %    \end{macrocode}
-% Our stack will use another sequence in which the definitions of the parent
-% call will be stored for the sequence and the integer. The other variables put
-% on a stack by |\indrisloop| aren't required. The synopsis of
-% |\tw@mk@indrisloop| will be different to the one provided by \pkg{catoptions}.
-% The delimiter will be a mandatory argument (not in brackets), and there is no
-% starred version.
+%
+% \subsection{Key=value options}
 %    \begin{macrocode}
-\cs_new_protected:Npn \__twmk_pushseq:
+\keys_define:nn { menukeys }
   {
-    \seq_push:No \l__twmk_indris_seqstack_seq \l__twmk_indris_seq
-  }
-\cs_new_protected:Npn \__twmk_pushint:
-  {
-    \seq_push:NV \l__twmk_indris_intstack_seq \l__twmk_indris_int
-  }
-\cs_new_protected:Npn \__twmk_popseq:
-  {
-    \seq_if_empty:NTF \l__twmk_indris_seqstack_seq
-      { \seq_clear:N \l__twmk_indris_seq }
-      { \seq_pop:NN \l__twmk_indris_seqstack_seq \l__twmk_indris_seq }
-  }
-\cs_new_protected:Npn \__twmk_popint:
-  {
-    \seq_if_empty:NTF \l__twmk_indris_intstack_seq
-      { \int_zero:N \l__twmk_indris_int }
+     skip-empty .choice:
+    ,skip-empty / none  .code:n =
       {
-        \group_begin:
-          \seq_pop:NN \l__twmk_indris_intstack_seq \l__twmk_indris_tl
-          \exp_args:NNNo
-        \group_end:
-        \int_set:Nn \l__twmk_indris_int \l__twmk_indris_tl
+        \bool_set_false:N \l_@@_skip_empty_first_bool
+        \bool_set_false:N \l_@@_skip_empty_mid_bool
+        \bool_set_false:N \l_@@_skip_empty_last_bool
+      }
+    ,skip-empty / first .code:n =
+      {
+        \bool_set_true:N  \l_@@_skip_empty_first_bool
+        \bool_set_false:N \l_@@_skip_empty_mid_bool
+        \bool_set_false:N \l_@@_skip_empty_last_bool
+      }
+    ,skip-empty / mid   .code:n =
+      {
+        \bool_set_false:N \l_@@_skip_empty_first_bool
+        \bool_set_true:N  \l_@@_skip_empty_mid_bool
+        \bool_set_false:N \l_@@_skip_empty_last_bool
+      }
+    ,skip-empty / last  .code:n =
+      {
+        \bool_set_false:N \l_@@_skip_empty_first_bool
+        \bool_set_false:N \l_@@_skip_empty_mid_bool
+        \bool_set_true:N  \l_@@_skip_empty_last_bool
+      }
+    ,skip-empty / ends  .code:n =
+      {
+        \bool_set_true:N  \l_@@_skip_empty_first_bool
+        \bool_set_false:N \l_@@_skip_empty_mid_bool
+        \bool_set_true:N  \l_@@_skip_empty_last_bool
+      }
+    ,skip-empty / all   .code:n =
+      {
+        \bool_set_true:N  \l_@@_skip_empty_first_bool
+        \bool_set_true:N  \l_@@_skip_empty_mid_bool
+        \bool_set_true:N  \l_@@_skip_empty_last_bool
+      }
+    ,skip-empty       .initial:n  = none
+    ,definemenumacros .bool_set:N = \l_@@_define_menumacros_bool
+    ,definemenumacros .initial:n  = true
+    ,definekeys       .bool_set:N = \l_@@_define_keys_bool
+    ,definemenumacros .initial:n  = true
+    ,os .choices:nn      = { win, mac }
+      { \tl_set_eq:NN \l_@@_os_tl \l_keys_choice_tl }
+    ,os .initial:n       = mac
+    ,mackeys .choices:nn = { symbols, text }
+      { \tl_set_eq:NN \l_@@_mac_keys_tl \l_keys_choice_tl }
+    ,mackeys .initial:n  = symbols 
+  }
+%    \end{macrocode}
+%
+% |.choice:| keys should issue a customized error message that also lists the
+% available choices. Since this should be used for every choice key, we can
+% define all those |unknown| handlers within a loop.
+%    \begin{macrocode}
+\clist_map_inline:nn
+  {
+    { skip-empty } { none,~first,~mid,~last,~ends,~all }
+    { os }         { win,~mac }
+    { mackeys }    { symbols,~text }
+  }
+  {
+    \exp_args:Nno \keys_define:nn { menukeys }
+      {
+        \use_i:nn #1 / unknown .code:n =
+          { \msg_error:nnnnn { menukeys } { unknown-choice } #1 {##1} }
       }
   }
 %    \end{macrocode}
-% The real loop works by first splitting the input into a sequence according to
-% the delimiter in |#1|. Then this sequence is stepped through, but instead of
-% using |\seq_map:NN| we'll have to pop the sequence into a local variable so
-% that our test for the last element works. The parameter |#2| has to be
-% expanded once as it is handed in as a token storing the real argument in later
-% use.
+%
+% The keys which shouldn't accept a value can be specified using a loop as well.
 %    \begin{macrocode}
-\cs_generate_variant:Nn \seq_set_split:Nnn { Nno }
-\cs_new_protected:Npn \tw@mk@indrisloop #1 #2 #3
+\clist_map_inline:nn
   {
-    \__twmk_pushseq:
-    \__twmk_pushint:
-    \seq_set_split:Nno \l__twmk_indris_seq {#1} {#2}
-    \int_zero:N \l__twmk_indris_int
-    \bool_do_while:nn { \bool_not_p:n { \seq_if_empty_p:N \l__twmk_indris_seq } }
-      {
-        \int_incr:N \l__twmk_indris_int
-        \seq_pop_left:NN \l__twmk_indris_seq \l__twmk_indris_tl
-        \exp_args:No #3 \l__twmk_indris_tl
-      }
-    \__twmk_popseq:
-    \__twmk_popint:
+    skip-empty/none, skip-empty/first, skip-empty/mid, skip-empty/last,
+    skip-empty/ends, skip-empty/all,
+    os/win, os/mac,
+    mackeys/symbols, mackeys/text
   }
-\ExplSyntaxOff
+  { \keys_define:nn { menukeys } { #1 .value_forbidden = true } }
 %    \end{macrocode}
 %
-% \subsection{Helper macros}
-% \begin{macro}{\tw@mk@error}\begin{macro}{\tw@mk@warning}
-% \begin{macro}{\tw@mk@warning@noline}
-% Define macros to call |\PackageError| and warnings
+% Parse the list of package options.
 %    \begin{macrocode}
-\newcommand*{\tw@mk@error}[2][Please consult the manual for more information.]{%
-   \PackageError{menukeys}{#2}{#1}%
-}
-\newcommand*{\tw@mk@warning}[1]{%
-   \PackageWarning{menukeys}{#1}%
-}
-\newcommand*{\tw@mk@warning@noline}[1]{%
-   \PackageWarningNoLine{menukeys}{#1}%
-}
+\ProcessKeysOptions { menukeys }
 %    \end{macrocode}
-% \end{macro}\end{macro}\end{macro}
-% \begin{macro}{\tw@mk@tempa}\begin{macro}{\tw@mk@tempb}
-% Some commands for temporary use:
+%
+% We need to invalidate the keys which should be only available during package
+% load-time.
 %    \begin{macrocode}
-\def\tw@mk@tempa{}
-\def\tw@mk@tempb{}
+  \clist_map_inline:nn { definemenumacros, definekeys }
+    {
+      \keys_define:nn { menukeys }
+        {
+          #1 .code:n =
+            { \msg_error:nnn { menukeys } { only-package-option } {#1} }
+        }
+    }
 %    \end{macrocode}
-% \end{macro}\end{macro}
-% \begin{macro}{\tw@mk@gobble@args}
-% Define a command to gobble arguments.
+%
+% \begin{macro}{\menusetup}
+%   We provide a macro for the user to change settings at a later point.
 %    \begin{macrocode}
-\DeclareDocumentCommand{\tw@mk@gobble@args}{m}{%
-   \RenewDocumentCommand{\tw@mk@tempa}{#1}{}%
-   \tw@mk@tempa%
-}
+\NewDocumentCommand \menusetup { m }
+  {
+    \keys_set:nn { menukeys } {#1}
+  }
 %    \end{macrocode}
 % \end{macro}
 %
-% \subsection{Options}
-% First we declare and process the package options
-%    \begin{macrocode}
-\RequirePackage{kvoptions}
-\SetupKeyvalOptions{
-  family=tw@mk,
-  prefix=tw@mk@
-}
-\DeclareBoolOption[true]{definemenumacros}
-\DeclareBoolOption[true]{definekeys}
-\DeclareBoolOption[false]{hyperrefcolorlinks}
-\DeclareStringOption[mac]{os}
-\DeclareStringOption[symbols]{mackeys}
-\ProcessKeyvalOptions{tw@mk}\relax
-%    \end{macrocode}
-% Now we have to do some error treatment:
-%    \begin{macrocode}
-\IfSubStr{.mac.win.}{.\tw@mk@os.}{}{%
-   \tw@mk@error{Unknown value for option 'os'\MessageBreak
-   Possible values are 'mac' or 'win'.}%
-}
-\IfSubStr{.symbols.text.}{.\tw@mk@mackeys.}{}{%
-   \tw@mk@error{Unknown value for option 'mackeys'\MessageBreak
-   Possible values are 'symbols' or 'text'.}%
-}
-%    \end{macrocode}
+% \subsection{Parsing macros}
 %
-% \subsection{Workarounds}
-% Some workarounds to ``solve'' some incompatibilities:
-% \subsubsection{\pkg{hyperref}'s \opt{colorlinks} option}\label{sec:hyperref-colorlinks}
-% \changes{v1.6}{2020/10/27}{\opt{hyperrefcolorlinks} obsolete}
-% \changes{v1.5}{2016/08/08}{New option \opt{hyperrefcolorlinks}}
-% There used to be an issue with using the \opt{colorlinks} option of
-% \pkg{hyperref} due to \pkg{catoptions} being loaded. Since \pkg{catoptions}
-% isn't required any more, this workaround isn't necessary. For backwards
-% compatibility the \opt{hyperrefcolorlinks} option is still evaluated and just
-% uses |\hypersetup| or |\PassOptionsToPackage| depending on whether
-% \pkg{hyperref} is already loaded.
+% \begin{macro}{\@@_loop:nn,\@@_loop_pop:}
+%   \cs{@@_loop:nn} separates the input |#2| at the delimiter |#1|. If the
+%   input contains only one element, the function \cs{@@_format_single:} will be
+%   called, else for the first element \cs{@@_format_first:} will be called,
+%   \cs{@@_format_last:} for the last element, and \cs{@@_format_mid:} for the
+%   other elements.
 %    \begin{macrocode}
-\iftw@mk@hyperrefcolorlinks
-  \tw@mk@warning{The option `hyperrefcolorlinks' is obsolete}
-  \@ifpackageloaded{hyperref}
-    {\hypersetup{colorlinks}}
-    {\PassOptionsToPackage{colorlinks}{hyperref}}
-\fi
-%    \end{macrocode}
-%
-% \subsection{Color themes}
-% \subsubsection{Internal commands}
-% \begin{macro}{\tw@make@color@theme}
-% First we define an internal command to make a color theme
-%    \begin{macrocode}
-\newcommand*{\tw@make@color@theme}[8]{%
-   \definecolor{tw@color@theme@#1@bg}{#2}{#3}%
-   \definecolor{tw@color@theme@#1@br}{#2}{#4}%
-   \definecolor{tw@color@theme@#1@txt}{#2}{#5}%
-   \definecolor{tw@color@theme@#1@a}{#2}{#6}%
-   \definecolor{tw@color@theme@#1@b}{#2}{#7}%
-   \definecolor{tw@color@theme@#1@c}{#2}{#8}%
-}
-%    \end{macrocode}
-% \end{macro}
-% \subsubsection{User-level commands}
-% \begin{macro}{\newmenucolortheme}\begin{macro}{\renewmenucolortheme}
-% After that we define the user-level commands:
-%    \begin{macrocode}
-\NewDocumentCommand{\newmenucolortheme}{ m m m m m O{#3} O{#4} O{#5} }{%
-   \@ifundefinedcolor{tw@color@theme@#1@bg}{%
-      \tw@make@color@theme{#1}{#2}{#3}{#4}{#5}{#6}{#7}{#8}%
-   }{%
-      \tw@mk@error{Color theme '#1' already defined!\MessageBreak
-      Use \string\renewmenucolortheme\space instead.}%
-   }
-}
-\NewDocumentCommand{\renewmenucolortheme}{ m m m m m O{#3} O{#4} O{#5} }{%
-   \tw@make@color@theme{#1}{#2}{#3}{#4}{#5}{#6}{#7}{#8}%
-}
-%    \end{macrocode}
-% \end{macro}\end{macro}
-% \begin{macro}{\changemenucolor}\begin{macro}{\copymenucolortheme}
-% Lastly we define the changing and copying commands
-%    \begin{macrocode}
-\newcommand*{\changemenucolor}[4]{%
-   \IfSubStr{ bg br txt }{ #2 }{%
-      \definecolor{tw@color@theme@#1@#2}{#3}{#4}%
-   }{%
-      \tw@mk@error{No such color element ('#2')!\MessageBreak
-      Possible values are bg, br and txt.}
-   }%
-}
-\newcommand*{\copymenucolortheme}[2]{%
-   \@ifundefinedcolor{tw@color@theme@#1@bg}{%
-      \colorlet{tw@color@theme@#1@bg}{tw@color@theme@#2@bg}%
-      \colorlet{tw@color@theme@#1@br}{tw@color@theme@#2@br}%
-      \colorlet{tw@color@theme@#1@txt}{tw@color@theme@#2@txt}%
-      \colorlet{tw@color@theme@#1@a}{tw@color@theme@#2@a}%
-      \colorlet{tw@color@theme@#1@b}{tw@color@theme@#2@b}%
-      \colorlet{tw@color@theme@#1@c}{tw@color@theme@#2@c}%
-   }{%
-      \tw@mk@error{Color theme '#1' already defined!\MessageBreak
-      Use \string\renewmenucolortheme\space instead.}
-   }
-}
-%    \end{macrocode}
-% \end{macro}\end{macro}
-% \begin{macro}{\changemenucolortheme}
-% To be able to change the color theme of a style we must define this:
-%    \begin{macrocode}
-\newcommand{\changemenucolortheme}[2]{%
-   \ifcsundef{tw@style@#1@pre}{%
-      \tw@mk@error{Style '#1' undefined!\MessageBreak
-      Maybe you misspelled it?}%
-   }{%
-      \@ifundefinedcolor{tw@color@theme@#2@bg}{%
-         \tw@mk@error{Color theme '#2' is not defined!}%
-      }{%
-         \csdef{tw@style@#1@color@theme}{#2}%
-      }%
-   }%
-}
-%    \end{macrocode}
-% \end{macro}
-% \begin{macro}{\usemenucolor}
-% To use a color of a theme we define |\usemenucolor| as following.
-%    \begin{macrocode}
-\newcommand{\usemenucolor}[1]{%
-   tw@color@theme@\tw@current@color@theme @#1%
-}
-%    \end{macrocode}
-% \end{macro}
-% \subsubsection{Predefined themes}
-% There are two predefined color themes
-%    \begin{macrocode}
-\newmenucolortheme{gray}{gray}{0.95}{0.3}{0}[0.95][0][0]
-\newmenucolortheme{blacknwhite}{gray}{1}{0}{0}[1][0][0]
-%    \end{macrocode}
-% \subsection{Styles}
-% The style generating commands will set some commands that are named
-% like |\tw@style@|\meta{name}|@|\meta{element}.
-% \begin{macro}{\tw@default@sep}
-% \begin{macro}{\tw@default@pre}
-% \begin{macro}{\tw@default@post}
-% Before we can define the internal
-% declaring macro to use it later in the user level commands, we have to set
-% some defaults for the optional arguments
-%    \begin{macrocode}
-\newcommand{\tw@default@sep}{%
-   \hspace{0.2em plus 0.1em minus 0.5em}%
-}
-\newcommand{\tw@default@pre}{}
-\newcommand{\tw@default@post}{}
-%    \end{macrocode}
-% \end{macro}\end{macro}\end{macro}
-% \subsubsection{Internal commands}
-% Now we can define the internal commands.
-% \begin{macro}{\tw@declare@style@simple}
-% Our first step is to define the simple command.
-%    \begin{macrocode}
-\DeclareDocumentCommand{\tw@declare@style@simple}{%
-   s m O{\tw@default@pre} m O{\tw@default@sep} O{\tw@default@post} m
-}{%
-   \csdef{tw@style@#2@color@theme}{#7}%
-   \csdef{tw@style@#2@pre}{#3}%
-   \csdef{tw@style@#2@sep}{#5}%
-   \csdef{tw@style@#2@post}{#6}%
-   \IfBooleanTF{#1}{%
-      \csdef{tw@style@#2@single}{#4}%
-      \csdef{tw@style@#2@first}{#4}%
-      \csdef{tw@style@#2@mid}{#4}%
-      \csdef{tw@style@#2@last}{#4}%
-   }{%
-      \csdef{tw@style@#2@single}{%
-         \tikz[baseline=(tw@node.base)]{%
-         \node(tw@node)[#4]{\strut\CurrentMenuElement};}}%
-      \csdef{tw@style@#2@first}{%
-         \tikz[baseline=(tw@node.base)]{%
-         \node(tw@node)[#4]{\strut\CurrentMenuElement};}}%
-      \csdef{tw@style@#2@mid}{%
-         \tikz[baseline=(tw@node.base)]{%
-         \node(tw@node)[#4]{\strut\CurrentMenuElement};}}%
-      \csdef{tw@style@#2@last}{%
-         \tikz[baseline=(tw@node.base)]{%
-         \node(tw@node)[#4]{\strut\CurrentMenuElement};}}%
-   }%
-}
-%    \end{macrocode}
-% \end{macro}
-% \begin{macro}{\tw@declare@sytle}\begin{macro}{\tw@declare@sytle@extra@args}
-% The next step is to create the extended command. This command must have
-% ten arguments (including the star) so we have to define a helping macro
-% to grab the last two macros.
-%    \begin{macrocode}
-\DeclareDocumentCommand{\tw@declare@sytle@extra@args}{%
-   O{\tw@default@post} m
-}{%
-   \csdef{tw@style@\tw@current@style @post}{#1}%
-   \csdef{tw@style@\tw@current@style @color@theme}{#2}%
-}
-%    \end{macrocode}
-% Now we can define |\tw@declare@style|:
-%    \begin{macrocode}
-\DeclareDocumentCommand{\tw@declare@style}{%
-   s m O{\tw@default@pre} m O{\tw@default@sep} m m m 
-}{%
-   \def\tw@current@style{#2}
-   \csdef{tw@style@#2@pre}{#3}%
-   \csdef{tw@style@#2@sep}{#5}%
-   \IfBooleanTF{#1}{%
-      \csdef{tw@style@#2@single}{#8}%
-      \csdef{tw@style@#2@first}{#4}%
-      \csdef{tw@style@#2@mid}{#6}%
-      \csdef{tw@style@#2@last}{#7}%
-   }{%
-      \csdef{tw@style@#2@single}{%
-         \tikz[baseline=(tw@node.base)]{%
-         \node(tw@node)[#8]{\strut\CurrentMenuElement};}}%
-      \csdef{tw@style@#2@first}{%
-         \tikz[baseline=(tw@node.base)]{%
-         \node(tw@node)[#4]{\strut\CurrentMenuElement};}}%
-      \csdef{tw@style@#2@mid}{%
-         \tikz[baseline=(tw@node.base)]{%
-         \node(tw@node)[#6]{\strut\CurrentMenuElement};}}%
-      \csdef{tw@style@#2@last}{%
-         \tikz[baseline=(tw@node.base)]{%
-         \node(tw@node)[#7]{\strut\CurrentMenuElement};}}%
-   }%
-   \tw@declare@sytle@extra@args%
-}
-%    \end{macrocode}
-% \end{macro}\end{macro}
-% \subsubsection{User-level commands}
-% \begin{macro}{newmenustylesimple}\begin{macro}{renewmenustylesimple}%
-% \begin{macro}{providemenustylesimple}\begin{macro}{newmenustyle}\begin{macro}%
-% {renewmenustyle}\begin{macro}{providemenustyle}
-% It's time to define the user-level commands now:
-%    \begin{macrocode}
-\NewDocumentCommand{\newmenustylesimple}{s m}{%
-   \ifcsundef{tw@style@#2@pre}{%
-      \IfBooleanTF{#1}{%
-         \tw@declare@style@simple*{#2}%
-      }{%
-         \tw@declare@style@simple{#2}%
-      }%
-   }{%
-      \tw@mk@error{Style '#2' already defined!\MessageBreak 
-      Use \string\renewmenustylesimple\space instead.}%
-      \tw@mk@gobble@args{o m o o m}%
-   }%
-}
-\NewDocumentCommand{\renewmenustylesimple}{s m}{%
-   \IfBooleanTF{#1}{%
-      \tw@declare@style@simple*{#2}%
-   }{%
-     \tw@declare@style@simple{#2}%
-   }%
-}
-\NewDocumentCommand{\providemenustylesimple}{s m}{%
-   \ifcsundef{tw@style@#2@pre}{%
-      \IfBooleanTF{#1}{%
-         \tw@declare@style@simple*{#2}%
-      }{%
-         \tw@declare@style@simple{#2}%
-      }%
-   }{%
-      \tw@mk@warning{Trying to provide style '#2' failed,\MessageBreak
-      because it's already defined.\MessageBreak 
-      You may use \string\renewmenustylesimple\space instead.}%
-      \tw@mk@gobble@args{o m o o m}%
-   }%
-}
-
-\NewDocumentCommand{\newmenustyle}{s m}{%
-   \ifcsundef{tw@style@#2@pre}{%
-      \IfBooleanTF{#1}{%
-         \tw@declare@style*{#2}%
-      }{%
-         \tw@declare@style{#2}%
-      }%
-   }{%
-      \tw@mk@error{Style '#2' already defined!\MessageBreak 
-      Use \string\renewmenustyle\space instead.}%
-      \tw@mk@gobble@args{o m o m m m o m}%
-   }%
-}
-\NewDocumentCommand{\renewmenustyle}{s m}{%
-   \IfBooleanTF{#1}{%
-      \tw@declare@style*{#2}%
-   }{%
-     \tw@declare@style{#2}%
-   }%
-}
-\NewDocumentCommand{\providemenustyle}{s m}{%
-   \ifcsundef{tw@style@#2@pre}{%
-      \IfBooleanTF{#1}{%
-         \tw@declare@style*{#2}%
-      }{%
-         \tw@declare@style{#2}%
-      }%
-   }{%
-      \tw@mk@warning{Trying to provide style #2 failed,\MessageBreak
-      because it's already defined.\MessageBreak 
-      You may use \string\renewmenustyle\space instead.}%
-      \tw@mk@gobble@args{o m o m m m o m}%
-   }%
-}
-%    \end{macrocode}
-% \end{macro}\end{macro}\end{macro}\end{macro}\end{macro}\end{macro}
-% 
-% \subsubsection{Copying and changing}
-% \begin{macro}{\copymenustyle}
-% The last two steps in this part are to define a command to copy
-% styles
-%    \begin{macrocode}
-\newcommand*{\copymenustyle}[2]{%
-   \ifcsundef{tw@style@#1@pre}{%
-      \ifcsundef{tw@style@#2@pre}{%
-         \tw@mk@error{Can't copy not existing style ('#2')!}%
-      }{%
-         \csletcs{tw@style@#1@pre}{tw@style@#2@pre}%
-         \csletcs{tw@style@#1@post}{tw@style@#2@post}%
-         \csletcs{tw@style@#1@sep}{tw@style@#2@sep}%
-         \csletcs{tw@style@#1@single}{tw@style@#2@single}%
-         \csletcs{tw@style@#1@first}{tw@style@#2@first}%
-         \csletcs{tw@style@#1@mid}{tw@style@#2@mid}%
-         \csletcs{tw@style@#1@last}{tw@style@#2@last}%
-         \csletcs{tw@style@#1@color@theme}{tw@style@#2@color@theme}
-      }%
-   }{%
-      \tw@mk@error{Style '#1' already exists!}%
-   }%
-}
-%    \end{macrocode}
-% \end{macro}
-% \begin{macro}{\changemenuelement}
-% and one to change a single element of a style.
-%    \begin{macrocode}
-\NewDocumentCommand{\changemenuelement}{s m m m}{%
-   \ifcsundef{tw@style@#2@pre}{%
-      \tw@mk@error{Style '#2' undefined.}%
-   }{%
-      \IfSubStr{ single first middle last pre post sep }{ #3 }{%
-         \IfBooleanTF{#1}{%
-            \csdef{tw@style@#2@#3}{#4}%
-         }{%
-            \IfSubStr{ pre post sep }{ #3 }{%
-               \csdef{tw@style@#2@#3}{#4}%
-            }{%
-            \csdef{tw@style@#2@#3}{%
-               \tikz[baseline=(tw@node.base)]{%
-               \node(tw@node)[#4]{\strut\color{\usemenucolor{txt}}\CurrentMenuElement};}}%
-            }%
-         }%
-      }{\tw@mk@error{No element '#3'. Possible values are\MessageBreak
-        single, first, middle, last, pre, post or sep.}}%
-   }%
-}
-%    \end{macrocode}
-% \end{macro}
-% \subsubsection{Predefined styles}
-% We define several styles for menu sequences, paths and keystrokes.
-% \begin{macro}{tw@set@tikz@colors}
-% First we define a \TikZ-style to apply the color theme to a node
-% easily
-%    \begin{macrocode}
-\tikzset{tw@set@tikz@colors/.style={%
-   draw=\usemenucolor{br},
-   fill=\usemenucolor{bg},
-   text=\usemenucolor{txt},
-}}
-%    \end{macrocode}
-% \end{macro}
-% Now we can define the styles. To keep the most settings of
-% a style together we make additional \TikZ-styles instead of setting
-% everything directly to the |node|s.
-%    \begin{macrocode}
-\tikzset{tw@menus@base/.style={%
-   tw@set@tikz@colors,
-   rounded corners=0.15ex,
-   inner sep=0pt,
-   inner xsep=2pt,
-   text height=1.825ex,
-   text depth=0.7ex,
-   minimum width=1.5em,
-   font=\relsize{-1}\sffamily,
-   signal,
-   signal to=nowhere,
-   signal pointer angle=110,
-}}
-\tw@declare@style*{menus}{%
-   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
-      \node(tw@node)[tw@menus@base,signal to=east]%
-      {\strut\color{\usemenucolor{txt}}\CurrentMenuElement};}%
-}[\hspace{-0.2em}\hspace{0em plus 0.1em minus 0.05em}]%
-{%
-   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
-      \node(tw@node)[tw@menus@base,signal from=west,signal to=east]%
-      {\strut\color{\usemenucolor{txt}}\CurrentMenuElement};}%
-}{%
-   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
-      \node(tw@node)[tw@menus@base,signal from=west,]%
-      {\strut\color{\usemenucolor{txt}}\CurrentMenuElement};}%
-}{%
-   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
-      \node(tw@node)[tw@menus@base]{\strut\color{\usemenucolor{txt}}\CurrentMenuElement};}%
-}{gray}
-
-\tikzset{tw@roundedmenus@base/.style={%
-   tw@set@tikz@colors,
-   rounded corners=0.3ex,
-   inner sep=0pt,
-   inner xsep=2pt,
-   text height=1.825ex,
-   text depth=0.7ex,
-   minimum width=1.5em,
-   font=\relsize{-1}\sffamily,
-   signal,
-   signal to=nowhere,
-   signal pointer angle=110,
-}}
-\tw@declare@style*{roundedmenus}{%
-   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
-      \node(tw@node)[tw@roundedmenus@base,signal to=east]%
-      {\strut\color{\usemenucolor{txt}}\CurrentMenuElement};}%
-}[\hspace{-0.2em}\hspace{0em plus 0.1em minus 0.05em}]%
-{%
-   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
-      \node(tw@node)[tw@roundedmenus@base,signal from=west,signal to=east]%
-      {\strut\color{\usemenucolor{txt}}\CurrentMenuElement};}%
-}{%
-   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
-      \node(tw@node)[tw@roundedmenus@base,signal from=west,]%
-      {\strut\color{\usemenucolor{txt}}\CurrentMenuElement};}%
-}{%
-   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
-      \node(tw@node)[tw@roundedmenus@base]{\strut\color{\usemenucolor{txt}}\CurrentMenuElement};}%
-}{gray}
-
-\tikzset{tw@angularmenus@base/.style={%
-   tw@set@tikz@colors,
-   inner sep=0pt,
-   inner xsep=2pt,
-   text height=1.825ex,
-   text depth=0.7ex,
-   minimum width=1.5em,
-   font=\relsize{-1}\sffamily,
-   signal,
-   signal to=nowhere,
-   signal pointer angle=110,
-}}
-\tw@declare@style*{angularmenus}{%
-   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
-      \node(tw@node)[tw@angularmenus@base,signal to=east]%
-      {\strut\color{\usemenucolor{txt}}\CurrentMenuElement};}%
-}[\hspace{-0.2em}\hspace{0em plus 0.1em minus 0.05em}]%
-{%
-   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
-      \node(tw@node)[tw@angularmenus@base,signal from=west,signal to=east]%
-      {\strut\color{\usemenucolor{txt}}\CurrentMenuElement};}%
-}{%
-   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
-      \node(tw@node)[tw@angularmenus@base,signal from=west,]%
-      {\strut\color{\usemenucolor{txt}}\CurrentMenuElement};}%
-}{%
-   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
-      \node(tw@node)[tw@angularmenus@base]{\strut\color{\usemenucolor{txt}}\CurrentMenuElement};}%
-}{gray}
-
-\tikzset{tw@roundedkeys@base/.style={%
-   tw@set@tikz@colors,
-   rounded corners=0.3ex,
-   inner sep=0pt,
-   inner xsep=2pt,
-   text height=1.825ex,
-   text depth=0.7ex,
-   minimum width=1.5em,
-   font=\relsize{-1}\sffamily,
-}}
-\tw@declare@style@simple*{roundedkeys}{%
-   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
-      \node(tw@node)[tw@roundedkeys@base]%
-         {\strut\color{\usemenucolor{txt}}\CurrentMenuElement};}%
-}[%
-   \hspace{0.1em plus 0.1em minus 0.05em}%
-   \textcolor{\usemenucolor{b}}{\raisebox{0.25ex}{\sffamily\relsize{-2}+}}%
-   \hspace{0.1em plus 0.1em minus 0.05em}%
-]{gray}
-
-\tikzset{tw@shadowedroundedkeys@base/.style={%
-   tw@set@tikz@colors,
-   rounded corners=0.3ex,
-   inner sep=0pt,
-   inner xsep=2pt,
-   text height=1.825ex,
-   text depth=0.7ex,
-   minimum width=1.5em,
-   font=\relsize{-1}\sffamily,
-   general shadow={%
-      shadow xshift=.2ex, shadow yshift=-.15ex,
-      fill=\usemenucolor{c},
-   },
-}}
-\tw@declare@style@simple*{shadowedroundedkeys}{%
-   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
-      \node(tw@node)[tw@shadowedroundedkeys@base]%
-         {\strut\color{\usemenucolor{txt}}\CurrentMenuElement};%
-   }%
-}[%
-   \hspace{0.2ex}\hspace{0.1em plus 0.1em minus 0.05em}%
-   \textcolor{\usemenucolor{b}}{\raisebox{0.25ex}{\sffamily\relsize{-2}+}}%
-   \hspace{0.1em plus 0.1em minus 0.05em}%
-][\hspace{0.2ex}]{gray}
-
-\tikzset{tw@angularkeys@base/.style={%
-   tw@set@tikz@colors,
-   inner sep=0pt,
-   inner xsep=2pt,
-   text height=1.825ex,
-   text depth=0.7ex,
-   minimum width=1.5em,
-   font=\relsize{-1}\sffamily,
-}}
-\tw@declare@style@simple*{angularkeys}{%
-   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
-      \node(tw@node)[tw@angularkeys@base]%
-         {\strut\color{\usemenucolor{txt}}\CurrentMenuElement};}%
-}[%
-   \hspace{0.1em plus 0.1em minus 0.05em}%
-   \textcolor{\usemenucolor{b}}{\raisebox{0.25ex}{\sffamily\relsize{-2}+}}%
-   \hspace{0.1em plus 0.1em minus 0.05em}%
-]{gray}
-
-\tikzset{tw@shadowedangularkeys@base/.style={%
-   tw@set@tikz@colors,
-   inner sep=0pt,
-   inner xsep=2pt,
-   text height=1.825ex,
-   text depth=0.7ex,
-   minimum width=1.5em,
-   font=\relsize{-1}\sffamily,
-   general shadow={%
-      shadow xshift=.2ex, shadow yshift=-.15ex,
-      fill=\usemenucolor{c},
-   },
-}}
-\tw@declare@style@simple*{shadowedangularkeys}{%
-   \tikz[baseline={($(tw@node.base)+(0,-0.2ex)$)}]{%
-      \node(tw@node)[tw@shadowedangularkeys@base]%
-         {\strut\color{\usemenucolor{txt}}\CurrentMenuElement};}%
-}[%
-   \hspace{0.2ex}\hspace{0.1em plus 0.1em minus 0.05em}%
-   \textcolor{\usemenucolor{b}}{\raisebox{0.25ex}{\sffamily\relsize{-2}+}}%
-   \hspace{0.1em plus 0.1em minus 0.05em}%
-][\hspace{0.2ex}]{gray}
-
-\tikzset{tw@typewriterkeys@base/.style={%
-   tw@set@tikz@colors,
-   shape=circle,
-   minimum size=2ex,
-   inner sep=0.5pt, outer sep=1pt,
-   font=\ttfamily\relsize{-1},
-}}
-\tw@declare@style@simple*{typewriterkeys}{%
-   \def\tw@typewriterkeys@curr@elem{%
-      \maxsizebox*{2ex}{2ex}{\CurrentMenuElement}%
-   }%
-   \begin{tikzpicture}[baseline={($(tw@node.south)+(0,0.8ex)$)}]%
-      \node(tw@node)[%
-         tw@typewriterkeys@base, inner sep=1.25pt, line width=0.6pt%
-      ]{\color{\usemenucolor{txt}}\tw@typewriterkeys@curr@elem};
-      \node[tw@typewriterkeys@base]%
-         {\color{\usemenucolor{txt}}\tw@typewriterkeys@curr@elem};
-   \end{tikzpicture}%
-}[%
-   \hspace{0.2ex}\hspace{0.1em plus 0.1em minus 0.05em}%
-   \textcolor{\usemenucolor{b}}{\raisebox{0.25ex}{\sffamily\relsize{-2}+}}%
-   \hspace{0.1em plus 0.1em minus 0.05em}%
-]{blacknwhite}
-
-\tw@declare@style@simple*{paths}{%
-   {\ttfamily\color{\usemenucolor{txt}}\CurrentMenuElement}%
-}[%
-   \hspace{0.2em plus 0.1em}%
-   \raisebox{0.08ex}{%
-      \tikz{\fill[\usemenucolor{c}] (0,0) -- (0.5ex,0.5ex)%
-                -- (0,1ex) -- cycle;}%
-   }%
-   \hspace{0.2em plus 0.1em}%
-]{blacknwhite}
-
-\newcounter{tw@hyphen@char@num}
-\newif\if@tw@hyphenatepaths@warnig
-\@tw@hyphenatepaths@warnigtrue
-\tw@declare@style@simple*{hyphenatepaths}{%
-   {\ttfamily
-    \IfStrEq{T1}{\encodingdefault}{%
-       \setcounter{tw@hyphen@char@num}{23}%
-    }{%
-       \IfStrEq{OT1}{\encodingdefault}{%
-          \setcounter{tw@hyphen@char@num}{255}%
-       }{%
-          \if@tw@hyphenatepaths@warnig%
-          \tw@mk@warning{The hyphenatepaths styles will probably only\MessageBreak
-          work with T1 or OT1 encoding.}%
-          \fi\global\@tw@hyphenatepaths@warnigfalse%
-       }%
-    }%
-    \hyphenchar\font=\value{tw@hyphen@char@num}\relax
-    \color{\usemenucolor{txt}}%
-    \CurrentMenuElement}%
-}[%
-   \hspace{0.2em plus 0.1em}%
-   \raisebox{0.08ex}{%
-      \tikz{\fill[\usemenucolor{c}] (0,0) -- (0.5ex,0.5ex)%
-                -- (0,1ex) -- cycle;}%
-   }%
-   \hspace{0.2em plus 0.1em}%
-]{blacknwhite}
-
-\NewDocumentCommand{\drawtikzfolder}{O{white} O{black}}{%
-   \begin{tikzpicture}[rounded corners=0.02ex,scale=0.7]
-      \draw [#2] (0,0) -- (1em,0) -- (1em,1.5ex) -- (0.5em,1.5ex) -- %
-            (0.4em,1.7ex) -- (0.1em,1.7ex) -- (0,1.5ex) -- cycle;
-      \draw [#2,fill=#1] (0,0) -- (1em,0) -- (0.85em,1.15ex) -- %
-            ++(-1em,0) -- cycle;
-   \end{tikzpicture}%
-}
-
-\copymenustyle{pathswithfolder}{paths}
-\changemenuelement{pathswithfolder}{pre}{%
-   \drawtikzfolder[\usemenucolor{a}][\usemenucolor{b}]%
-   \hspace{0.2em plus 0.1em}%
-}
-
-\copymenustyle{pathswithblackfolder}{paths}
-\changemenuelement{pathswithblackfolder}{pre}{%
-   \drawtikzfolder[\usemenucolor{c}][\usemenucolor{b}]%
-   \hspace{0.2em plus 0.1em}%
-}
-
-\copymenustyle{hyphenatepathswithfolder}{hyphenatepaths}
-\changemenuelement{hyphenatepathswithfolder}{pre}{%
-   \drawtikzfolder[\usemenucolor{a}][\usemenucolor{b}]%
-   \hspace{0.2em plus 0.1em}%
-}
-
-\copymenustyle{hyphenatepathswithblackfolder}{hyphenatepaths}
-\changemenuelement{hyphenatepathswithblackfolder}{pre}{%
-   \drawtikzfolder[\usemenucolor{c}][\usemenucolor{b}]%
-   \hspace{0.2em plus 0.1em}%
-}
-%    \end{macrocode}
-%
-% \subsection{Menu macros}
-% \subsubsection{Internal commands}
-% \begin{macro}{\tw@default@input@sep}
-% First we define our default input separator
-%    \begin{macrocode}
-\edef\tw@default@input@sep{,}
-%    \end{macrocode}
-% \end{macro}
-% \begin{macro}{\CurrentMenuElement} and the |\CurrentMenuElement| dummy
-%    \begin{macrocode}
-\def\CurrentMenuElement{}
-%    \end{macrocode}
-% \end{macro}
-% \begin{macro}{\tw@define@menu@macro}
-% \changes{v1.1a}{2013/05/28}{Fixed minor bug, that causes a warning about robustifying (issue \#23),
-%    by deleting the line to make the command robust.}
-% \changes{v1.2}{2013/07/23}{Replaced \cs{edef} by \cs{protected@edef}}
-% \changes{v1.2c}{2013/07/23}{Replaced \cs{protected@edef} by \cs{def}}
-% \changes{v1.2}{2013/07/23}{Added \cs{leavevmode}}
-% \changes{v1.6}{2020/10/27}{Don't use \cs{NewDocumentCommand}}
-% Then we set up the internal command to create new menu macros.
-% The list parsing code was essentially provided by Ahmed Musa at
-% \url{http://tex.stackexchange.com/a/44989/4918}. Jonathan P.\@ Spratte
-% made some major changes to make \pkg{menukeys} work without \pkg{catoptions}
-% and reimplemented the parsing code usding \LaTeX3. Thank you both very much!
-%    \begin{macrocode}
-\begingroup
-\lccode`\,=1
-\lowercase{\endgroup
-  \@ifdefinable\tw@mk@test@input@sep
-    {%
-      \protected\def\tw@mk@test@input@sep#1{%
-        \tw@mk@xifinsetTF
-          {,\tw@mk@trimspaces{#1},}{,bslash,backslash,directory,location,}%
-      }%
-    }%
-}
-\newcommand\tw@define@menu@macro[4]{%
-   \ifcsundef{tw@style@#4@sep}{%
-      \tw@mk@error{Can't define menu macro \string#2\space,\MessageBreak
-      because the style '#4' is not available!}
-   }{%
-      \csdef{tw@parse@menu@list@\expandafter\@gobble\string#2}##1{%
-         \tw@mk@iflastindris
-          {%
-            \ifnum\tw@mk@indrisnr=\@ne
-                \def\CurrentMenuElement{##1}%
-                \@nameuse{tw@style@#4@single}%
-            \else
-                \def\CurrentMenuElement{##1}%
-                \@nameuse{tw@style@#4@sep}\@nameuse{tw@style@#4@last}%
-            \fi
+\cs_new_protected:Npn \@@_loop:nn #1#2
+  {
+    \seq_set_split:Nnn \l_@@_loop_seq {#1} {#2}
+    \@@_loop_pop:
+    \seq_if_empty:NTF \l_@@_loop_seq
+      { \@@_format_single: }
+      {
+        \@@_format_first:
+        \@@_loop_pop:
+        \bool_while_do:nn { ! \seq_if_empty_p:N \l_@@_loop_seq }
+          {
+            \@@_format_mid:
+            \@@_loop_pop:
           }
-          {%
-            \ifnum\tw@mk@indrisnr=\@ne
-               \def\CurrentMenuElement{##1}%
-               \@nameuse{tw@style@#4@first}%
-            \else
-               \def\CurrentMenuElement{##1}%
-               \@nameuse{tw@style@#4@sep}\@nameuse{tw@style@#4@mid}%
-            \fi
-          }%
-      }%
-      #1 #2 { +O{#3} +m }{%
-         \leavevmode%
-         {\def\tw@current@color@theme{\csname tw@style@#4@color@theme\endcsname}%
-         \@nameuse{tw@style@#4@pre}%
-         \tw@mk@test@input@sep{##1}{%
-            \edef\tw@menu@list{\detokenize{##2}}\edef\tw@mk@tempa{\@backslashchar}%
-         }{%
-            \edef\tw@menu@list{\unexpanded{##2}}\edef\tw@mk@tempa{\tw@mk@trimspaces{##1}}%
-         }%
-         {\letcs{\tw@mk@tempb}{tw@parse@menu@list@\expandafter\@gobble\string#2}%
-         \tw@mk@expanded{\tw@mk@indrisloop{\tw@mk@tempa}}\tw@menu@list\tw@mk@tempb}%
-         \@nameuse{tw@style@#4@post}}%
-      }%
-   }%
-}
+        \@@_format_last:
+      }
+  }
 %    \end{macrocode}
-% \end{macro}
-% \subsubsection{User-level commands}
-% \begin{macro}{\newmenumacro}
-% \changes{v1.1a}{2013/05/28}{Added a line to make a new macro robust.}
-% \changes{v1.6}{2020/10/27}{use \cs{NewDocumentCommand}}
-% \begin{macro}{\renewmenumacro}
-% \changes{v1.6}{2020/10/27}{use \cs{RenewDocumentCommand}}
-% \begin{macro}{\providemenumacro}
-% \changes{v1.6}{2020/10/27}{use \cs{ProvideDocumentCommand}}
-% Now it's time to build the user-level commands
+%   \cs{@@_loop_pop:} just gets the next element from the sequence.
 %    \begin{macrocode}
-\NewDocumentCommand{\newmenumacro}{m O{\tw@default@input@sep} m}{%
-   \ifcsundef{\expandafter\@gobble\string#1}{%
-      \tw@define@menu@macro\NewDocumentCommand{#1}{#2}{#3}%
-   }{%
-      \tw@mk@error{Menu macro '\string#1' already defined!\MessageBreak
-      Use \string\renewmenustyle\space instead.}%
-   }%
-}
-\NewDocumentCommand{\renewmenumacro}{m O{\tw@default@input@sep} m}{%
-   \tw@define@menu@macro\RenewDocumentCommand{#1}{#2}{#3}%
-}
-\NewDocumentCommand{\providemenumacro}{m O{\tw@default@input@sep} m}{%
-   \ifcsundef{\expandafter\@gobble\string#1}{%
-      \tw@define@menu@macro\ProvideDocumentCommand{#1}{#2}{#3}%
-   }{%
-      \tw@mk@warning{Menu macro '\string#1' already defined!\MessageBreak
-      Use \string\renewmenustyle\space to redefine it.}%
-   }%
-}
-%    \end{macrocode}
-% \end{macro}\end{macro}\end{macro}
-%
-% \subsubsection{Predefined menu macros}
-% Now we got all tools to predefine some menu macros. To be sure that
-% these commands won't conflict with other packages we introduced the
-% option |definemacros|. Here we have to check it:
-%    \begin{macrocode}
-\iftw@mk@definemenumacros
-%    \end{macrocode}
-% \begin{macro}{\menu}\begin{macro}{\directory}%
-% \changes{v1.1}{2012/02/27}{Renamed \cmd{\path} to \cmd{\directory} because it
-%    crashes with \pkg{biblatex}}
-% \begin{macro}{\keys}
-% And then we define three basic macros.
-%    \begin{macrocode}
-\newmenumacro{\menu}[>]{menus}
-\newmenumacro{\directory}[/]{paths}
-\newmenumacro{\keys}[+]{roundedkeys}
-%    \end{macrocode}
-% \end{macro}\end{macro}\end{macro}
-% Lastly we close the |definemacros| if statement:
-%    \begin{macrocode}
-\fi
-%    \end{macrocode}
-%
-% \subsection{Keys}
-% Before we define anything we check if the user allows it:
-%    \begin{macrocode}
-\iftw@mk@definekeys
-%    \end{macrocode}
-%
-% Before define the key macros we create some macros that save some typing by
-% condensing the similarities between the key macros.
-% \begin{macro}{\tw@make@key@box}
-% The first of these macros helps us building save boxes
-% to store the |{tikzpicture}|, that will draw the key later.
-% This is necessary because otherwise the picture will inherit
-% the style of the key sequence |node|.
-%    \begin{macrocode}
-\NewDocumentCommand{\tw@make@key@box}{m m}{%
-%   \expandafter\newbox\csname tw@mk@box@#1\endcsname
-%   \expandafter\sbox\csname tw@mk@box@#1\endcsname{%
-%      #2%
-%   }%
-   \csdef{tw@mk@#1}{%
-%      \expandafter\usebox\csname tw@mk@box@#1\endcsname%
-      #2%
-   }%
-}
-%    \end{macrocode}
-% \end{macro}
-% \begin{macro}{\tw@make@key@macro}
-% The next macro defines the user level command by accessing a
-% macro like |tw@mk@|\meta{key} or |tw@mk@|\meta{key}|@|\meta{os},
-% if the appearance differs between Mac and Windows.
-% To use this macro we assume that the |tw@mk@|\meta{key} commands
-% are defined.
-%    \begin{macrocode}
-\NewDocumentCommand{\tw@make@key@macro}{s m}{%
-   \IfBooleanTF{#1}{%
-      \expandafter\providecommand\csname\expandafter\@gobble\string#2\endcsname{%
-         \expandonce{\maxsizebox{!}{1.8ex}{%
-            \@nameuse{tw@mk@\expandafter\@gobble\string#2@\tw@mk@os}}%
-         }%
-      }%
-      \expandafter\providecommand\csname\expandafter\@gobble\string#2mac\endcsname{%
-         \expandonce{\maxsizebox{!}{1.8ex}{%
-            \@nameuse{tw@mk@\expandafter\@gobble\string#2@mac}}%
-         }%
-      }%
-      \expandafter\providecommand\csname\expandafter\@gobble\string#2win\endcsname{%
-         \expandonce{\maxsizebox{!}{1.8ex}{%
-            \@nameuse{tw@mk@\expandafter\@gobble\string#2@win}}%
-         }%
-      }%
-   }{%
-      \expandafter\providecommand\csname\expandafter\@gobble\string#2\endcsname{%
-         \expandonce{\maxsizebox{!}{1.8ex}{%
-            \@nameuse{tw@mk@\expandafter\@gobble\string#2}}%
-         }%
-      }%
-   }%
-}
-%    \end{macrocode}
-% \end{macro}
-% \begin{macro}{\tw@define@mackey}
-% The last helping macro is |\tw@define@mackey|. We use it to execute
-% code depending on the |mackeys| option.
-%    \begin{macrocode}
-\newcommand*{\tw@define@mackey}[2]{%
-   \IfStrEq{text}{\tw@mk@mackeys}{#1}{%
-      \IfStrEq{symbols}{\tw@mk@mackeys}{#2}{}%
-   }%
-}
+\cs_new_protected:Npn \@@_loop_pop:
+  { \seq_pop_left:NN \l_@@_loop_seq \CurrentMenuElement }
 %    \end{macrocode}
 % \end{macro}
 %
-% Next thing to do is to set up some \TikZ-styles.
+% \begin{macro}
+%   {
+%     \@@_format_single:,
+%     \@@_format_first:,
+%     \@@_format_mid:,
+%     \@@_format_last:,
+%     \@@_format_separator:
+%   }
+%   \cs{@@_format_single:} just calls the corresponding output macro of the
+%   currently active style.
+%   \cs{@@_format_separator:} has to check whether there is a replacement text
+%   for the separator specified, if so it uses \pkg{accsupp} to add some
+%   |ActualText| and inserts the separater output macro of the currently active
+%   style.
+%   The other macros test whether they should skip the output for empty list
+%   elements and if so also check for this. If any of the two conditions is
+%   false they call the corresponding output macro of the currently active
+%   style.
 %    \begin{macrocode}
-\tikzset{
-   menukeys key symbol/.style={
-      rounded corners=0pt,
-      line width=0.1ex,
-      baseline={(0,0)},
-   },
-   menukeys thick/.style={line width=0.25ex},
-}
-%    \end{macrocode}
-%
-% Now we ar prepared to generate the key macros. I will be nearly the same
-% way for all keys. Step one is to build a |tw@mk@|\meta{key} macro
-% and then we define the user-level command |\|\meta{key}
-% \begin{macro}{\shift}
-%    \begin{macrocode}
-\normalsize
-\tw@make@key@box{shift}{%
-   \begin{tikzpicture}[yshift=-0.1ex,menukeys key symbol]
-      \draw (0.3ex,0) -- (1.1ex,0) -- (1.1ex,1.2ex) -- %
-            (1.5ex,1.2ex) -- (0.7ex,1.9ex) -- (-0.1ex,1.2ex) -- %
-            (0.3ex,1.2ex) -- cycle;
-   \end{tikzpicture}%
-}
-\tw@make@key@macro{\shift}
-%    \end{macrocode}
-% \end{macro}
-% It's a little more complicated if the appearance should differ depending on the
-% OS: The first step again is to define |tw@mk@|\meta{key}|@mac| and
-% |tw@mk@|\meta{key}|@win|. And then use the starred version
-% |\tw@make@key@macro*| which creates |\|\meta{key} that depends on the |os|
-% option, |\|\meta{key}|mac| and |\|\meta{key}|win|, that are not affected by
-% |os|.
-% \begin{macro}{\capslock}
-%    \begin{macrocode}
-\tw@make@key@box{capslock@mac}{%
-   \begin{tikzpicture}[yshift=-0.1ex,menukeys key symbol]
-      \draw (0.3ex,0.7ex) -- (1.1ex,0.7ex) -- (1.1ex,1.2ex) -- %
-            (1.5ex,1.2ex) -- (0.7ex,1.9ex) -- (-0.1ex,1.2ex) -- %
-            (0.3ex,1.2ex) -- cycle;
-      \draw (0.3ex,0) rectangle (1.1ex,0.4ex);
-   \end{tikzpicture}%
-}
-\tw@make@key@box{capslock@win}{%
-   \begin{tikzpicture}[yscale=-1,yshift=-1.8ex,menukeys key symbol]
-      \draw (0.3ex,0) -- (1.1ex,0) -- (1.1ex,1.2ex) -- %
-            (1.5ex,1.2ex) -- (0.7ex,1.9ex) -- (-0.1ex,1.2ex) -- %
-            (0.3ex,1.2ex) -- cycle;
-   \end{tikzpicture}%
-}
-\tw@make@key@macro*{\capslock}
-%    \end{macrocode}
-% \end{macro}
-% Here are the other macros:
-% \begin{macro}{\tab}
-%    \begin{macrocode}
-\tw@make@key@box{tab@mac}{%
-   \begin{tikzpicture}[yshift=0.6ex,menukeys key symbol]
-      \draw [->] (0,0) -- (1em,0);
-      \draw (1em,-0.35ex) -- (1em,0.35ex);
-   \end{tikzpicture}%
-}
-\tw@make@key@box{tab@win}{%
-   \begin{tikzpicture}[yshift=0.1ex,menukeys key symbol]
-      \draw [->] (0.2em,0) -- (1.2em,0);
-      \draw (1.2em,-0.35ex) -- (1.2em,0.35ex);
-      \draw [<-] (0,1ex) -- (1em,1ex);
-      \draw (0,0.65ex) -- (0,1.35ex);
-   \end{tikzpicture}%
-}
-\tw@make@key@macro*{\tab}
+\cs_new:Npn \@@_format_single:
+  { \use:c { @@_format_single_ \l_@@_style_str : } }
+\cs_new:Npn \@@_format_first:
+  {
+    \bool_lazy_and:nnF
+      { \l_@@_skip_empty_first_bool }
+      { \tl_if_empty_p:N \CurrentMenuElement }
+      { \use:c { @@_format_first_ \l_@@_style_str : } }
+  }
+\cs_new:Npn \@@_format_mid:
+  {
+    \@@_format_separator:
+    \bool_lazy_and:nnF
+      { \l_@@_skip_empty_mid_bool }
+      { \tl_if_empty_p:N \CurrentMenuElement }
+      { \use:c { @@_format_mid_ \l_@@_style_str : } }
+  }
+\cs_new:Npn \@@_format_last:
+  {
+    \@@_format_separator:
+    \bool_lazy_and:nnF
+      { \l_@@_skip_empty_last_bool }
+      { \tl_if_empty_p:N \CurrentMenuElement }
+      { \use:c { @@_format_last_ \l_@@_style_str : } }
+  }
+\cs_new_protected:Npn \@@_format_separator:
+  {
+    \bool_if:NT \l_@@_substitute_separator_bool
+      {
+        \exp_args:Nx
+        \BeginAccSupp { space, ActualText = \l_@@_substitute_separator_str }
+      }
+    \use:c { @@_format_separator_ \l_@@_style_str : }
+    \bool_if:NT \l_@@_substitute_separator_bool { \EndAccSupp {} }
+  }
 %    \end{macrocode}
 % \end{macro}
-% \begin{macro}{\esc}\begin{macro}{\oldesc}
-% \changes{v1.4}{2016/04/17}{Fixed direction of \cs{escmac}; added \cs{oldesc}}
-%    \begin{macrocode}
-\def\tw@mk@esc@win{Esc}
-\tw@define@mackey{%
-   \def\tw@mk@esc@mac{esc}
-}{%
-   \tw@make@key@box{esc@mac}{%
-      \begin{tikzpicture}[yshift=-0.1ex,menukeys key symbol]
-         \draw [->] (0.5ex,0.5ex) -- ++(135:1.1ex);
-         \draw (0.5ex,0.5ex) ++(105:0.6ex) arc (105:-195:0.6ex);
-      \end{tikzpicture}%
-   }%
-}
-\tw@make@key@macro*{\esc}
-\def\tw@mk@oldesc@win{Esc}
-\tw@define@mackey{%
-   \def\tw@mk@oldesc@mac{esc}
-}{%
-   \tw@make@key@box{oldesc@mac}{%
-      \begin{tikzpicture}[yshift=-0.1ex,menukeys key symbol]
-         \draw [->] (0.5ex,0.5ex) -- ++(45:1.1ex);
-         \draw (0.5ex,0.5ex) ++(15:0.6ex) arc (15:-285:0.6ex);
-      \end{tikzpicture}%
-   }%
-}
-\tw@make@key@macro*{\oldesc}
-%    \end{macrocode}
-% \end{macro}\end{macro}
-% \begin{macro}{\ctrl}
-%    \begin{macrocode}
-\providecommand\ctrlname{Ctrl}
-\def\tw@mk@ctrl@win{\ctrlname}
-\def\tw@mk@ctrl@mac{ctrl}
-\tw@make@key@macro*{\ctrl}
-%    \end{macrocode}
-% \end{macro}
-% \begin{macro}{\Alt}
-% \begin{macro}{\AltGr}
-%    \begin{macrocode}
-\def\tw@mk@Alt@win{Alt}
-\tw@define@mackey{%
-   \def\tw@mk@Alt@mac{alt}%
-}{%
-   \tw@make@key@box{Alt@mac}{%
-      \begin{tikzpicture}[yshift=-0.1ex,menukeys key symbol]
-         \draw (0,1ex) -- (0.5ex,1ex) -- (1ex,0.3ex) -- (1.8ex,0.3ex);
-         \draw (0.8ex,1ex) -- (1.8ex,1ex);
-      \end{tikzpicture}%
-   }%
-}
-\tw@make@key@macro*{\Alt}
-\providecommand*{\AltGr}{Alt\,Gr}
-%    \end{macrocode}
-% \end{macro}\end{macro}
-% \begin{macro}{\cmd}
-%    \begin{macrocode}
-\def\tw@mk@cmd@win{%
-   \tw@mk@warning{'\string\cmd' only for Mac!}%
-}
-\tw@define@mackey{%
-   \def\tw@mk@cmd@mac{cmd}%
-}{%
-   \tw@make@key@box{cmd@mac}{%
-      \begin{tikzpicture}[yshift=-0.15ex,menukeys key symbol]
-         \draw (0.5ex,0.7ex) -- (0.5ex,1.25ex) arc (0:270:0.25ex) -- %
-               (1.25ex,1ex) arc (-90:180:0.25ex) -- (1ex,0.25ex) %
-               arc (-180:90:0.25ex) -- (0.25ex,0.5ex) arc (90:360:0.25ex) %
-               -- cycle;
-      \end{tikzpicture}%
-   }%
-}
-\tw@make@key@macro*{\cmd}
-%    \end{macrocode}
-% \end{macro}
-% \begin{macro}{\Space}\begin{macro}{\SPACE}
-%    \begin{macrocode}
-\providecommand*{\Space}{\expandonce{\rule{3em}{0pt}}}
-\newcommand{\spacename}{Space}
-\providecommand*{\SPACE}{\expandonce{\rule{2em}{0pt}\spacename\rule{2em}{0pt}}}
-%    \end{macrocode}
-% \end{macro}\end{macro}
-% \begin{macro}{\return}
-%    \begin{macrocode}
-\tw@make@key@box{return@mac}{%
-   \begin{tikzpicture}[yshift=0.25ex,menukeys key symbol]
-      \draw [->, rounded corners=0.2ex] (1.25ex,1ex) -| %
-            (2ex,0) -- (0,0);
-   \end{tikzpicture}%
-}
-\tw@make@key@box{return@win}{%
-   \begin{tikzpicture}[menukeys key symbol]
-      \draw [->] (1ex,1.25ex) |- (0,0);
-   \end{tikzpicture}%
-}
-\tw@make@key@macro*{\return}
-%    \end{macrocode}
-% \end{macro}
-% \begin{macro}{\enter}
-%    \begin{macrocode}
-\def\tw@mk@enter@win{Enter}
-\tw@make@key@box{enter@mac}{%
-   \begin{tikzpicture}[menukeys key symbol]
-      \draw (0,0) -- (0.5ex,0.5ex) -- (1ex,0);
-      \draw (0,0.55ex) -- (1ex,0.55ex);
-   \end{tikzpicture}%
-}
-\tw@make@key@macro*{\enter}
-%    \end{macrocode}
-% \end{macro}
-% \begin{macro}{\winmenu}
-%    \begin{macrocode}
-\def\tw@mk@winmenu@mac{%
-   \tw@mk@warning{'\string\winmenu' only for Windows!}%
-}
-\tw@make@key@box{winmenu@win}{%
-   \begin{tikzpicture}[yshift=-0.2ex,menukeys key symbol]
-      \draw (0,0) rectangle (1.5ex,1.8ex);
-      \draw (0.25ex,1.4ex) -- ++(1ex,0);
-      \draw (0.25ex,1ex) -- ++(1ex,0);
-      \draw (0.25ex,0.6ex) -- ++(1ex,0);
-   \end{tikzpicture}%
-}
-\tw@make@key@macro*{\winmenu}
-%    \end{macrocode}
-% \end{macro}
-% \begin{macro}{\backspace}
-%    \begin{macrocode}
-\tw@make@key@box{backspace}{%
-   \begin{tikzpicture}[yshift=0.65ex,menukeys key symbol]
-      \draw [<-,menukeys thick] (0,0) -- (1.35em,0);
-   \end{tikzpicture}%
-}
-\tw@make@key@macro{\backspace}
-%    \end{macrocode}
-% \end{macro}
-% \begin{macro}{\del}\begin{macro}{\backdel}
-% \changes{v1.4}{2016/04/17}{Added \cs{backdel}}
-%    \begin{macrocode}
-\providecommand{\delname}{Del.}
-\def\tw@mk@del@win{\delname}
-\tw@define@mackey{%
-   \def\tw@mk@del@mac{\delname}%
-}{%
-   \tw@make@key@box{del@mac}{%
-      \begin{tikzpicture}[yshift=0.2ex,menukeys key symbol]
-         \draw (0,0) -- (1.5ex,0) -- (2ex,0.5ex) --%
-               (1.5ex,1ex) -- (0,1ex) -- cycle;
-         \draw (0.5ex,0.2ex) -- (1.1ex,0.8ex);
-         \draw (0.5ex,0.8ex) -- (1.1ex,0.2ex);
-      \end{tikzpicture}%
-   }%
-}
-\tw@make@key@macro*{\del}
-\def\tw@mk@backdel@win{\delname}
-\tw@define@mackey{%
-   \def\tw@mk@backdel@mac{\delname}%
-}{%
-   \tw@make@key@box{backdel@mac}{%
-      \begin{tikzpicture}[yshift=0.2ex,menukeys key symbol]
-         \draw (2ex,0) -- (0.5ex,0) -- (0,0.5ex) --%
-               (0.5ex,1ex) -- (2ex,1ex) -- cycle;
-         \draw (1ex,0.2ex) -- (1.6ex,0.8ex);
-         \draw (1ex,0.8ex) -- (1.6ex,0.2ex);
-      \end{tikzpicture}%
-   }%
-}
-\tw@make@key@macro*{\backdel}
-%    \end{macrocode}
-% \end{macro}\end{macro}
-%
-% \begin{macro}{\arrowkeyup}\begin{macro}{\arrowkeydown}
-% \begin{macro}{\arrowkeyleft}\begin{macro}{\arrowkeyright}
-% Lastly we define the arrow macros:
-%    \begin{macrocode}
-\tw@make@key@box{arrowkeyup}{%
-   \begin{tikzpicture}[yshift=-0.2ex,menukeys key symbol]
-      \draw [->] (0,0) -- (0,0.8em);
-   \end{tikzpicture}%
-}
-\tw@make@key@macro{\arrowkeyup}
-
-\tw@make@key@box{arrowkeydown}{%
-   \begin{tikzpicture}[yshift=0.7em,menukeys key symbol]
-      \draw [->] (0,0) -- (0,-0.8em);
-   \end{tikzpicture}%
-}
-\tw@make@key@macro{\arrowkeydown}
-
-\tw@make@key@box{arrowkeyright}{%
-   \begin{tikzpicture}[yshift=0.5ex,menukeys key symbol]
-      \draw [->] (0,0) -- (0.8em,0);
-   \end{tikzpicture}%
-}
-\tw@make@key@macro{\arrowkeyright}
-
-\tw@make@key@box{arrowkeyleft}{%
-   \begin{tikzpicture}[yshift=0.5ex,menukeys key symbol]
-      \draw [->] (0,0) -- (-0.8em,0);
-   \end{tikzpicture}%
-}
-\tw@make@key@macro{\arrowkeyleft}
-%    \end{macrocode}
-% \end{macro}\end{macro}\end{macro}\end{macro}
-% \begin{macro}{\arrowkey}
-% And the |\arrowkey| macro that get's it's direction as argument.
-%    \begin{macrocode}
-\newcommand{\arrowkey}[1]{%
-   \IfStrEq{^}{#1}{\arrowkeyup}{%
-      \IfStrEq{v}{#1}{\arrowkeydown}{%
-         \IfStrEq{<}{#1}{\arrowkeyleft}{%
-            \IfStrEq{>}{#1}{\arrowkeyright}{%
-               \tw@mk@error{Wrong value '#1' for \string\arrowkey\MessageBreak
-               Possible values are '^', 'v', '<' or '>'}%
-            }%
-         }%
-      }%
-   }%
-}
-%    \end{macrocode}
-% \end{macro}
-% Close the |\iftw@mk@definekeys|
-%    \begin{macrocode}
-\fi
-%    \end{macrocode}
-%
 %
 % \Finale
 \endinput
