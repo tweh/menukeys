@@ -811,6 +811,12 @@
 %<@@=twmk>
 %    \end{macrocode}
 %
+% \subsection{Constants}
+%    \begin{macrocode}
+\str_const:Nn \c_@@_pgf_dir_root_str  { /menukeys/ }
+\str_const:Nn \c_@@_pgf_dir_style_str { styles/ }
+%    \end{macrocode}
+%
 % \subsection{Variables}
 %    \begin{macrocode}
 \bool_new:N \l_@@_skip_empty_first_bool
@@ -905,7 +911,7 @@
     \exp_args:Nno \keys_define:nn { menukeys }
       {
         \use_i:nn #1 / unknown .code:n =
-          { \msg_error:nnnnn { menukeys } { unknown-choice } #1 {##1} }
+          \msg_error:nnnnn { menukeys } { unknown-choice } #1 {##1}
       }
   }
 %    \end{macrocode}
@@ -930,14 +936,11 @@
 % We need to invalidate the keys which should be only available during package
 % load-time.
 %    \begin{macrocode}
-  \clist_map_inline:nn { definemenumacros, definekeys }
-    {
-      \keys_define:nn { menukeys }
-        {
-          #1 .code:n =
-            { \msg_error:nnn { menukeys } { only-package-option } {#1} }
-        }
-    }
+\clist_map_inline:nn { definemenumacros, definekeys }
+  {
+    \keys_define:nn { menukeys }
+      { #1 .code:n = \msg_error:nnn { menukeys } { only-package-option } {#1} }
+  }
 %    \end{macrocode}
 %
 % \begin{macro}{\menusetup}
@@ -1038,6 +1041,45 @@
     \use:c { @@_format_separator_ \l_@@_style_str : }
     \bool_if:NT \l_@@_substitute_separator_bool { \EndAccSupp {} }
   }
+%    \end{macrocode}
+% \end{macro}
+%
+% \subsection{Cross-interface to \pkg{pgfkeys}}
+%
+% \begin{macro}{\@@_pgf_set_style:nn, \@@_pgf_set_style:on}
+%   If we want to specify a Ti\textit{k}Z |.style| we could either call
+%   |\pgfkeys| and let it parse the keys completely, or we use a short cut and
+%   directly define the key.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_pgf_set_style:nn #1#2
+  { \exp_args:No \pgfkeysdef { \c_@@_pgf_dir_root_str #1} { \pgfkeysalso {#2} } }
+\cs_generate_variant:Nn \@@_pgf_set_style:nn { o }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\@@_pgf_if_style_defined:nTF, \@@_pgf_if_style_defined:oTF}
+%   \pkg{pgfkeys} has a built-in function to test whether a key is defined. The
+%   problem is that this test is false for a key defined with \cs{pgfkeysdef},
+%   hence we have to check an internal key representing a key defined through
+%   that interface.
+%    \begin{macrocode}
+\cs_new:Npn \@@_pgf_if_style_defined:nTF #1
+  { \exp_args:No \pgfkeysifdefined { \c_@@_pgf_dir_root_str #1 /.@cmd } }
+\cs_generate_variant:Nn \@@_pgf_if_style_defined:nTF { o }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\@@_pgf_provide_style:nn, \@@_pgf_provide_style:on}
+%   This macro just tests whether a style is already defined and if it's not,
+%   defines it.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_pgf_provide_style:nn #1#2
+  {
+    \@@_pgf_if_style_defined:nTF {#1}
+      {}
+      { \@@_pgf_set_style:nn {#1} {#2} }
+  }
+\cs_generate_variant:Nn \@@_pgf_provide_style:nn { o }
 %    \end{macrocode}
 % \end{macro}
 %
