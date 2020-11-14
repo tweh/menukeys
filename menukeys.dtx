@@ -822,8 +822,11 @@
 \bool_new:N \l_@@_skip_empty_first_bool
 \bool_new:N \l_@@_skip_empty_mid_bool
 \bool_new:N \l_@@_skip_empty_last_bool
+\bool_new:N \l_@@_substitute_separator_bool
 \int_new:N \l_@@_element_int
 \seq_new:N \l_@@_loop_seq
+\str_new:N \l_@@_style_str
+\str_new:N \l_@@_substitute_separator_str
 \tl_new:N \CurrentMenuElement
 \tl_new:N \l_@@_os_tl
 \tl_new:N \l_@@_mac_keys_tl
@@ -888,12 +891,31 @@
     ,definemenumacros .initial:n  = true
     ,definekeys       .bool_set:N = \l_@@_define_keys_bool
     ,definemenumacros .initial:n  = true
-    ,os .choices:nn      = { win, mac }
+    ,os               .choices:nn = { win, mac }
       { \tl_set_eq:NN \l_@@_os_tl \l_keys_choice_tl }
-    ,os .initial:n       = mac
-    ,mackeys .choices:nn = { symbols, text }
+    ,os               .initial:n  = mac
+    ,mackeys          .choices:nn = { symbols, text }
       { \tl_set_eq:NN \l_@@_mac_keys_tl \l_keys_choice_tl }
-    ,mackeys .initial:n  = symbols 
+    ,mackeys          .initial:n  = symbols 
+    ,copy-separator   .code:n     =
+      {
+        \str_case:nnF {#1}
+          {
+            { true }  { \bool_set_true:N \l_@@_substitute_separator_bool }
+            { false } { \bool_set_false:N \l_@@_substitute_separator_bool }
+            { bslash }
+              {
+                \bool_set_true:N \l_@@_substitute_separator_bool
+                \str_set_eq:NN \l_@@_substitute_separator_str \c_backslash_str
+              }
+          }
+          {
+            \bool_set_true:N \l_@@_substitute_separator_bool
+            \str_set:Nx \l_@@_substitute_separator_str {#1}
+          }
+      }
+    ,copy-separator   .default:n  = true
+    ,copy-separator   .initial:n  = false
   }
 %    \end{macrocode}
 %
@@ -1052,7 +1074,9 @@
 %   directly define the key.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_pgf_set_style:nn #1#2
-  { \exp_args:No \pgfkeysdef { \c_@@_pgf_dir_root_str #1} { \pgfkeysalso {#2} } }
+  {
+    \exp_args:No \pgfkeysdef { \c_@@_pgf_dir_root_str #1 } { \pgfkeysalso {#2} }
+  }
 \cs_generate_variant:Nn \@@_pgf_set_style:nn { o }
 %    \end{macrocode}
 % \end{macro}

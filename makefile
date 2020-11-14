@@ -15,7 +15,7 @@ ${ZIP}: ${CONTRIBUTION}.dtx ${CONTRIBUTION}.ins README ${CONTRIBUTION}.pdf
 	cp ${CONTRIBUTION}.dtx ${CONTRIBUTION}.ins ${CONTRIBUTION}.pdf README ${CONTRIBUTION}
 	zip ${CONTRIBUTION}.zip ./${CONTRIBUTION}/*
 	# tidy up
-	$(CLEANUP)
+	- $(CLEANUP)
 	rm ${CONTRIBUTION}.sty
 	rm -r ${CONTRIBUTION}
 	
@@ -26,7 +26,7 @@ ${ZIP}: ${CONTRIBUTION}.dtx ${CONTRIBUTION}.ins README ${CONTRIBUTION}.pdf
 # generate documentation file
 ${CONTRIBUTION}.pdf: ${CONTRIBUTION}.dtx ${CONTRIBUTION}.sty
 	# tidy up
-	$(CLEANUP)
+	- $(CLEANUP)
 	# generate doc
 	pdflatex ${CONTRIBUTION}.dtx 
 	pdflatex ${CONTRIBUTION}.dtx
@@ -37,4 +37,4 @@ ${CONTRIBUTION}.pdf: ${CONTRIBUTION}.dtx ${CONTRIBUTION}.sty
 
 clean:
 	# tidy up
-	$(CLEANUP)
+	- $(CLEANUP)
