@@ -11,7 +11,7 @@
 %%
 %<package>\NeedsTeXFormat{LaTeX2e}[2009/01/01]
 %<package>\ProvidesPackage{menukeys}
-%<package>  [2020/10/31 v1.6 -- A package to format menus, paths and shortcuts]
+%<package>  [2020/11/28 v1.6.1 -- A package to format menus, paths and shortcuts]
 %
 %<*driver>
 \documentclass{ltxdoc}
@@ -285,7 +285,7 @@
 %   \IfStrEq,\hyphenchar,\expandonce,\encodingdefault,\DeclareStringOption}
 %
 % \title{\Huge\MENU[,]{M,E,N,U,K,E,Y,S}}
-% \author{Jonathan P.\@ Spratte\qquad Tobias Weh\\
+% \author{Tobias Weh\qquad Jonathan P.\@ Spratte\\
 %   \normalsize\href{mailto:mail@tobiw.de}{\texttt{mail@tobiw.de}}\\
 %   \normalsize\url{http://tobiw.de/en}\\
 %   \normalsize\url{http://github.com/tweh/menukeys}\\
@@ -305,10 +305,7 @@
 %    \par\bigskip\noindent
 %    \emph{Many thanks to Ahmed Musa, who provided the original list parsing
 %    code at \url{http://tex.stackexchange.com/a/44989/4918}.}
-%    \par\bigskip\noindent
-%    \emph{Special thanks to Jonathan P.\@ Spratte, who made the changes in v1.6
-%    to remove the \pkg{catoptions} dependency so that \pkg{menukeys} works with
-%    \LaTeX\ releases starting from 2020/10/01.}
+%    \par
 %   \end{abstract}
 % 
 % \newpage\tableofcontents\newpage
@@ -794,7 +791,8 @@
 %    \begin{macrocode}
 \ExplSyntaxOn
 \cs_new_eq:NN \tw@mk@trimspaces \tl_trim_spaces:n
-\cs_new_eq:NN \tw@mk@expanded \use:x
+\cs_new_eq:NN \tw@mk@exp@NNx    \exp_args:NNx
+\cs_new_eq:NN \tw@mk@string     \cs_to_str:N
 \prg_generate_conditional_variant:Nnn \tl_if_in:nn { xx } { TF }
 \cs_new:Npn \tw@mk@xifinsetTF #1 #2
   {
@@ -864,12 +862,12 @@
 % expanded once as it is handed in as a token storing the real argument in later
 % use.
 %    \begin{macrocode}
-\cs_generate_variant:Nn \seq_set_split:Nnn { Nno }
+\cs_generate_variant:Nn \seq_set_split:Nnn { Noo }
 \cs_new_protected:Npn \tw@mk@indrisloop #1 #2 #3
   {
     \__twmk_pushseq:
     \__twmk_pushint:
-    \seq_set_split:Nno \l__twmk_indris_seq {#1} {#2}
+    \seq_set_split:Noo \l__twmk_indris_seq {#1} {#2}
     \int_zero:N \l__twmk_indris_int
     \bool_do_while:nn { \bool_not_p:n { \seq_if_empty_p:N \l__twmk_indris_seq } }
       {
@@ -1573,7 +1571,7 @@
 % \begin{macro}{\tw@default@input@sep}
 % First we define our default input separator
 %    \begin{macrocode}
-\edef\tw@default@input@sep{,}
+\def\tw@default@input@sep{,}
 %    \end{macrocode}
 % \end{macro}
 % \begin{macro}{\CurrentMenuElement} and the |\CurrentMenuElement| dummy
@@ -1588,6 +1586,9 @@
 % \changes{v1.2c}{2013/07/23}{Replaced \cs{protected@edef} by \cs{def}}
 % \changes{v1.2}{2013/07/23}{Added \cs{leavevmode}}
 % \changes{v1.6}{2020/10/27}{Don't use \cs{NewDocumentCommand}}
+% \changes{v1.6.1}{2020/11/28}{Handles default input separator.}
+% \changes{v1.6.1}{2020/11/28}{No x-type expansion on the separator to call the
+%   loop}
 % Then we set up the internal command to create new menu macros.
 % The list parsing code was essentially provided by Ahmed Musa at
 % \url{http://tex.stackexchange.com/a/44989/4918}. Jonathan P.\@ Spratte
@@ -1605,72 +1606,93 @@
       }%
     }%
 }
-\newcommand\tw@define@menu@macro[4]{%
-   \ifcsundef{tw@style@#4@sep}{%
-      \tw@mk@error{Can't define menu macro \string#2\space,\MessageBreak
-      because the style '#4' is not available!}
-   }{%
-      \csdef{tw@parse@menu@list@\expandafter\@gobble\string#2}##1{%
-         \tw@mk@iflastindris
+\newcommand\tw@define@menu@macro[4]
+  {%
+    \ifcsundef{tw@style@#4@sep}
+      {%
+        \tw@mk@error
           {%
-            \ifnum\tw@mk@indrisnr=\@ne
-                \def\CurrentMenuElement{##1}%
-                \@nameuse{tw@style@#4@single}%
-            \else
-                \def\CurrentMenuElement{##1}%
-                \@nameuse{tw@style@#4@sep}\@nameuse{tw@style@#4@last}%
-            \fi
-          }
+            Can't define menu macro \string#2\space,\MessageBreak
+            because the style '#4' is not available!%
+          }%
+      }
+      {%
+        \csdef{tw@parse@menu@list@\tw@mk@string#2}##1%
           {%
-            \ifnum\tw@mk@indrisnr=\@ne
-               \def\CurrentMenuElement{##1}%
-               \@nameuse{tw@style@#4@first}%
-            \else
-               \def\CurrentMenuElement{##1}%
-               \@nameuse{tw@style@#4@sep}\@nameuse{tw@style@#4@mid}%
-            \fi
+            \def\CurrentMenuElement{##1}%
+            \tw@mk@iflastindris
+              {%
+                \ifnum\tw@mk@indrisnr=\@ne
+                  \@nameuse{tw@style@#4@single}%
+                \else
+                  \@nameuse{tw@style@#4@sep}%
+                  \@nameuse{tw@style@#4@last}%
+                \fi
+              }
+              {%
+                \ifnum\tw@mk@indrisnr=\@ne
+                  \@nameuse{tw@style@#4@first}%
+                \else
+                  \@nameuse{tw@style@#4@sep}%
+                  \@nameuse{tw@style@#4@mid}%
+                \fi
+              }%
+          }%
+        \IfNoValueTF{#3}
+          {\tw@mk@exp@NNx#1#2{+O{\tw@default@input@sep}+m}}
+          {#1#2{+O{#3}+m}}%
+          {%
+            \leavevmode
+            \begingroup
+              \def\tw@current@color@theme
+                {\csname tw@style@#4@color@theme\endcsname}%
+              \@nameuse{tw@style@#4@pre}%
+              \tw@mk@test@input@sep{##1}
+                {%
+                  \edef\tw@menu@list{\detokenize{##2}}%
+                  \edef\tw@mk@tempa{\@backslashchar}%
+                }
+                {%
+                  \edef\tw@menu@list{\unexpanded{##2}}%
+                  \edef\tw@mk@tempa{\tw@mk@trimspaces{##1}}%
+                }%
+              \begingroup
+                \letcs{\tw@mk@tempb}{tw@parse@menu@list@\tw@mk@string#2}%
+                \tw@mk@indrisloop\tw@mk@tempa\tw@menu@list\tw@mk@tempb
+              \endgroup
+              \@nameuse{tw@style@#4@post}%
+            \endgroup
           }%
       }%
-      #1 #2 { +O{#3} +m }{%
-         \leavevmode%
-         {\def\tw@current@color@theme{\csname tw@style@#4@color@theme\endcsname}%
-         \@nameuse{tw@style@#4@pre}%
-         \tw@mk@test@input@sep{##1}{%
-            \edef\tw@menu@list{\detokenize{##2}}\edef\tw@mk@tempa{\@backslashchar}%
-         }{%
-            \edef\tw@menu@list{\unexpanded{##2}}\edef\tw@mk@tempa{\tw@mk@trimspaces{##1}}%
-         }%
-         {\letcs{\tw@mk@tempb}{tw@parse@menu@list@\expandafter\@gobble\string#2}%
-         \tw@mk@expanded{\tw@mk@indrisloop{\tw@mk@tempa}}\tw@menu@list\tw@mk@tempb}%
-         \@nameuse{tw@style@#4@post}}%
-      }%
-   }%
-}
+  }
 %    \end{macrocode}
 % \end{macro}
 % \subsubsection{User-level commands}
 % \begin{macro}{\newmenumacro}
 % \changes{v1.1a}{2013/05/28}{Added a line to make a new macro robust.}
 % \changes{v1.6}{2020/10/27}{use \cs{NewDocumentCommand}}
+% \changes{v1.6.1}{2020/11/28}{default handled by \cs{tw@define@menu@macro}}
 % \begin{macro}{\renewmenumacro}
 % \changes{v1.6}{2020/10/27}{use \cs{RenewDocumentCommand}}
+% \changes{v1.6.1}{2020/11/28}{default handled by \cs{tw@define@menu@macro}}
 % \begin{macro}{\providemenumacro}
 % \changes{v1.6}{2020/10/27}{use \cs{ProvideDocumentCommand}}
+% \changes{v1.6.1}{2020/11/28}{default handled by \cs{tw@define@menu@macro}}
 % Now it's time to build the user-level commands
 %    \begin{macrocode}
-\NewDocumentCommand{\newmenumacro}{m O{\tw@default@input@sep} m}{%
-   \ifcsundef{\expandafter\@gobble\string#1}{%
+\NewDocumentCommand{\newmenumacro}{m o m}{%
+   \ifcsundef{\tw@mk@string#1}{%
       \tw@define@menu@macro\NewDocumentCommand{#1}{#2}{#3}%
    }{%
       \tw@mk@error{Menu macro '\string#1' already defined!\MessageBreak
       Use \string\renewmenustyle\space instead.}%
    }%
 }
-\NewDocumentCommand{\renewmenumacro}{m O{\tw@default@input@sep} m}{%
+\NewDocumentCommand{\renewmenumacro}{m o m}{%
    \tw@define@menu@macro\RenewDocumentCommand{#1}{#2}{#3}%
 }
-\NewDocumentCommand{\providemenumacro}{m O{\tw@default@input@sep} m}{%
-   \ifcsundef{\expandafter\@gobble\string#1}{%
+\NewDocumentCommand{\providemenumacro}{m o m}{%
+   \ifcsundef{\tw@mk@string#1}{%
       \tw@define@menu@macro\ProvideDocumentCommand{#1}{#2}{#3}%
    }{%
       \tw@mk@warning{Menu macro '\string#1' already defined!\MessageBreak
@@ -1738,25 +1760,25 @@
 %    \begin{macrocode}
 \NewDocumentCommand{\tw@make@key@macro}{s m}{%
    \IfBooleanTF{#1}{%
-      \expandafter\providecommand\csname\expandafter\@gobble\string#2\endcsname{%
+      \expandafter\providecommand\csname\tw@mk@string#2\endcsname{%
          \expandonce{\maxsizebox{!}{1.8ex}{%
-            \@nameuse{tw@mk@\expandafter\@gobble\string#2@\tw@mk@os}}%
+            \@nameuse{tw@mk@\tw@mk@string#2@\tw@mk@os}}%
          }%
       }%
-      \expandafter\providecommand\csname\expandafter\@gobble\string#2mac\endcsname{%
+      \expandafter\providecommand\csname\tw@mk@string#2mac\endcsname{%
          \expandonce{\maxsizebox{!}{1.8ex}{%
-            \@nameuse{tw@mk@\expandafter\@gobble\string#2@mac}}%
+            \@nameuse{tw@mk@\tw@mk@string#2@mac}}%
          }%
       }%
-      \expandafter\providecommand\csname\expandafter\@gobble\string#2win\endcsname{%
+      \expandafter\providecommand\csname\tw@mk@string#2win\endcsname{%
          \expandonce{\maxsizebox{!}{1.8ex}{%
-            \@nameuse{tw@mk@\expandafter\@gobble\string#2@win}}%
+            \@nameuse{tw@mk@\tw@mk@string#2@win}}%
          }%
       }%
    }{%
-      \expandafter\providecommand\csname\expandafter\@gobble\string#2\endcsname{%
+      \expandafter\providecommand\csname\tw@mk@string#2\endcsname{%
          \expandonce{\maxsizebox{!}{1.8ex}{%
-            \@nameuse{tw@mk@\expandafter\@gobble\string#2}}%
+            \@nameuse{tw@mk@\tw@mk@string#2}}%
          }%
       }%
    }%
