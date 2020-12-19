@@ -11,7 +11,7 @@
 %%
 %<package>\NeedsTeXFormat{LaTeX2e}[2009/01/01]
 %<package>\ProvidesPackage{menukeys}
-%<package>  [2020/12/05 v1.6.1 -- A package to format menus, paths and shortcuts]
+%<package>  [2020/12/19 v1.6.1 -- A package to format menus, paths and shortcuts]
 %
 %<*driver>
 \documentclass{ltxdoc}
@@ -1586,7 +1586,7 @@
 %    \end{macrocode}
 % \end{macro}
 % \begin{macro}{\tw@define@menu@macro}
-% \changes{v1.6.1}{2020/12/05}{Handles default input separator.}
+% \changes{v1.6.1}{2020/12/19}{Handles default input separator.}
 % \begin{macro}{\tw@define@menu@macro@}
 % \changes{v1.1a}{2013/05/28}{Fixed minor bug, that causes a warning about robustifying (issue \#23),
 %    by deleting the line to make the command robust.}
@@ -1594,8 +1594,8 @@
 % \changes{v1.2c}{2013/07/23}{Replaced \cs{protected@edef} by \cs{def}}
 % \changes{v1.2}{2013/07/23}{Added \cs{leavevmode}}
 % \changes{v1.6}{2020/10/27}{Don't use \cs{NewDocumentCommand}}
-% \changes{v1.6.1}{2020/12/05}{Renamed from \cs{tw@define@menu@macro}}
-% \changes{v1.6.1}{2020/12/05}{No x-type expansion on the separator to call the
+% \changes{v1.6.1}{2020/12/19}{Renamed from \cs{tw@define@menu@macro}}
+% \changes{v1.6.1}{2020/12/19}{No x-type expansion on the separator to call the
 %   loop}
 % Then we set up the internal command to create new menu macros.
 % The list parsing code was essentially provided by Ahmed Musa at
@@ -1684,13 +1684,13 @@
 % \begin{macro}{\newmenumacro}
 % \changes{v1.1a}{2013/05/28}{Added a line to make a new macro robust.}
 % \changes{v1.6}{2020/10/27}{use \cs{NewDocumentCommand}}
-% \changes{v1.6.1}{2020/12/05}{default handled by \cs{tw@define@menu@macro}}
+% \changes{v1.6.1}{2020/12/19}{default handled by \cs{tw@define@menu@macro}}
 % \begin{macro}{\renewmenumacro}
 % \changes{v1.6}{2020/10/27}{use \cs{RenewDocumentCommand}}
-% \changes{v1.6.1}{2020/12/05}{default handled by \cs{tw@define@menu@macro}}
+% \changes{v1.6.1}{2020/12/19}{default handled by \cs{tw@define@menu@macro}}
 % \begin{macro}{\providemenumacro}
 % \changes{v1.6}{2020/10/27}{use \cs{ProvideDocumentCommand}}
-% \changes{v1.6.1}{2020/12/05}{default handled by \cs{tw@define@menu@macro}}
+% \changes{v1.6.1}{2020/12/19}{default handled by \cs{tw@define@menu@macro}}
 % Now it's time to build the user-level commands
 %    \begin{macrocode}
 \NewDocumentCommand{\newmenumacro}{m o m}{%
