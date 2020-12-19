@@ -11,7 +11,7 @@
 %%
 %<package>\NeedsTeXFormat{LaTeX2e}[2009/01/01]
 %<package>\ProvidesPackage{menukeys}
-%<package>  [2020/11/28 v1.6.1 -- A package to format menus, paths and shortcuts]
+%<package>  [2020/12/05 v1.6.1 -- A package to format menus, paths and shortcuts]
 %
 %<*driver>
 \documentclass{ltxdoc}
@@ -791,7 +791,7 @@
 %    \begin{macrocode}
 \ExplSyntaxOn
 \cs_new_eq:NN \tw@mk@trimspaces \tl_trim_spaces:n
-\cs_new_eq:NN \tw@mk@exp@NNx    \exp_args:NNx
+\cs_new_eq:NN \tw@mk@exp@Nnno   \exp_args:Nnno
 \cs_new_eq:NN \tw@mk@string     \cs_to_str:N
 \prg_generate_conditional_variant:Nnn \tl_if_in:nn { xx } { TF }
 \cs_new:Npn \tw@mk@xifinsetTF #1 #2
@@ -1580,20 +1580,22 @@
 %    \end{macrocode}
 % \end{macro}
 % \begin{macro}{\tw@define@menu@macro}
+% \changes{v1.6.1}{2020/12/05}{Handles default input separator.}
+% \begin{macro}{\tw@define@menu@macro@}
 % \changes{v1.1a}{2013/05/28}{Fixed minor bug, that causes a warning about robustifying (issue \#23),
 %    by deleting the line to make the command robust.}
 % \changes{v1.2}{2013/07/23}{Replaced \cs{edef} by \cs{protected@edef}}
 % \changes{v1.2c}{2013/07/23}{Replaced \cs{protected@edef} by \cs{def}}
 % \changes{v1.2}{2013/07/23}{Added \cs{leavevmode}}
 % \changes{v1.6}{2020/10/27}{Don't use \cs{NewDocumentCommand}}
-% \changes{v1.6.1}{2020/11/28}{Handles default input separator.}
-% \changes{v1.6.1}{2020/11/28}{No x-type expansion on the separator to call the
+% \changes{v1.6.1}{2020/12/05}{Renamed from \cs{tw@define@menu@macro}}
+% \changes{v1.6.1}{2020/12/05}{No x-type expansion on the separator to call the
 %   loop}
 % Then we set up the internal command to create new menu macros.
 % The list parsing code was essentially provided by Ahmed Musa at
 % \url{http://tex.stackexchange.com/a/44989/4918}. Jonathan P.\@ Spratte
 % made some major changes to make \pkg{menukeys} work without \pkg{catoptions}
-% and reimplemented the parsing code usding \LaTeX3. Thank you both very much!
+% and reimplemented the parsing code using \LaTeX3. Thank you both very much!
 %    \begin{macrocode}
 \begingroup
 \lccode`\,=1
@@ -1606,7 +1608,13 @@
       }%
     }%
 }
-\newcommand\tw@define@menu@macro[4]
+\newcommand\tw@define@menu@macro[3]
+  {%
+    \IfNoValueTF{#3}
+      {\tw@mk@exp@Nnno\tw@define@menu@macro@{#1}{#2}\tw@default@input@sep}
+      {\tw@define@menu@macro@{#1}{#2}{#3}}%
+  }
+\newcommand\tw@define@menu@macro@[4]
   {%
     \ifcsundef{tw@style@#4@sep}
       {%
@@ -1638,9 +1646,7 @@
                 \fi
               }%
           }%
-        \IfNoValueTF{#3}
-          {\tw@mk@exp@NNx#1#2{+O{\tw@default@input@sep}+m}}
-          {#1#2{+O{#3}+m}}%
+        #1#2{+O{#3}+m}%
           {%
             \leavevmode
             \begingroup
@@ -1667,17 +1673,18 @@
   }
 %    \end{macrocode}
 % \end{macro}
+% \end{macro}
 % \subsubsection{User-level commands}
 % \begin{macro}{\newmenumacro}
 % \changes{v1.1a}{2013/05/28}{Added a line to make a new macro robust.}
 % \changes{v1.6}{2020/10/27}{use \cs{NewDocumentCommand}}
-% \changes{v1.6.1}{2020/11/28}{default handled by \cs{tw@define@menu@macro}}
+% \changes{v1.6.1}{2020/12/05}{default handled by \cs{tw@define@menu@macro}}
 % \begin{macro}{\renewmenumacro}
 % \changes{v1.6}{2020/10/27}{use \cs{RenewDocumentCommand}}
-% \changes{v1.6.1}{2020/11/28}{default handled by \cs{tw@define@menu@macro}}
+% \changes{v1.6.1}{2020/12/05}{default handled by \cs{tw@define@menu@macro}}
 % \begin{macro}{\providemenumacro}
 % \changes{v1.6}{2020/10/27}{use \cs{ProvideDocumentCommand}}
-% \changes{v1.6.1}{2020/11/28}{default handled by \cs{tw@define@menu@macro}}
+% \changes{v1.6.1}{2020/12/05}{default handled by \cs{tw@define@menu@macro}}
 % Now it's time to build the user-level commands
 %    \begin{macrocode}
 \NewDocumentCommand{\newmenumacro}{m o m}{%
