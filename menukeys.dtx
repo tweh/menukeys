@@ -222,7 +222,7 @@
 %
 % \GetFileInfo{menukeys.sty}
 %
-% \DoNotIndex{\?,\.,\@M,\@@input,\@Alph,\@alph,\@addtoreset,\@arabic}
+% \DoNotIndex{\?,\_,\.,\@M,\@@input,\@Alph,\@alph,\@addtoreset,\@arabic}
 % \DoNotIndex{\@badmath,\@centercr,\@cite}
 % \DoNotIndex{\@dotsep,\@empty,\@float,\@gobble,\@gobbletwo,\@ignoretrue}
 % \DoNotIndex{\@input,\@ixpt,\@m,\@minus,\@mkboth}
@@ -318,8 +318,8 @@
 %
 % \section{Introduction}\label{intro}
 % The \menukeys package is mainly designed to parse and print
-% sequences of software menus, folders and files or keystrokes.
-% The most predefined styles use the power of \TikZ\footnote{See
+% sequences of software menus, folders and files, or keystrokes.
+% Most predefined styles use the power of \TikZ\footnote{See
 % \url{https://www.ctan.org/pkg/pgf}.} to format the output.
 % 
 % For example if you want to tell the reader of a manual how to set the ruler
@@ -330,9 +330,9 @@
 %    to view the rulers is \keys{cmd + R}. Pressing these keys again
 %    will hide the rulers.
 %    
-%    The standard path for saving your document is \directory{Macintosh HD/Users/
-%    Your Name/Documents} but you can change it at \menu{Extras > Settings
-%    > Saving} by clicking \menu{Change save path}.
+%    The standard path for saving your document is \directory{Macintosh HD/
+%    Users/Your Name/Documents} but you can change it at \menu{Extras >
+%    Settings > Saving} by clicking \menu{Change save path}.
 % \end{verbatim}
 % and get this:
 % 
@@ -342,9 +342,9 @@
 %    to view the rulers is \keys{cmd + R}. Pressing these keys again
 %    will hide the rulers.
 %    
-%    The standard path for saving your document is \directory{Macintosh HD/Users/
-%    Your Name/Documents} but you can change it at \menu{Extras > Settings
-%    > Saving} by clicking \menu{Change save path}.
+%    The standard path for saving your document is \directory{Macintosh HD/
+%    Users/Your Name/Documents} but you can change it at \menu{Extras >
+%    Settings > Saving} by clicking \menu{Change save path}.
 % 
 % \bigskip\noindent
 % The package is loaded as usual via
@@ -742,7 +742,7 @@
 %       loaded after it. Otherwise some key macros get corrupted.
 %    \item \changes{v1.1}{2012/02/26}{Load \pkg{xcolor} before \menukeys.}
 %       \menukeys must be loaded after \pkg{xcolor}, if you load
-%       the latter with options. Otherwise you'll get an option clash
+%       the latter with options. Otherwise you'll get an option clash.
 %       Since \menukeys loads \pkg{xcolor} internally you may pass
 %       options as global options via |\documentclass| or directly to it via
 %       |\PassOptionsToPackage|.
