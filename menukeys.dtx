@@ -175,6 +175,7 @@
 }{blacknwhite}
 \newmenumacro{\filefolder}[/]{pathswithblackfolder}
 \newmenumacro{\MENU}[,]{menusbig}
+\newcommand\email[1]{\href{mailto:#1}{\texttt{#1}}}
 \makeatother
 
 \EnableCrossrefs
@@ -285,9 +286,14 @@
 %   \IfStrEq,\hyphenchar,\expandonce,\encodingdefault,\DeclareStringOption}
 %
 % \title{\Huge\MENU[,]{M,E,N,U,K,E,Y,S}}
-% \author{Tobias Weh\qquad Jonathan P.\@ Spratte\\
-%   \normalsize\href{mailto:mail@tobiw.de}{\texttt{mail@tobiw.de}}\\
-%   \normalsize\url{http://tobiw.de/en}\\
+% \author{^^A
+%   Tobias Weh\\
+%   {\normalsize\email{mail@tobiw.de}}\\
+%   {\normalsize\url{http://tobiw.de/en}}\\[\medskipamount]
+%   ^^A
+%   Jonathan P.\@ Spratte\\
+%   {\normalsize\email{jspratte@yahoo.de}}\\[\medskipamount]
+%   ^^A
 %   \normalsize\url{http://github.com/tweh/menukeys}\\
 %   \normalsize\url{http://www.ctan.org/pkg/menukeys}\\
 %   \normalsize\filefolder{macros/latex/contrib/menukeys}}
