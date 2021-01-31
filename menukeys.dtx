@@ -211,7 +211,7 @@
 % \changes{v1.2}{2013/07/23}{Added \cs{SPACE} and \cs{spacename}}
 % \changes{v1.2}{2013/07/23}{Added \cs{normalsize} before symbol definitions to make
 %                            the \texttt{ex} unit available}
-% \changes{v1.2a}{2013/09/10}{Replaced obsolete \cs{tikzsytle}}
+% \changes{v1.2a}{2013/09/10}{Replaced obsolete \cs{tikzstyle}}
 % \changes{v1.2a}{2013/09/10}{Added braces to the \cs{tikz} macro since the parser
 %                             seems to crash with \pkg{babel}'s french option otherwise.}
 % \changes{v1.3}{2014/03/10}{Improved key symbols.}
@@ -520,11 +520,11 @@
 %    \item [sep] is the code executed between the lists elements, e.g. some
 %       space or a symbol.
 %    \item [mid] is the style for all elements between the first and the
-%       last one. It has to be a \TikZ sytle.
+%       last one. It has to be a \TikZ style.
 %    \item [last] is the style for the last list element.
-%       It has to be a \TikZ sytle.
+%       It has to be a \TikZ style.
 %    \item [single] this style is used if the list contains only one element.
-%       It has to be a \TikZ sytle.
+%       It has to be a \TikZ style.
 %    \item [post] is the code which is executed after a menu macro.
 %    \item [theme] is a color theme (see section~\ref{colors}).
 % \end{description}
@@ -1107,12 +1107,12 @@
 }
 %    \end{macrocode}
 % \end{macro}
-% \begin{macro}{\tw@declare@sytle}\begin{macro}{\tw@declare@sytle@extra@args}
+% \begin{macro}{\tw@declare@style}\begin{macro}{\tw@declare@style@extra@args}
 % The next step is to create the extended command. This command must have
 % ten arguments (including the star) so we have to define a helping macro
 % to grab the last two macros.
 %    \begin{macrocode}
-\DeclareDocumentCommand{\tw@declare@sytle@extra@args}{%
+\DeclareDocumentCommand{\tw@declare@style@extra@args}{%
    O{\tw@default@post} m
 }{%
    \csdef{tw@style@\tw@current@style @post}{#1}%
@@ -1146,7 +1146,7 @@
          \tikz[baseline=(tw@node.base)]{%
          \node(tw@node)[#7]{\strut\CurrentMenuElement};}}%
    }%
-   \tw@declare@sytle@extra@args%
+   \tw@declare@style@extra@args%
 }
 %    \end{macrocode}
 % \end{macro}\end{macro}
