@@ -11,7 +11,7 @@
 %%
 %<package>\NeedsTeXFormat{LaTeX2e}[2009/01/01]
 %<package>\ProvidesPackage{menukeys}
-%<package>  [2020/12/19 v1.6.1 -- A package to format menus, paths and shortcuts]
+%<package>  [2022/06/28 v1.6.2 -- A package to format menus, paths and shortcuts]
 %
 %<*driver>
 \documentclass{ltxdoc}
@@ -1439,6 +1439,9 @@
    \hspace{0.2ex}\hspace{0.1em plus 0.1em minus 0.05em}%
    \textcolor{\usemenucolor{b}}{\raisebox{0.25ex}{\sffamily\relsize{-2}+}}%
    \hspace{0.1em plus 0.1em minus 0.05em}%
+%    \end{macrocode}
+% \changes{v1.6.2}{2022/06/28}{changed \cs{hspace} to \cs{kern}}
+%    \begin{macrocode}
 ][\kern0.2ex]{gray}
 
 \tikzset{tw@angularkeys@base/.style={%
@@ -1481,6 +1484,9 @@
    \hspace{0.2ex}\hspace{0.1em plus 0.1em minus 0.05em}%
    \textcolor{\usemenucolor{b}}{\raisebox{0.25ex}{\sffamily\relsize{-2}+}}%
    \hspace{0.1em plus 0.1em minus 0.05em}%
+%    \end{macrocode}
+% \changes{v1.6.2}{2022/06/28}{changed \cs{hspace} to \cs{kern}}
+%    \begin{macrocode}
 ][\kern0.2ex]{gray}
 
 \tikzset{tw@typewriterkeys@base/.style={%
