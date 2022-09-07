@@ -36,7 +36,11 @@ LaTeX version 1999/12/01 or later.
 \endpreamble
 
 \askforoverwritefalse
-\generate{\file{menukeys.sty}{\from{menukeys.dtx}{package}}}
+\generate
+  {%
+    \file{menukeys.sty}{\from{menukeys.dtx}{pkg,cur,rbk}}%
+    \file{menukeys-2020-12-19.sty}{\from{menukeys.dtx}{pkg,161}}%
+  }
 
 \obeyspaces
 \Msg{****************************************************}

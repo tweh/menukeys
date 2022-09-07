@@ -9,9 +9,14 @@
 %%
 %%    https://www.latex-project.org/lppl.txt
 %%
-%<package>\NeedsTeXFormat{LaTeX2e}[2009/01/01]
-%<package>\ProvidesPackage{menukeys}
-%<package>  [2022/06/28 v1.6.2 -- A package to format menus, paths and shortcuts]
+%<pkg>\NeedsTeXFormat{LaTeX2e}[2009/01/01]
+%<rbk>\providecommand\DeclareRelease[3]{}
+%<rbk>\providecommand\DeclareCurrentRelease[2]{}
+%<rbk>\DeclareRelease{v1.6.1}{2020-12-19}{menukeys-2020-12-19.sty}
+%<rbk>\DeclareCurrentRelease{v1.6.2}{2022-07-01}
+%<pkg>\ProvidesPackage{menukeys}
+%<cur>  [2022/07/01 v1.6.2 -- A package to format menus, paths and shortcuts]
+%<161>  [2020/12/19 v1.6.1 -- A package to format menus, paths and shortcuts]
 %
 %<*driver>
 \documentclass{ltxdoc}
@@ -772,6 +777,9 @@
 % \StopEventually{\clearpage\PrintChanges\clearpage\PrintIndex}
 %
 % \section{Implementation}
+%    \begin{macrocode}
+%<*pkg>
+%    \end{macrocode}
 % \subsection{Required packages}
 % \changes{v1.6}{2020/10/27}{Don't load \pkg{catoptions}}
 % Load the required packages
@@ -1440,9 +1448,14 @@
    \textcolor{\usemenucolor{b}}{\raisebox{0.25ex}{\sffamily\relsize{-2}+}}%
    \hspace{0.1em plus 0.1em minus 0.05em}%
 %    \end{macrocode}
-% \changes{v1.6.2}{2022/06/28}{changed \cs{hspace} to \cs{kern}}
+% \changes{v1.6.2}{2022/07/01}{changed \cs{hspace} to \cs{kern}}
 %    \begin{macrocode}
-][\kern0.2ex]{gray}
+%</pkg>
+%<cur>][\kern0.2ex\relax]{gray}
+%<161>][\hspace{0.2ex}]{gray}
+%<*pkg>
+%    \end{macrocode}
+%    \begin{macrocode}
 
 \tikzset{tw@angularkeys@base/.style={%
    tw@set@tikz@colors,
@@ -1485,9 +1498,14 @@
    \textcolor{\usemenucolor{b}}{\raisebox{0.25ex}{\sffamily\relsize{-2}+}}%
    \hspace{0.1em plus 0.1em minus 0.05em}%
 %    \end{macrocode}
-% \changes{v1.6.2}{2022/06/28}{changed \cs{hspace} to \cs{kern}}
+% \changes{v1.6.2}{2022/07/01}{changed \cs{hspace} to \cs{kern}}
 %    \begin{macrocode}
-][\kern0.2ex]{gray}
+%</pkg>
+%<cur>][\kern0.2ex\relax]{gray}
+%<161>][\hspace{0.2ex}]{gray}
+%<*pkg>
+%    \end{macrocode}
+%    \begin{macrocode}
 
 \tikzset{tw@typewriterkeys@base/.style={%
    tw@set@tikz@colors,
@@ -2125,6 +2143,9 @@
 \fi
 %    \end{macrocode}
 %
+%    \begin{macrocode}
+%</pkg>
+%    \end{macrocode}
 %
 % \Finale
 \endinput
