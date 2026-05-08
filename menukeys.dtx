@@ -29,7 +29,6 @@
 \usepackage[hang]{footmisc}
 \usepackage{dblfnote}
 \setlength{\footnotemargin}{1em}
-\usepackage{listings}
 \usepackage{xcolor}
 \definecolor{darkred}{HTML}{770011}
 \definecolor{darkblue}{HTML}{003b8b}
@@ -75,19 +74,50 @@
 \newcommand{\minisec}[1]{\par\medskip\noindent{\sffamily\bfseries#1}\quad}
 \newcommand{\example}{\minisec{Example}\xspace}
 
+\ExpandArgs{c}\newif{iffirstteststyle}
+\global\firstteststyletrue
+\colorlet{keywordcolor}{green!45!black}
+\newcommand\keyword[1]{\textcolor{keywordcolor}{\string#1}}
+\newcommand\braced[1]
+  {%
+    \allowbreak
+    \textcolor{keywordcolor}{\{}%
+    \detokenize{#1}%
+    \textcolor{keywordcolor}{\}}%
+  }
+
 \providemenumacro{\test}{roundedmenus}
 \NewDocumentCommand{\teststyle}{ o m m m }{{%
    \renewmenumacro{\test}{#2}%
    \par\vspace{1.5\baselineskip plus 0.5\baselineskip minus 0.25\baselineskip}
    \noindent
-   \fbox{\begin{minipage}{0.97\textwidth}
-   Name: \texttt{#2}
-      \index{#2=\texttt{#2}  (style)|usage}%
-      \index{Styles:>\texttt{#2}|usage}
-   \par\vspace{0.5\baselineskip}%
-   \test{#3}
-   \par\vspace{0.5\baselineskip}%
-   \test{#4}%
+   \fbox{\begin{minipage}{\dimexpr\textwidth-2\fboxsep-2\fboxrule\relax}
+   \begin{minipage}[t]{0.45\linewidth}
+     Name: \texttt{#2}
+        \index{#2=\texttt{#2}  (style)|usage}%
+        \index{Styles:>\texttt{#2}|usage}
+     \par\vspace{0.5\baselineskip}%
+     \test{#3}
+     \par\vspace{0.5\baselineskip}%
+     \test{#4}%
+   \end{minipage}\hfill
+   \begin{minipage}[t]{0.53\linewidth}
+     \ttfamily\footnotesize
+     \hangindent1em
+     \textbf{%
+       \color{keywordcolor}%
+       \iffirstteststyle
+         \string\newmenumacro
+       \else
+         \string\renewmenumacro
+       \fi
+     }%
+     \keyword{\test}\braced{#2}\par
+     \hangindent1em
+     \keyword{\test}\braced{#3}\par
+     \hangindent1em
+     \keyword{\test}\braced{#4}
+   \end{minipage}
    \par\vspace{0.5\baselineskip}%
    This is some more or less blind text, to demonstrate how
    the sequence looks in text. This \test{#3} is the result
@@ -98,6 +128,7 @@
       \itshape\footnotesize#1\par
    }}%
    \end{minipage}}%
+   \global\firstteststylefalse
 }}
 \makeatletter
 \newcommand{\colortest}[1]{{%
