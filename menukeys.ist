@@ -1,0 +1,48 @@
+% This is a copy of l3doc.ist originally authored by the LaTeX project team
+%
+% The original contents follow below the next rule
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%% This is file `l3doc.ist',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% l3doc.dtx  (with options: `docist')
+%% 
+%% Copyright (C) 1990-2026 The LaTeX Project
+%% 
+%% It may be distributed and/or modified under the conditions of
+%% the LaTeX Project Public License (LPPL), either version 1.3c of
+%% this license or (at your option) any later version.  The latest
+%% version of this license is in the file:
+%% 
+%%    https://www.latex-project.org/lppl.txt
+%% 
+%% This file is part of the "l3kernel bundle" (The Work in LPPL)
+%% and all files in that bundle must be distributed together.
+%% 
+%% File: l3doc.dtx
+actual '='
+quote '!'
+level '>'
+preamble
+"\n \\begin{theindex} \n \\makeatletter\\scan@allowedfalse\n"
+postamble
+"\n\n \\end{theindex}\n"
+item_x1   "\\efill \n \\subitem "
+item_x2   "\\efill \n \\subsubitem "
+delim_0   "\\pfill "
+delim_1   "\\pfill "
+delim_2   "\\pfill "
+lethead_prefix   "{\\bfseries\\hfil "
+lethead_suffix   "\\hfil}\\nopagebreak\n"
+lethead_flag       1
+heading_prefix   "{\\bfseries\\hfil "
+heading_suffix   "\\hfil}\\nopagebreak\n"
+headings_flag       1
+
+page_precedence "rnaA"
+%% 
+%%
+%% End of file `l3doc.ist'.

@@ -36,7 +36,7 @@ ${CONTRIBUTION}.pdf: ${CONTRIBUTION}.dtx ${CONTRIBUTION}.sty
 	${TEX} ${CONTRIBUTION}.dtx
 	${TEX} ${CONTRIBUTION}.dtx
 	makeindex -s gglo.ist -o ${CONTRIBUTION}.gls ${CONTRIBUTION}.glo
-	makeindex -s l3doc.ist -o ${CONTRIBUTION}.ind ${CONTRIBUTION}.idx
+	makeindex -s menukeys.ist -o ${CONTRIBUTION}.ind ${CONTRIBUTION}.idx
 	${TEX} ${CONTRIBUTION}.dtx
 	${TEX} ${CONTRIBUTION}.dtx
 
