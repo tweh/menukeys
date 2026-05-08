@@ -6,11 +6,7 @@ ZIP = ${CONTRIBUTION}.zip
 ## cleanup command
 CLEANUP = find . -type f -regextype posix-extended -regex "\./${CONTRIBUTION}(.?|-doc)\.(aux|glo|gls|hd|idx|ilg|ind|lof|log|lot|out|toc)" -delete
 ## TeX-engine to use
-TEX = /usr/local/texlive/2021/bin/x86_64-linux/pdflatex
-## if it doesn't exist fall back to any pdflatex
-ifeq ("$(wildcard ${TEX})","")
-	TEX = pdflatex
-endif
+TEX = pdflatex
 ## temporary build directory
 BUILD := ${CONTRIBUTION}
 
