@@ -344,7 +344,7 @@
 % \date{\filedate{} --- \fileversion}
 % \thispagestyle{empty}
 % \maketitle
-% 
+%
 % \begin{abstract}
 %    \noindent
 %    This package is build to format menu sequences, paths and keystrokes.
@@ -357,7 +357,7 @@
 %    code at \url{https://tex.stackexchange.com/a/44989/4918}.}
 %    \par
 %   \end{abstract}
-% 
+%
 % \newpage\tableofcontents\newpage
 %
 % \section{Introduction}\label{intro}
@@ -365,7 +365,7 @@
 % sequences of software menus, folders and files, or keystrokes.
 % Most predefined styles use the power of \TikZ\footnote{See
 % \url{https://www.ctan.org/pkg/pgf}.} to format the output.
-% 
+%
 % For example if you want to tell the reader of a manual how to set the ruler
 % unit you may type
 % \begin{verbatim}
@@ -373,36 +373,36 @@
 %    and choose between millimeters, inches and pixels. The shortcut
 %    to view the rulers is \keys{cmd + R}. Pressing these keys again
 %    will hide the rulers.
-%    
+%
 %    The standard path for saving your document is \directory{Macintosh HD/
 %    Users/Your Name/Documents} but you can change it at \menu{Extras >
 %    Settings > Saving} by clicking \menu{Change save path}.
 % \end{verbatim}
 % and get this:
-% 
+%
 % \medskip
 %    To set the unit of the rulers go to \menu{Extras > Settings > Rulers}
 %    and choose between millimeters, inches and pixels. The shortcut
 %    to view the rulers is \keys{cmd + R}. Pressing these keys again
 %    will hide the rulers.
-%    
+%
 %    The standard path for saving your document is \directory{Macintosh HD/
 %    Users/Your Name/Documents} but you can change it at \menu{Extras >
 %    Settings > Saving} by clicking \menu{Change save path}.
-% 
+%
 % \bigskip\noindent
 % The package is loaded as usual via
 % \begin{verbatim}
 %    \usepackage{menukeys}
 % \end{verbatim}
-% 
+%
 % \section{Installation}
 % To install \menukeys manually run
 % \begin{verbatim}
 %    latex menukeys.ins
 % \end{verbatim}
 % and copy |menukeys.sty| to a path where \LaTeX{} can find it.
-% 
+%
 % To typeset this manual run
 % \begin{verbatim}
 %    pdflatex menukeys.dtx
@@ -419,7 +419,7 @@
 % (even after \pkg{hyperref}\footnote{See \url{https://tex.stackexchange.com/q/237683/4918}
 % and \url{https://github.com/tweh/menukeys/issues/41}.}).
 % \textbf{This is no longer the case!}
-% 
+%
 % These are the possible options:
 % \begin{description}
 %    \item [definemenumacros:] Most of \menukeys' macros should not
@@ -430,7 +430,7 @@
 %       conflict with other packages. To prevent this you can tell
 %       \menukeys to not define them by calling the option \DO{definemenumacros}
 %       |definemenumacros=false|. The default value is |true|.
-%       
+%
 %       If you do so you have to define your own menu macros, see section~\ref{menumacros}
 %       for details.
 %    \item [definekeys:] Equal to |definemenumacros|  \DO{definekeys}  for the key macros.
@@ -443,7 +443,7 @@
 %    \item [hyperrefcolorlinks:] \emph{Obsolete}
 %       (see sec.~\ref{sec:issues} and~\ref{sec:hyperref-colorlinks}).
 % \end{description}
-% 
+%
 % \section{Usage}
 % \subsection{Basics}\label{basics}
 % \menukeys comes with three ``menu macros'' that parse and print lists. We have
@@ -451,31 +451,31 @@
 % \DM{\directory}|\directory|\marg{path and files} with |/| as default separator and
 % \DM{\keys}|\keys|\marg{keystrokes} with |+| as default separator. You've seen
 % examples for all of them in section~\ref{intro}.
-% 
+%
 % These macros have also an optional argument to set the input list separator.
 % E.g. if you want to put in your menus with |,| instead of |>| you can say
 % |\menu[,]|\marg{menu sequence}.\footnote{If you want to change the input separator
 %  globally it's recommended to renew the menu macro as described in section~\ref{menumacros}.}
-% 
+%
 % The possible input separators are |/|, |=|, |*|, |+|, |,|, |;|, |:|, |-|, |>|,
 % |<| and |bslash| (to use |\| as separator).  You can hide a separator from the
 % parser by putting a part of the sequence in braces. Spaces around the separator
 % will be ignored, i.e. |\keys{\ctrl+C}| equals |\keys{\ctrl + C}|.
-% \example |\menu[,]{Extras,Settings,{Units, rulers and origin}}| gives 
+% \example |\menu[,]{Extras,Settings,{Units, rulers and origin}}| gives
 % \menu[,]{Extras,Settings,{Units, rulers and origin}}
 %
 % \subsection{Styles}
 % \menukeys defines several ``styles'' that determine the output format
 % of a menu macro. There are some predefined styles and others can be
 % created by the user.
-% 
-% Both pre-defined and custom styles may be applied using the command 
-% |\renewmenumacro|\marg{macro}\oarg{input sep}\marg{style}. For further 
+%
+% Both pre-defined and custom styles may be applied using the command
+% |\renewmenumacro|\marg{macro}\oarg{input sep}\marg{style}. For further
 % information on defining and using macro styles, refer to section~\ref{menumacros}.
 % For example, the ``shadowed angular'' keys style may be applied using the command
 % |\renewmenumacro|\hspace{0pt}|{\keys}|\hspace{0pt}|{shadowedangularkeys}|.
 % \subsubsection{Predefined styles}
-% 
+%
 % \teststyle{menus}{File,Extras,Preferences}{Menu}
 % \teststyle{roundedmenus}{File,Extras,Preferences}{Menu}
 % \teststyle{angularmenus}{File,Extras,Preferences}{Menu}
@@ -505,7 +505,7 @@
 %    The sep color is taken from optional color C.%
 %    ]
 %    {pathswithblackfolder}{C:,User,Folder,MyFile.tex}{MyFile.tex}
-% 
+%
 % \bigskip\noindent
 % The following three styles allow paths elements to be hyphenated, but
 % they insert only a line break without a hyphen dash. Note that they only
@@ -534,7 +534,7 @@
 % |\drawtikzfolder| which is part of \menukeys and has two optional arguments
 % to change the color of the lines and the fill color of the front:\\
 % |\drawtikzfolder|\oarg{front fill}\oarg{draw}
-% 
+%
 % \subsubsection{Declaring styles}
 % The simplest way to define a new style is to use \DM{\newmenustylesimple}
 % |\newmenustylesimple|. It has six arguments: |\newmenustylesimple|\AST%
@@ -556,7 +556,7 @@
 % \begin{verbatim}
 %    \newmenustylesimple{mystyle}{draw}[$\ast$]{mycolors}
 % \end{verbatim}
-% 
+%
 % The more advanced command is \DM{\newmenustyle}|\newmenustyle|. It has
 % nine arguments: |\newmenustyle|\AST\marg{name}\oarg{pre}\marg{first}%
 % \oarg{sep}\marg{mid}\marg{last}\marg{single}\newline\oarg{post}\marg{theme}
@@ -585,9 +585,9 @@
 %    \newmenustyle{mystyle}[$\bullet$]{draw,red}[$\ast$]%
 %       {draw}{draw,red}{draw,dashed}[$\bullet$]
 % \end{verbatim}
-% 
+%
 % If the \TikZ |node| system doesn't fit your needs there are the \textbf{starred versions}:
-% Use them and the arguments \meta{first}, 
+% Use them and the arguments \meta{first},
 % \meta{mid}, \meta{last}, \meta{single} can be any \LaTeX{} code. To access the
 % current list element use \DM{\CurrentMenuElement}|\CurrentMenuElement|.
 % \example consider that we want all menu elements simple be fat and not
@@ -598,9 +598,9 @@
 %
 % If you want to make your own style you must take care of using the color
 % theme. \DM{\usemenucolor} To access a color of the currently applied
-% theme while defining a style use |\usemenucolor|\marg{element} (See 
+% theme while defining a style use |\usemenucolor|\marg{element} (See
 % section~\ref{colors} for details about possible elements).
-% 
+%
 % \subsubsection{Copying styles}
 % To copy an existing style to a new style use \DM{\copymenustyle}|\copymenustyle|%
 % \marg{copy}\marg{original}.
@@ -608,7 +608,7 @@
 % \begin{verbatim}
 %    \copymenustyle{mycopy}{mystyle}
 % \end{verbatim}
-% 
+%
 % \subsubsection{Changing styles}
 % The simplest change we can imagine is to change a single element or the color theme of
 % an existing style. For the first case there is \DM{\changemenuelement}
@@ -625,7 +625,7 @@
 % \begin{verbatim}
 %    \changemenucolortheme{mystyle}{myothercolors}
 % \end{verbatim}
-% 
+%
 % \DM{\renewmenustylesimple}\DM{\providemenustylesimple}\DM{\renewmenustyle}%
 % \DM{\providemenustyle} The next level is redefining a style. This package provides
 % the following  macros the work like their \LaTeX-paragons and have the same
@@ -635,7 +635,7 @@
 % \subsection{Color themes}\label{colors}%
 % To make the colors of a style become changeable without
 % touching the style itself, \menukeys uses ``color themes''. Every color theme
-% must contain three color definitions that can be used to draw a |node| 
+% must contain three color definitions that can be used to draw a |node|
 % background, a |node| frame and a text color, and additionally two optional
 % colors used by some themes.
 % \subsubsection{Predefined themes}
@@ -675,7 +675,7 @@
 % \begin{verbatim}
 %    \changemenucolor{mycolors}{txt}{named}{gray}
 % \end{verbatim}
-% 
+%
 % \DM{\renewmenucolortheme}To redefine a complete theme use |\renewmenucolortheme|.
 % It works with the same arguments as |\newmenucolortheme|.
 %
@@ -689,9 +689,9 @@
 % \oarg{input sep}\marg{style}.
 % \begin{description}
 %    \item [name] is a \LaTeX{} control sequence name.
-%    \item [input sep] is the default separator used in the input list 
+%    \item [input sep] is the default separator used in the input list
 %       (see section~\ref{basics} for a list of valid separators).
-%    
+%
 %       If you don't give it the package's default (|,|) is used.
 %    \item [style] is a menu style.
 % \end{description}
@@ -703,7 +703,7 @@
 % \end{verbatim}
 % and then use it as e.g. |\winpath{C:\System\Deep\Deeper\YourFile.txt}|.
 % Note that |mystyle| must be defined before you call |\newmenumacro|.
-% 
+%
 % \DM{\providemenumacro}\DM{\renewmenumacro}There are also the two commands
 % |\providemenumacro| and |\renewmenumacro| which take the same arguments as
 % |\newmenumacro| and work like the \LaTeX{} macros |\renewcommand| and |\providecommand|.
@@ -774,18 +774,18 @@
 % The macro |\arrowkey|\marg{direction} is a little special
 % since it takes the direction as a singe character |^|, |v|
 % (lower case v), |>| or |<|.
-% 
-% \DM{\ctrlname}\DM{\delname}\DM{\spacename}The texts for |\ctrl|, 
+%
+% \DM{\ctrlname}\DM{\delname}\DM{\spacename}The texts for |\ctrl|,
 % |\del| and |\SPACE| are saved in |\ctrlname|, |\delname|, |\spacename| respectively.
 % So you can change them with |\renewcommand|.
-% 
+%
 % The rendering of some Mac macros depend on the option \DO{mackeys}\opt{mackeys}
 % The different versions are shown in the table (left: |text|, right: |symbols|).
 %
 % \bigskip\noindent
 % I apologize that there are no commands for the windows key
 % and the apple logo, but that would be a copyright infringement.
-% 
+%
 % \section{Known issues and bugs}\label{sec:issues}
 % \begin{itemize}
 %    \item If you use the \pkg{inputenc} package \menukeys must be
@@ -1175,7 +1175,7 @@
 % Now we can define |\tw@declare@style|:
 %    \begin{macrocode}
 \DeclareDocumentCommand{\tw@declare@style}{%
-   s m O{\tw@default@pre} m O{\tw@default@sep} m m m 
+   s m O{\tw@default@pre} m O{\tw@default@sep} m m m
 }{%
    \def\tw@current@style{#2}
    \csdef{tw@style@#2@pre}{#3}%
@@ -1217,7 +1217,7 @@
          \tw@declare@style@simple{#2}%
       }%
    }{%
-      \tw@mk@error{Style '#2' already defined!\MessageBreak 
+      \tw@mk@error{Style '#2' already defined!\MessageBreak
       Use \string\renewmenustylesimple\space instead.}%
       \tw@mk@gobble@args{o m o o m}%
    }%
@@ -1238,7 +1238,7 @@
       }%
    }{%
       \tw@mk@warning{Trying to provide style '#2' failed,\MessageBreak
-      because it's already defined.\MessageBreak 
+      because it's already defined.\MessageBreak
       You may use \string\renewmenustylesimple\space instead.}%
       \tw@mk@gobble@args{o m o o m}%
    }%
@@ -1252,7 +1252,7 @@
          \tw@declare@style{#2}%
       }%
    }{%
-      \tw@mk@error{Style '#2' already defined!\MessageBreak 
+      \tw@mk@error{Style '#2' already defined!\MessageBreak
       Use \string\renewmenustyle\space instead.}%
       \tw@mk@gobble@args{o m o m m m o m}%
    }%
@@ -1273,14 +1273,14 @@
       }%
    }{%
       \tw@mk@warning{Trying to provide style #2 failed,\MessageBreak
-      because it's already defined.\MessageBreak 
+      because it's already defined.\MessageBreak
       You may use \string\renewmenustyle\space instead.}%
       \tw@mk@gobble@args{o m o m m m o m}%
    }%
 }
 %    \end{macrocode}
 % \end{macro}\end{macro}\end{macro}\end{macro}\end{macro}\end{macro}
-% 
+%
 % \subsubsection{Copying and changing}
 % \begin{macro}{\copymenustyle}
 % The last two steps in this part are to define a command to copy
