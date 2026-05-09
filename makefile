@@ -3,47 +3,60 @@
 CONTRIBUTION = menukeys
 ## final ZIP file name
 ZIP = ${CONTRIBUTION}.zip
-## cleanup command
-CLEANUP = find . -type f -regextype posix-extended -regex "\./${CONTRIBUTION}(.?|-doc)\.(aux|glo|gls|hd|idx|ilg|ind|lof|log|lot|out|toc)" -delete
 ## TeX-engine to use
 TEX = pdflatex
 ## temporary build directory
-BUILD := ${CONTRIBUTION}
+BUILD = ./build
+## files that need to be included in the release
+ZIPFILES = ${CONTRIBUTION}.dtx ${CONTRIBUTION}.ins ${CONTRIBUTION}.pdf README
+## cleanup command
+CLEANUP = -rm -rf ${BUILD}/doc/*
+## command for one TeX run in the build folder
+TEXRUN = cd ${BUILD}/doc; ${TEX} ${CONTRIBUTION}.dtx
+## command to run find with regex
+FIND = find . -type f -regextype posix-extended -regex
 
 all: ${ZIP}
+doc: ${CONTRIBUTION}.pdf
+sty: ${CONTRIBUTION}.sty
 
 # generate ZIP
 ${ZIP}: ${CONTRIBUTION}.pdf README
 	# ZIP
 	mkdir ${CONTRIBUTION}
-	cp ${CONTRIBUTION}.dtx ${CONTRIBUTION}.ins ${CONTRIBUTION}.pdf README ${CONTRIBUTION}
+	cp ${ZIPFILES} ${CONTRIBUTION}
 	zip ${CONTRIBUTION}.zip ./${CONTRIBUTION}/*
 	rm -r ${CONTRIBUTION}
 
 # generate *.sty files
 %.sty: ${CONTRIBUTION}.ins ${CONTRIBUTION}.dtx
-	latex $<
+	mkdir -p ${BUILD}/sty
+	cp $^ ${BUILD}/sty
+	cd ${BUILD}/sty; latex $<
+	cp ${BUILD}/sty/$@ .
 
 # generate documentation file
-${CONTRIBUTION}.pdf: ${CONTRIBUTION}.dtx ${CONTRIBUTION}.sty
+${CONTRIBUTION}.pdf: ${CONTRIBUTION}.dtx ${CONTRIBUTION}.sty ${CONTRIBUTION}.ist
 	# tidy up
 	$(CLEANUP)
+	mkdir -p ${BUILD}/doc
+	cp $^ ${BUILD}/doc
 	# generate doc
-	${TEX} ${CONTRIBUTION}.dtx
-	${TEX} ${CONTRIBUTION}.dtx
-	makeindex -s gglo.ist -o ${CONTRIBUTION}.gls ${CONTRIBUTION}.glo
-	makeindex -s menukeys.ist -o ${CONTRIBUTION}.ind ${CONTRIBUTION}.idx
-	${TEX} ${CONTRIBUTION}.dtx
-	${TEX} ${CONTRIBUTION}.dtx
+	${TEXRUN}
+	${TEXRUN}
+	cd ${BUILD}/doc; makeindex -s gglo.ist -o ${CONTRIBUTION}.gls ${CONTRIBUTION}.glo
+	cd ${BUILD}/doc; makeindex -s ${CONTRIBUTION}.ist -o ${CONTRIBUTION}.ind ${CONTRIBUTION}.idx
+	${TEXRUN}
+	${TEXRUN}
+	cp ${BUILD}/doc/$@ .
 
-clean-most:
-	$(CLEANUP)
 clean-pdf:
-	find . -type f -regextype posix-extended -regex "\./${CONTRIBUTION}(.?|-doc)\.pdf" -delete
+	${FIND} "\./${CONTRIBUTION}(.?|-doc)\.pdf" -delete
 clean-sty:
-	-rm ${CONTRIBUTION}.sty ${CONTRIBUTION}-20*.sty
+	${FIND} "\./${CONTRIBUTION}(-20.*)?.sty" -delete
 clean-zip:
 	-rm ${ZIP}
-clean: clean-most clean-pdf clean-sty clean-zip
+clean: clean-pdf clean-sty clean-zip
+	-rm -rf ${BUILD}
 
-.PHONY: clean clean-most clean-pdf clean-sty clean-zip all
+.PHONY: clean clean-pdf clean-sty clean-zip all doc sty
