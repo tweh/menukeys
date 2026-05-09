@@ -16,3 +16,5 @@ _TODO.txt
 *.tex
 /CTAN-INFO.txt
 *.synctex.gz
+build
+*.zip
