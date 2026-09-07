@@ -1883,12 +1883,14 @@
 % \end{macro}
 %
 % Next thing to do is to set up some \TikZ-styles.
+% \changes{v1.6.4}{2026-09-07}{Added setting arrow style to \texttt{To}}
 %    \begin{macrocode}
 \tikzset{
    menukeys key symbol/.style={
       rounded corners=0pt,
       line width=0.1ex,
       baseline={(0,0)},
+      >=To,
    },
    menukeys thick/.style={line width=0.25ex},
 }
