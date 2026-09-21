@@ -988,7 +988,7 @@
 \DeclareBoolOption[true]{definekeys}
 \DeclareBoolOption[true]{defineshortnames}
 \DeclareBoolOption[false]{hyperrefcolorlinks}
-\DeclareStringOption[mk]{macroprefix}
+\DeclareStringOption[mk]{keysprefix}
 \DeclareStringOption[mac]{os}
 \DeclareStringOption[symbols]{mackeys}
 \ProcessKeyvalOptions{tw@mk}\relax
@@ -1853,10 +1853,10 @@
       \tw@mk@warn@if@defined
       \providecommand
   \fi
-  \ifx\@empty\tw@mk@macroprefix
+  \ifx\@empty\tw@mk@keysprefix
   \else
     \ExpandArgs{nee}\tw@make@key@macro@aux{#1}%
-      {\tw@mk@macroprefix\tw@mk@string#2}%
+      {\tw@mk@keysprefix\tw@mk@string#2}%
       {\tw@mk@string#2}%
       \@gobble
       \newcommand
@@ -1890,10 +1890,10 @@
         \tw@mk@warn@if@defined
         \providecommand
     \fi
-    \ifx\@empty\tw@mk@macroprefix
+    \ifx\@empty\tw@mk@keysprefix
     \else
       \ExpandArgs{e}\tw@make@simple@key@macro@aux
-        {\tw@mk@macroprefix\tw@mk@string#1}%
+        {\tw@mk@keysprefix\tw@mk@string#1}%
         {#2}%
         \@gobble
         \newcommand
