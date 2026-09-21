@@ -2201,18 +2201,40 @@
 % \begin{macro}{\arrowkey}
 % And the |\arrowkey| macro that get's it's direction as argument.
 %    \begin{macrocode}
-\newcommand{\arrowkey}[1]{%
-   \IfStrEq{^}{#1}{\arrowkeyup}{%
-      \IfStrEq{v}{#1}{\arrowkeydown}{%
-         \IfStrEq{<}{#1}{\arrowkeyleft}{%
-            \IfStrEq{>}{#1}{\arrowkeyright}{%
-               \tw@mk@error{Wrong value '#1' for \string\arrowkey\MessageBreak
-               Possible values are '^', 'v', '<' or '>'}%
-            }%
-         }%
-      }%
-   }%
-}
+\ExplSyntaxOn
+\cs_new_protected:Npn \__twmk_arrowkey_aux:nn #1#2
+  {
+    \cs_if_exist_use:cF
+      {
+        #1
+        arrowkey
+        \str_case:nnF {#2}
+          {
+            { ^ } { up }
+            { v } { down }
+            { < } { left }
+            { > } { right }
+          }
+          { UNDEFINED }
+      }
+      {
+        \tw@mk@error
+          {
+            Wrong~ value~ '#2'~ for~ \string\arrowkey.\MessageBreak
+            Possible~ values~ are~ '^',~ 'v',~ '<'~ or~ '>'
+          }
+      }
+  }
+\iftw@mk@defineshortnames
+  \tw@mk@warn@if@defined{arrowkey}
+  \providecommand\arrowkey{\__twmk_arrowkey_aux:nn{}}
+\fi
+\ifx\@empty\tw@mk@keysprefix
+\else
+  \exp_args:Nc \newcommand { \tw@mk@keysprefix arrowkey }
+    {\__twmk_arrowkey_aux:nn\tw@mk@keysprefix}
+\fi
+\ExplSyntaxOff
 %    \end{macrocode}
 % \end{macro}
 % Close the |\iftw@mk@definekeys|
