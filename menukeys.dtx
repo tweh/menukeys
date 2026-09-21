@@ -987,6 +987,7 @@
 \DeclareBoolOption[true]{definemenumacros}
 \DeclareBoolOption[true]{definekeys}
 \DeclareBoolOption[false]{hyperrefcolorlinks}
+\DeclareStringOption[mk]{macroprefix}
 \DeclareStringOption[mac]{os}
 \DeclareStringOption[symbols]{mackeys}
 \ProcessKeyvalOptions{tw@mk}\relax
@@ -1836,7 +1837,7 @@
 }
 %    \end{macrocode}
 % \end{macro}
-% \begin{macro}{\tw@make@key@macro}
+% \begin{macro}{\tw@make@key@macro,\tw@make@key@macro@aux,\tw@mk@symbol}
 % The next macro defines the user level command by accessing a
 % macro like |tw@mk@|\meta{key} or |tw@mk@|\meta{key}|@|\meta{os},
 % if the appearance differs between Mac and Windows.
@@ -1844,30 +1845,60 @@
 % are defined.
 %    \begin{macrocode}
 \NewDocumentCommand{\tw@make@key@macro}{s m}{%
-   \IfBooleanTF{#1}{%
-      \expandafter\providecommand\csname\tw@mk@string#2\endcsname{%
-         \expandonce{\maxsizebox{!}{1.8ex}{%
-            \@nameuse{tw@mk@\tw@mk@string#2@\tw@mk@os}}%
-         }%
-      }%
-      \expandafter\providecommand\csname\tw@mk@string#2mac\endcsname{%
-         \expandonce{\maxsizebox{!}{1.8ex}{%
-            \@nameuse{tw@mk@\tw@mk@string#2@mac}}%
-         }%
-      }%
-      \expandafter\providecommand\csname\tw@mk@string#2win\endcsname{%
-         \expandonce{\maxsizebox{!}{1.8ex}{%
-            \@nameuse{tw@mk@\tw@mk@string#2@win}}%
-         }%
-      }%
-   }{%
-      \expandafter\providecommand\csname\tw@mk@string#2\endcsname{%
-         \expandonce{\maxsizebox{!}{1.8ex}{%
-            \@nameuse{tw@mk@\tw@mk@string#2}}%
-         }%
-      }%
-   }%
+  \ExpandArgs{nee}\tw@make@key@macro@aux{#1}%
+    {\tw@mk@string#2}%
+    {\tw@mk@string#2}%
+    \tw@mk@warn@if@defined
+    \providecommand
+  \ifx\@empty\tw@mk@macroprefix
+  \else
+    \ExpandArgs{nee}\tw@make@key@macro@aux{#1}%
+      {\tw@mk@macroprefix\tw@mk@string#2}%
+      {\tw@mk@string#2}%
+      \@gobble
+      \newcommand
+  \fi
 }
+\newcommand\tw@make@key@macro@aux[5]{%
+  #4{#2}%
+  \IfBooleanTF{#1}
+    {%
+      #4{#2mac}%
+      #4{#2win}%
+      \expandafter#5\csname#2\endcsname   {\tw@mk@symbol{tw@mk@#3@\tw@mk@os}}%
+      \expandafter#5\csname#2mac\endcsname{\tw@mk@symbol{tw@mk@#3@mac}}%
+      \expandafter#5\csname#2win\endcsname{\tw@mk@symbol{tw@mk@#3@win}}%
+    }%
+    {\expandafter#5\csname#2\endcsname{\tw@mk@symbol{tw@mk@#3}}}%
+}
+\newcommand\tw@mk@symbol[1]{\maxsizebox{!}{1.8ex}{\@nameuse{#1}}}
+\newcommand\tw@mk@warn@if@defined[1]
+  {%
+    \ifcsundef{#1}%
+      {}%
+      {\tw@mk@warning{Macro \tw@mk@string\\#1 already defined!}}%
+  }
+\newcommand\tw@make@simple@key@macro[2]
+  {%
+    \ExpandArgs{e}\tw@make@simple@key@macro@aux
+      {\tw@mk@string#1}
+      {#2}%
+      \tw@mk@warn@if@defined
+      \providecommand
+    \ifx\@empty\tw@mk@macroprefix
+    \else
+      \ExpandArgs{e}\tw@make@simple@key@macro@aux
+        {\tw@mk@macroprefix\tw@mk@string#1}%
+        {#2}%
+        \@gobble
+        \newcommand
+    \fi
+  }
+\newcommand\tw@make@simple@key@macro@aux[4]
+  {%
+    #3{#1}%
+    \expandafter#4\csname#1\endcsname{#2}%
+  }
 %    \end{macrocode}
 % \end{macro}
 % \begin{macro}{\tw@define@mackey}
@@ -2010,7 +2041,7 @@
    }%
 }
 \tw@make@key@macro*{\Alt}
-\providecommand*{\AltGr}{Alt\,Gr}
+\tw@make@simple@key@macro\AltGr{Alt\,Gr}
 %    \end{macrocode}
 % \end{macro}\end{macro}
 % \begin{macro}{\cmd}
@@ -2035,9 +2066,9 @@
 % \end{macro}
 % \begin{macro}{\Space}\begin{macro}{\SPACE}
 %    \begin{macrocode}
-\providecommand*{\Space}{\expandonce{\rule{3em}{0pt}}}
+\tw@make@simple@key@macro\Space{\rule{3em}{0pt}}
 \newcommand{\spacename}{Space}
-\providecommand*{\SPACE}{\expandonce{\rule{2em}{0pt}\spacename\rule{2em}{0pt}}}
+\tw@make@simple@key@macro\SPACE{\rule{2em}{0pt}\spacename\rule{2em}{0pt}}
 %    \end{macrocode}
 % \end{macro}\end{macro}
 % \begin{macro}{\return}
