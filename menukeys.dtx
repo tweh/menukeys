@@ -986,6 +986,7 @@
 }
 \DeclareBoolOption[true]{definemenumacros}
 \DeclareBoolOption[true]{definekeys}
+\DeclareBoolOption[true]{defineshortnames}
 \DeclareBoolOption[false]{hyperrefcolorlinks}
 \DeclareStringOption[mk]{macroprefix}
 \DeclareStringOption[mac]{os}
@@ -1845,11 +1846,13 @@
 % are defined.
 %    \begin{macrocode}
 \NewDocumentCommand{\tw@make@key@macro}{s m}{%
-  \ExpandArgs{nee}\tw@make@key@macro@aux{#1}%
-    {\tw@mk@string#2}%
-    {\tw@mk@string#2}%
-    \tw@mk@warn@if@defined
-    \providecommand
+  \iftw@mk@defineshortnames
+    \ExpandArgs{nee}\tw@make@key@macro@aux{#1}%
+      {\tw@mk@string#2}%
+      {\tw@mk@string#2}%
+      \tw@mk@warn@if@defined
+      \providecommand
+  \fi
   \ifx\@empty\tw@mk@macroprefix
   \else
     \ExpandArgs{nee}\tw@make@key@macro@aux{#1}%
@@ -1880,11 +1883,13 @@
   }
 \newcommand\tw@make@simple@key@macro[2]
   {%
-    \ExpandArgs{e}\tw@make@simple@key@macro@aux
-      {\tw@mk@string#1}
-      {#2}%
-      \tw@mk@warn@if@defined
-      \providecommand
+    \iftw@mk@defineshortnames
+      \ExpandArgs{e}\tw@make@simple@key@macro@aux
+        {\tw@mk@string#1}
+        {#2}%
+        \tw@mk@warn@if@defined
+        \providecommand
+    \fi
     \ifx\@empty\tw@mk@macroprefix
     \else
       \ExpandArgs{e}\tw@make@simple@key@macro@aux
