@@ -435,6 +435,19 @@
 %       for details.
 %    \item [definekeys:] Equal to |definemenumacros|  \DO{definekeys}  for the key macros.
 %       The default value is |true|.
+%    \item [defineshortnames:] The key macros are defined with a prefix and
+%       without that prefix. You can use \DO{defineshortnames}
+%       |defineshortnames=false| to instruct \menukeys to omit the shorter
+%       variants.
+%       The default value is |true|.
+%    \item [keysprefix:] Since the \DO{keysprefix} short key macro names like
+%       |\tab| or |\ctrl| might clash with other packages \menukeys defines them
+%       with a common prefix. If a shortname (so without a prefix) clashes
+%       \menukeys will throw a warning, however for the macros with the prefix
+%       instead an error will be thrown. If you set an empty prefix the prefix
+%       definitions will be omitted and only the shortnames will be used.
+%       The default value is |mk| (so in addition to |\tab| you can use |\mktab|
+%       to access the same symbol, \emph{etc.}).
 %    \item [mackeys:] This option \DO{mackeys} allows you to decide whether the mac keys
 %       are shown as text (|mackeys=text|) or symbols  (|mackeys=symbols|). The default
 %       value is |symbols|.
@@ -724,7 +737,14 @@
 % via the \opt{os} option macros like |\|\meta{key}|mac| and
 % |\|\meta{key}|win| that will always give the right symbol.
 %
-% The full ist of key macros is shown in table~\ref{tab:keys}.
+% Each key is defined with two names depending on package options. With
+% |defineshortnames=true| \DO{defineshortnames} a macro with only the key name
+% is defined. Additionally every key macro is defined with a prefix declared by
+% the |keysprefix| \DO{keysprefix} option. So with |keysprefix=mk| (the default)
+% you can use |\mkshift| to get \mkshift.
+%
+% The full list of key macros using the shortnames is shown in
+% table~\ref{tab:keys}.
 %
 % \begin{table}[ht]
 %  \caption{Overview of all key macros.}\label{tab:keys}
