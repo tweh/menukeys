@@ -435,6 +435,19 @@
 %       for details.
 %    \item [definekeys:] Equal to |definemenumacros|  \DO{definekeys}  for the key macros.
 %       The default value is |true|.
+%    \item [defineshortnames:] The key macros are defined with a prefix and
+%       without that prefix. You can use \DO{defineshortnames}
+%       |defineshortnames=false| to instruct \menukeys to omit the shorter
+%       variants.
+%       The default value is |true|.
+%    \item [keysprefix:] Since the \DO{keysprefix} short key macro names like
+%       |\tab| or |\ctrl| might clash with other packages \menukeys defines them
+%       with a common prefix. If a shortname (so without a prefix) clashes
+%       \menukeys will throw a warning, however for the macros with the prefix
+%       instead an error will be thrown. If you set an empty prefix the prefix
+%       definitions will be omitted and only the shortnames will be used.
+%       The default value is |mk| (so in addition to |\tab| you can use |\mktab|
+%       to access the same symbol, \emph{etc.}).
 %    \item [mackeys:] This option \DO{mackeys} allows you to decide whether the mac keys
 %       are shown as text (|mackeys=text|) or symbols  (|mackeys=symbols|). The default
 %       value is |symbols|.
@@ -724,7 +737,14 @@
 % via the \opt{os} option macros like |\|\meta{key}|mac| and
 % |\|\meta{key}|win| that will always give the right symbol.
 %
-% The full ist of key macros is shown in table~\ref{tab:keys}.
+% Each key is defined with two names depending on package options. With
+% |defineshortnames=true| \DO{defineshortnames} a macro with only the key name
+% is defined. Additionally every key macro is defined with a prefix declared by
+% the |keysprefix| \DO{keysprefix} option. So with |keysprefix=mk| (the default)
+% you can use |\mkshift| to get \mkshift.
+%
+% The full list of key macros using the shortnames is shown in
+% table~\ref{tab:keys}.
 %
 % \begin{table}[ht]
 %  \caption{Overview of all key macros.}\label{tab:keys}
@@ -986,7 +1006,9 @@
 }
 \DeclareBoolOption[true]{definemenumacros}
 \DeclareBoolOption[true]{definekeys}
+\DeclareBoolOption[true]{defineshortnames}
 \DeclareBoolOption[false]{hyperrefcolorlinks}
+\DeclareStringOption[mk]{keysprefix}
 \DeclareStringOption[mac]{os}
 \DeclareStringOption[symbols]{mackeys}
 \ProcessKeyvalOptions{tw@mk}\relax
@@ -1836,7 +1858,7 @@
 }
 %    \end{macrocode}
 % \end{macro}
-% \begin{macro}{\tw@make@key@macro}
+% \begin{macro}{\tw@make@key@macro,\tw@make@key@macro@aux,\tw@mk@symbol}
 % The next macro defines the user level command by accessing a
 % macro like |tw@mk@|\meta{key} or |tw@mk@|\meta{key}|@|\meta{os},
 % if the appearance differs between Mac and Windows.
@@ -1844,30 +1866,64 @@
 % are defined.
 %    \begin{macrocode}
 \NewDocumentCommand{\tw@make@key@macro}{s m}{%
-   \IfBooleanTF{#1}{%
-      \expandafter\providecommand\csname\tw@mk@string#2\endcsname{%
-         \expandonce{\maxsizebox{!}{1.8ex}{%
-            \@nameuse{tw@mk@\tw@mk@string#2@\tw@mk@os}}%
-         }%
-      }%
-      \expandafter\providecommand\csname\tw@mk@string#2mac\endcsname{%
-         \expandonce{\maxsizebox{!}{1.8ex}{%
-            \@nameuse{tw@mk@\tw@mk@string#2@mac}}%
-         }%
-      }%
-      \expandafter\providecommand\csname\tw@mk@string#2win\endcsname{%
-         \expandonce{\maxsizebox{!}{1.8ex}{%
-            \@nameuse{tw@mk@\tw@mk@string#2@win}}%
-         }%
-      }%
-   }{%
-      \expandafter\providecommand\csname\tw@mk@string#2\endcsname{%
-         \expandonce{\maxsizebox{!}{1.8ex}{%
-            \@nameuse{tw@mk@\tw@mk@string#2}}%
-         }%
-      }%
-   }%
+  \iftw@mk@defineshortnames
+    \ExpandArgs{nee}\tw@make@key@macro@aux{#1}%
+      {\tw@mk@string#2}%
+      {\tw@mk@string#2}%
+      \tw@mk@warn@if@defined
+      \providecommand
+  \fi
+  \ifx\@empty\tw@mk@keysprefix
+  \else
+    \ExpandArgs{nee}\tw@make@key@macro@aux{#1}%
+      {\tw@mk@keysprefix\tw@mk@string#2}%
+      {\tw@mk@string#2}%
+      \@gobble
+      \newcommand
+  \fi
 }
+\newcommand\tw@make@key@macro@aux[5]{%
+  #4{#2}%
+  \IfBooleanTF{#1}
+    {%
+      #4{#2mac}%
+      #4{#2win}%
+      \expandafter#5\csname#2\endcsname   {\tw@mk@symbol{tw@mk@#3@\tw@mk@os}}%
+      \expandafter#5\csname#2mac\endcsname{\tw@mk@symbol{tw@mk@#3@mac}}%
+      \expandafter#5\csname#2win\endcsname{\tw@mk@symbol{tw@mk@#3@win}}%
+    }%
+    {\expandafter#5\csname#2\endcsname{\tw@mk@symbol{tw@mk@#3}}}%
+}
+\newcommand\tw@mk@symbol[1]{\maxsizebox{!}{1.8ex}{\@nameuse{#1}}}
+\newcommand\tw@mk@warn@if@defined[1]
+  {%
+    \ifcsundef{#1}%
+      {}%
+      {\tw@mk@warning{Macro \tw@mk@string\\#1 already defined!}}%
+  }
+\newcommand\tw@make@simple@key@macro[2]
+  {%
+    \iftw@mk@defineshortnames
+      \ExpandArgs{e}\tw@make@simple@key@macro@aux
+        {\tw@mk@string#1}
+        {#2}%
+        \tw@mk@warn@if@defined
+        \providecommand
+    \fi
+    \ifx\@empty\tw@mk@keysprefix
+    \else
+      \ExpandArgs{e}\tw@make@simple@key@macro@aux
+        {\tw@mk@keysprefix\tw@mk@string#1}%
+        {#2}%
+        \@gobble
+        \newcommand
+    \fi
+  }
+\newcommand\tw@make@simple@key@macro@aux[4]
+  {%
+    #3{#1}%
+    \expandafter#4\csname#1\endcsname{#2}%
+  }
 %    \end{macrocode}
 % \end{macro}
 % \begin{macro}{\tw@define@mackey}
@@ -2010,7 +2066,7 @@
    }%
 }
 \tw@make@key@macro*{\Alt}
-\providecommand*{\AltGr}{Alt\,Gr}
+\tw@make@simple@key@macro\AltGr{Alt\,Gr}
 %    \end{macrocode}
 % \end{macro}\end{macro}
 % \begin{macro}{\cmd}
@@ -2035,9 +2091,9 @@
 % \end{macro}
 % \begin{macro}{\Space}\begin{macro}{\SPACE}
 %    \begin{macrocode}
-\providecommand*{\Space}{\expandonce{\rule{3em}{0pt}}}
+\tw@make@simple@key@macro\Space{\rule{3em}{0pt}}
 \newcommand{\spacename}{Space}
-\providecommand*{\SPACE}{\expandonce{\rule{2em}{0pt}\spacename\rule{2em}{0pt}}}
+\tw@make@simple@key@macro\SPACE{\rule{2em}{0pt}\spacename\rule{2em}{0pt}}
 %    \end{macrocode}
 % \end{macro}\end{macro}
 % \begin{macro}{\return}
@@ -2165,18 +2221,40 @@
 % \begin{macro}{\arrowkey}
 % And the |\arrowkey| macro that get's it's direction as argument.
 %    \begin{macrocode}
-\newcommand{\arrowkey}[1]{%
-   \IfStrEq{^}{#1}{\arrowkeyup}{%
-      \IfStrEq{v}{#1}{\arrowkeydown}{%
-         \IfStrEq{<}{#1}{\arrowkeyleft}{%
-            \IfStrEq{>}{#1}{\arrowkeyright}{%
-               \tw@mk@error{Wrong value '#1' for \string\arrowkey\MessageBreak
-               Possible values are '^', 'v', '<' or '>'}%
-            }%
-         }%
-      }%
-   }%
-}
+\ExplSyntaxOn
+\cs_new_protected:Npn \__twmk_arrowkey_aux:nn #1#2
+  {
+    \cs_if_exist_use:cF
+      {
+        #1
+        arrowkey
+        \str_case:nnF {#2}
+          {
+            { ^ } { up }
+            { v } { down }
+            { < } { left }
+            { > } { right }
+          }
+          { UNDEFINED }
+      }
+      {
+        \tw@mk@error
+          {
+            Wrong~ value~ '#2'~ for~ \string\arrowkey.\MessageBreak
+            Possible~ values~ are~ '^',~ 'v',~ '<'~ or~ '>'
+          }
+      }
+  }
+\iftw@mk@defineshortnames
+  \tw@mk@warn@if@defined{arrowkey}
+  \providecommand\arrowkey{\__twmk_arrowkey_aux:nn{}}
+\fi
+\ifx\@empty\tw@mk@keysprefix
+\else
+  \exp_args:Nc \newcommand { \tw@mk@keysprefix arrowkey }
+    {\__twmk_arrowkey_aux:nn\tw@mk@keysprefix}
+\fi
+\ExplSyntaxOff
 %    \end{macrocode}
 % \end{macro}
 % Close the |\iftw@mk@definekeys|
