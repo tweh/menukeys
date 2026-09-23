@@ -13,9 +13,9 @@
 %<rbk>\providecommand\DeclareRelease[3]{}
 %<rbk>\providecommand\DeclareCurrentRelease[2]{}
 %<rbk>\DeclareRelease{v1.6.1}{2020-12-19}{menukeys-2020-12-19.sty}
-%<rbk>\DeclareCurrentRelease{v1.6.3}{2026-05-14}
+%<rbk>\DeclareCurrentRelease{v1.6.4}{2026-09-23}
 %<pkg>\ProvidesPackage{menukeys}
-%<cur>  [2026/05/14 v1.6.3 -- A package to format menus, paths and shortcuts]
+%<cur>  [2026/09/23 v1.6.4 -- A package to format menus, paths and shortcuts]
 %<161>  [2020/12/19 v1.6.1 -- A package to format menus, paths and shortcuts]
 %
 %<*driver>
@@ -998,6 +998,8 @@
 %
 % \subsection{Options}
 % First we declare and process the package options
+% \changes{v1.6.4}{2026-09-23}{Added \texttt{defineshortnames} and
+%   \texttt{keysprefix} options}
 %    \begin{macrocode}
 \RequirePackage{kvoptions}
 \SetupKeyvalOptions{
@@ -1858,7 +1860,16 @@
 }
 %    \end{macrocode}
 % \end{macro}
-% \begin{macro}{\tw@make@key@macro,\tw@make@key@macro@aux,\tw@mk@symbol}
+% \begin{macro}{\tw@make@key@macro}
+% \changes{v1.6.4}{2026-09-23}{Add \texttt{keysprefix} variant definitions}
+% \begin{macro}{\tw@make@simple@key@macro}
+% \changes{v1.6.4}{2026-09-23}{Added \cs{tw@make@simple@key@macro}}
+% \begin{macro}
+%   {
+%     \tw@make@key@macro@aux,
+%     \tw@make@simple@key@macro@aux,
+%     \tw@mk@symbol,\tw@mk@warn@if@defined
+%   }
 % The next macro defines the user level command by accessing a
 % macro like |tw@mk@|\meta{key} or |tw@mk@|\meta{key}|@|\meta{os},
 % if the appearance differs between Mac and Windows.
@@ -1926,6 +1937,8 @@
   }
 %    \end{macrocode}
 % \end{macro}
+% \end{macro}
+% \end{macro}
 % \begin{macro}{\tw@define@mackey}
 % The last helping macro is |\tw@define@mackey|. We use it to execute
 % code depending on the |mackeys| option.
@@ -1939,7 +1952,7 @@
 % \end{macro}
 %
 % Next thing to do is to set up some \TikZ-styles.
-% \changes{v1.6.4}{2026-09-07}{Added setting arrow style to \texttt{To}}
+% \changes{v1.6.4}{2026-09-23}{Added setting arrow style to \texttt{To}}
 %    \begin{macrocode}
 \tikzset{
    menukeys key symbol/.style={
